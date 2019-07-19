@@ -32,7 +32,7 @@
     <dependencies>
         <dependency>
             <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-executor</artifactId>
+            <artifactId>bats-function</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

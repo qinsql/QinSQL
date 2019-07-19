@@ -27,7 +27,10 @@
 
     <modules>
         <module>bats-optimizer</module>
+        <module>bats-common</module>
         <module>bats-executor</module>
+        <module>bats-function</module>
+        <module>bats-vector</module>
         <module>bats-test</module>
     </modules>
 

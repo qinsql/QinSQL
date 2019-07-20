@@ -1,4 +1,4 @@
-<!--
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -14,26 +14,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.lealone.bats</groupId>
-        <artifactId>bats</artifactId>
-        <version>5.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+ */
+package org.lealone.bats.engine;
 
-    <artifactId>bats-test</artifactId>
-    <packaging>jar</packaging>
-    <version>5.0.0-SNAPSHOT</version>
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
-    <dependencies>
-        <dependency>
-            <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-engine</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-</project>
+public class JdbcTest {
+
+    public static void main(String[] args) throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mydb", "sa", "");
+        Statement stmt = conn.createStatement();
+        stmt.executeUpdate("DROP TABLE IF EXISTS my_table");
+        stmt.executeUpdate("CREATE TABLE IF NOT EXISTS my_table(name varchar(20))");
+        stmt.executeUpdate("INSERT INTO my_table(name) VALUES('abc')");
+
+        ResultSet rs = stmt.executeQuery("SELECT name FROM my_table");
+        rs.next();
+        System.out.println(rs.getString(1));
+
+        stmt.close();
+        conn.close();
+    }
+
+}

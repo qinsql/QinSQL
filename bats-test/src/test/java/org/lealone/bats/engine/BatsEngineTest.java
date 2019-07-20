@@ -1,4 +1,4 @@
-<!--
+/*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -14,26 +14,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.lealone.bats</groupId>
-        <artifactId>bats</artifactId>
-        <version>5.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
+ */
+package org.lealone.bats.engine;
 
-    <artifactId>bats-test</artifactId>
-    <packaging>jar</packaging>
-    <version>5.0.0-SNAPSHOT</version>
+import org.apache.calcite.sql.SqlNode;
+import org.apache.calcite.sql.parser.SqlParseException;
 
-    <dependencies>
-        <dependency>
-            <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-engine</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
-</project>
+public class BatsEngineTest {
+
+    public static void main(String[] args) throws Exception {
+        // parse();
+        BatsEngine.start();
+    }
+
+    static void parse() throws SqlParseException {
+        String sql = "select * from test where f1=1 or f2=2 order by f3 limit 2";
+        SqlNode sqlNode = BatsEngine.parse(sql);
+        System.out.println(sqlNode);
+    }
+
+}

@@ -25,15 +25,25 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>bats-test</artifactId>
+    <artifactId>bats-engine</artifactId>
     <packaging>jar</packaging>
     <version>5.0.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
             <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-engine</artifactId>
+            <artifactId>bats-function</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.lealone.bats</groupId>
+            <artifactId>bats-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.197</version>
         </dependency>
     </dependencies>
 </project>

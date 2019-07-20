@@ -47,7 +47,7 @@
  * in a node->buffer server->node path<br>
  * <br><b>Inline Stream (Within a Hadoop Container)</b><br>
  * <b>{@link com.datatorrent.stream.InlineStream}</b>: Streams data between two operators in inline mode. This implementation of
- * {@link com.datatorrent.engine.Stream} and {{@link com.datatorrent.api.Sink}
+ * {@link com.datatorrent.engine.Stream} and {{@link org.lealone.bats.api.Sink}
  * interface does not have connection to BufferServer and cannot be persisted.<br>
  *
  * <b>{@link com.datatorrent.stream.MuxStream}</b>: <br>

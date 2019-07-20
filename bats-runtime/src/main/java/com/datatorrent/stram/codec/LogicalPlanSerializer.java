@@ -41,19 +41,18 @@ import org.codehaus.jackson.type.JavaType;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.DAG.Locality;
+import org.lealone.bats.api.Operator.InputPort;
+import org.lealone.bats.api.Operator.OutputPort;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.util.ObjectMapperString;
 import org.apache.commons.beanutils.BeanMap;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Context;
-import com.datatorrent.api.DAG.Locality;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Operator.OutputPort;
-import com.datatorrent.common.util.ObjectMapperString;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.OperatorMeta;

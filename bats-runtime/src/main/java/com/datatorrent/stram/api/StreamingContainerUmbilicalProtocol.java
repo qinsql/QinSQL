@@ -30,12 +30,12 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.ipc.VersionedProtocol;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Stats;
+import org.lealone.bats.api.StatsListener;
+import org.lealone.bats.api.Attribute.AttributeMap;
+import org.lealone.bats.api.StatsListener.OperatorRequest;
 
-import com.datatorrent.api.Attribute.AttributeMap;
-import com.datatorrent.api.Context;
-import com.datatorrent.api.Stats;
-import com.datatorrent.api.StatsListener;
-import com.datatorrent.api.StatsListener.OperatorRequest;
 import com.datatorrent.stram.util.AbstractWritableAdapter;
 
 /**

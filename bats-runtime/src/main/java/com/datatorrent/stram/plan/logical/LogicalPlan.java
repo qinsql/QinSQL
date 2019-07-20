@@ -62,7 +62,13 @@ import javax.validation.constraints.NotNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.experimental.AppData;
+import org.apache.apex.common.metric.MetricsAggregator;
+import org.apache.apex.common.metric.SingleMetricAggregator;
+import org.apache.apex.common.metric.sum.DoubleSumAggregator;
+import org.apache.apex.common.metric.sum.LongSumAggregator;
+import org.apache.apex.common.util.FSStorageAgent;
+import org.apache.apex.common.util.Pair;
 import org.apache.commons.io.input.ClassLoaderObjectInputStream;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -70,44 +76,35 @@ import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.ReflectionUtils;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.lealone.bats.api.AffinityRule;
+import org.lealone.bats.api.AffinityRulesSet;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.AutoMetric;
+import org.lealone.bats.api.DAG;
+import org.lealone.bats.api.InputOperator;
+import org.lealone.bats.api.Module;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.Partitioner;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.StringCodec;
+import org.lealone.bats.api.Attribute.AttributeMap;
+import org.lealone.bats.api.Attribute.AttributeMap.DefaultAttributeMap;
+import org.lealone.bats.api.Module.ProxyInputPort;
+import org.lealone.bats.api.Module.ProxyOutputPort;
+import org.lealone.bats.api.Operator.InputPort;
+import org.lealone.bats.api.Operator.OutputPort;
+import org.lealone.bats.api.Operator.Unifier;
+import org.lealone.bats.api.annotation.InputPortFieldAnnotation;
+import org.lealone.bats.api.annotation.OperatorAnnotation;
+import org.lealone.bats.api.annotation.OutputPortFieldAnnotation;
 
 import com.google.common.collect.Sets;
-
-import com.datatorrent.api.AffinityRule;
-import com.datatorrent.api.AffinityRulesSet;
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Attribute.AttributeMap;
-import com.datatorrent.api.Attribute.AttributeMap.DefaultAttributeMap;
-import com.datatorrent.api.AutoMetric;
-import com.datatorrent.api.DAG;
-import com.datatorrent.api.InputOperator;
-import com.datatorrent.api.Module;
-import com.datatorrent.api.Module.ProxyInputPort;
-import com.datatorrent.api.Module.ProxyOutputPort;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Operator.OutputPort;
-import com.datatorrent.api.Operator.Unifier;
-import com.datatorrent.api.Partitioner;
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.api.StringCodec;
-import com.datatorrent.api.annotation.InputPortFieldAnnotation;
-import com.datatorrent.api.annotation.OperatorAnnotation;
-import com.datatorrent.api.annotation.OutputPortFieldAnnotation;
-import com.datatorrent.common.experimental.AppData;
-import com.datatorrent.common.metric.MetricsAggregator;
-import com.datatorrent.common.metric.SingleMetricAggregator;
-import com.datatorrent.common.metric.sum.DoubleSumAggregator;
-import com.datatorrent.common.metric.sum.LongSumAggregator;
-import com.datatorrent.common.util.FSStorageAgent;
-import com.datatorrent.common.util.Pair;
 import com.datatorrent.stram.engine.DefaultUnifier;
 import com.datatorrent.stram.engine.Slider;
 
-import static com.datatorrent.api.Context.PortContext.STREAM_CODEC;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.lealone.bats.api.Context.PortContext.STREAM_CODEC;
 
 /**
  * DAG contains the logical declarations of operators and streams.
@@ -1945,7 +1942,7 @@ public class LogicalPlan implements Serializable, DAG
         for (int i = 0; i < list.size(); i++) {
           for (int j = i + 1; j < list.size(); j++) {
             OperatorPair pair = new OperatorPair(list.get(i), list.get(j));
-            if (rule.getType() == com.datatorrent.api.AffinityRule.Type.AFFINITY) {
+            if (rule.getType() == org.lealone.bats.api.AffinityRule.Type.AFFINITY) {
               addToMap(affinities, rule, pair);
             } else {
               addToMap(antiAffinities, rule, pair);

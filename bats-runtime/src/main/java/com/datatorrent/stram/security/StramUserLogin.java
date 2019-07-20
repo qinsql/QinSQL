@@ -34,8 +34,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
-
-import com.datatorrent.api.StreamingApplication;
+import org.lealone.bats.api.StreamingApplication;
 
 import com.datatorrent.stram.client.StramClientUtils;
 import com.datatorrent.stram.util.FSUtil;

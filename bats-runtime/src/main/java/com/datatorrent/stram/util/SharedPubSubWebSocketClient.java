@@ -30,10 +30,8 @@ import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.util.PubSubMessage;
 import org.apache.apex.shaded.ning19.com.ning.http.client.ws.WebSocket;
-
-import com.datatorrent.common.util.PubSubMessage;
 
 /**
  * <p>SharedPubSubWebSocketClient class.</p>

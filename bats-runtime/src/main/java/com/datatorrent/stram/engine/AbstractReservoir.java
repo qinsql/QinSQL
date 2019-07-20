@@ -29,11 +29,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.jctools.queues.MessagePassingQueue;
 import org.jctools.queues.SpscArrayQueue;
-
+import org.lealone.bats.api.Sink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datatorrent.api.Sink;
 import com.datatorrent.netlet.util.CircularBuffer;
 import com.datatorrent.netlet.util.UnsafeBlockingQueue;
 import com.datatorrent.stram.tuple.Tuple;

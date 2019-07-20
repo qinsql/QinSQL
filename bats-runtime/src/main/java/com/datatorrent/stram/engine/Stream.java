@@ -18,10 +18,10 @@
  */
 package com.datatorrent.stram.engine;
 
-import com.datatorrent.api.Component;
-import com.datatorrent.api.ControlTupleEnabledSink;
-import com.datatorrent.api.Operator.ActivationListener;
-import com.datatorrent.api.Sink;
+import org.lealone.bats.api.Component;
+import org.lealone.bats.api.ControlTupleEnabledSink;
+import org.lealone.bats.api.Sink;
+import org.lealone.bats.api.Operator.ActivationListener;
 
 /**
  *

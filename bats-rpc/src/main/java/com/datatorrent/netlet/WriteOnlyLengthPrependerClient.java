@@ -17,10 +17,10 @@ package com.datatorrent.netlet;
 
 import java.io.IOException;
 
+import org.lealone.bats.api.Slice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datatorrent.netlet.util.Slice;
 import com.datatorrent.netlet.util.VarInt;
 
 public class WriteOnlyLengthPrependerClient extends WriteOnlyClient

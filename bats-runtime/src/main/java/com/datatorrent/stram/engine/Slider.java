@@ -23,12 +23,12 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.datatorrent.api.Context.OperatorContext;
-import com.datatorrent.api.DefaultOutputPort;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.Unifier;
-import com.datatorrent.api.Sink;
-import com.datatorrent.api.StatsListener;
+import org.lealone.bats.api.DefaultOutputPort;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.Sink;
+import org.lealone.bats.api.StatsListener;
+import org.lealone.bats.api.Context.OperatorContext;
+import org.lealone.bats.api.Operator.Unifier;
 
 /**
  * <p>Slider class.</p>

@@ -60,6 +60,10 @@ import org.codehaus.jackson.map.ser.std.SerializerBase;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.StringCodec;
+import org.lealone.bats.api.Context.DAGContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,11 +78,6 @@ import org.apache.hadoop.yarn.webapp.NotFoundException;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Context.DAGContext;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.StringCodec;
 import com.datatorrent.stram.StramAppContext;
 import com.datatorrent.stram.StramUtils;
 import com.datatorrent.stram.StreamingContainerAgent;

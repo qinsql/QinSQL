@@ -18,8 +18,8 @@
  */
 package org.apache.apex.engine.plugin;
 
-import org.apache.apex.api.plugin.Event;
 import org.apache.hadoop.service.AbstractService;
+import org.lealone.bats.api.plugin.Event;
 
 /**
  * @since 3.6.0

@@ -34,17 +34,16 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.hadoop.yarn.api.ApplicationConstants;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.lealone.bats.api.InputOperator;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.StorageAgent;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.Context.PortContext;
+import org.lealone.bats.api.DAG.Locality;
+import org.lealone.bats.api.Operator.ProcessingMode;
+import org.lealone.bats.api.annotation.Stateless;
 
 import com.google.common.collect.Sets;
-
-import com.datatorrent.api.Context.PortContext;
-import com.datatorrent.api.DAG.Locality;
-import com.datatorrent.api.InputOperator;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.ProcessingMode;
-import com.datatorrent.api.StorageAgent;
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.api.annotation.Stateless;
 import com.datatorrent.stram.api.Checkpoint;
 import com.datatorrent.stram.api.OperatorDeployInfo;
 import com.datatorrent.stram.api.OperatorDeployInfo.InputDeployInfo;

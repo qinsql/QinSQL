@@ -22,9 +22,9 @@ import java.util.LinkedHashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import org.apache.apex.api.plugin.Plugin;
 import org.apache.apex.engine.api.plugin.PluginLocator;
 import org.apache.hadoop.conf.Configuration;
+import org.lealone.bats.api.plugin.Plugin;
 
 /**
  * @since 3.6.0

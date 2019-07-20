@@ -35,7 +35,8 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.util.AsyncFSStorageAgent;
+import org.apache.apex.common.util.BasicContainerOptConfigurator;
 import org.apache.apex.common.util.JarHelper;
 import org.apache.apex.engine.security.ACLManager;
 
@@ -73,16 +74,13 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.StorageAgent;
+import org.lealone.bats.api.Context.OperatorContext;
+import org.lealone.bats.api.Context.SSLConfig;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
-
-import com.datatorrent.api.Context;
-import com.datatorrent.api.Context.OperatorContext;
-import com.datatorrent.api.Context.SSLConfig;
-import com.datatorrent.api.StorageAgent;
-import com.datatorrent.common.util.AsyncFSStorageAgent;
-import com.datatorrent.common.util.BasicContainerOptConfigurator;
 import com.datatorrent.stram.client.StramClientUtils;
 import com.datatorrent.stram.client.StramClientUtils.ClientRMHelper;
 import com.datatorrent.stram.engine.StreamingContainer;
@@ -132,12 +130,12 @@ public class StramClient
   // platform dependencies that are not part of Hadoop and need to be deployed,
   // entry below will cause containing jar file from client to be copied to cluster
   private static final Class<?>[] APEX_CLASSES = new Class<?>[]{
-      com.datatorrent.netlet.util.Slice.class,
+      org.lealone.bats.api.Slice.class,
       com.datatorrent.netlet.EventLoop.class,
       com.datatorrent.bufferserver.server.Server.class,
       com.datatorrent.stram.StreamingAppMaster.class,
-      com.datatorrent.api.StreamCodec.class,
-      com.datatorrent.common.util.FSStorageAgent.class,
+      org.lealone.bats.api.StreamCodec.class,
+      org.apache.apex.common.util.FSStorageAgent.class,
       javax.validation.ConstraintViolationException.class,
       com.esotericsoftware.kryo.Kryo.class,
       org.apache.bval.jsr303.ApacheValidationProvider.class,

@@ -23,18 +23,16 @@ import java.util.Collection;
 import java.util.List;
 
 import org.slf4j.Logger;
-
-import org.apache.apex.api.plugin.DAGSetupEvent;
-import org.apache.apex.api.plugin.DAGSetupPlugin;
-import org.apache.apex.api.plugin.Plugin.EventHandler;
 import org.apache.apex.engine.plugin.loaders.PropertyBasedPluginLocator;
 import org.apache.hadoop.conf.Configuration;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.DAG;
+import org.lealone.bats.api.plugin.DAGSetupEvent;
+import org.lealone.bats.api.plugin.DAGSetupPlugin;
+import org.lealone.bats.api.plugin.Plugin.EventHandler;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.DAG;
 
 import static org.slf4j.LoggerFactory.getLogger;
 

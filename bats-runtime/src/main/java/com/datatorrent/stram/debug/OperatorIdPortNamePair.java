@@ -18,7 +18,7 @@
  */
 package com.datatorrent.stram.debug;
 
-import com.datatorrent.api.Component;
+import org.lealone.bats.api.Component;
 
 /**
  *

@@ -27,10 +27,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.jctools.queues.SpscArrayQueue;
+import org.lealone.bats.api.Slice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.datatorrent.netlet.util.Slice;
 
 public class WriteOnlyClient extends AbstractClientListener
 {

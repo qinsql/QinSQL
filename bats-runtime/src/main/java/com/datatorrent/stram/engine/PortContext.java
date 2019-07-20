@@ -18,8 +18,9 @@
  */
 package com.datatorrent.stram.engine;
 
-import com.datatorrent.api.Attribute.AttributeMap;
-import com.datatorrent.api.Context;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Attribute.AttributeMap;
+
 import com.datatorrent.stram.api.BaseContext;
 
 /**

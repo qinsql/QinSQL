@@ -25,10 +25,9 @@ import java.nio.ByteOrder;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
+import org.lealone.bats.api.operator.ControlTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.apex.api.operator.ControlTuple;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoException;

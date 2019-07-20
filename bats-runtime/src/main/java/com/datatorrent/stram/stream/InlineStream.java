@@ -18,10 +18,9 @@
  */
 package com.datatorrent.stram.stream;
 
+import org.lealone.bats.api.operator.ControlTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.apex.api.operator.ControlTuple;
 
 import com.datatorrent.stram.engine.AbstractReservoir;
 import com.datatorrent.stram.engine.Stream;

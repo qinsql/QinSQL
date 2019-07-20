@@ -27,12 +27,11 @@ import java.util.Set;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Attribute.AttributeMap;
-import com.datatorrent.api.Context.OperatorContext;
-import com.datatorrent.api.DAG.Locality;
-import com.datatorrent.api.StreamCodec;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.Attribute.AttributeMap;
+import org.lealone.bats.api.Context.OperatorContext;
+import org.lealone.bats.api.DAG.Locality;
 
 /**
  * Operator deployment info passed from master to container as part of initialization

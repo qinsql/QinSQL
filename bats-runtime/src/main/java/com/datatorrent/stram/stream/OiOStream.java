@@ -18,9 +18,9 @@
  */
 package com.datatorrent.stram.stream;
 
-import org.apache.apex.api.operator.ControlTuple;
+import org.lealone.bats.api.Sink;
+import org.lealone.bats.api.operator.ControlTuple;
 
-import com.datatorrent.api.Sink;
 import com.datatorrent.stram.engine.Stream;
 import com.datatorrent.stram.engine.StreamContext;
 import com.datatorrent.stram.engine.SweepableReservoir;

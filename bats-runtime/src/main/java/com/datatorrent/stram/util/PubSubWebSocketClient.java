@@ -32,9 +32,14 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.Component;
+import org.lealone.bats.api.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.util.JacksonObjectMapperProvider;
+import org.apache.apex.common.util.NameableThreadFactory;
+import org.apache.apex.common.util.PubSubMessage;
+import org.apache.apex.common.util.PubSubMessageCodec;
 import org.apache.apex.shaded.ning19.com.ning.http.client.AsyncCompletionHandler;
 import org.apache.apex.shaded.ning19.com.ning.http.client.AsyncHttpClient;
 import org.apache.apex.shaded.ning19.com.ning.http.client.AsyncHttpClient.BoundRequestBuilder;
@@ -46,13 +51,6 @@ import org.apache.apex.shaded.ning19.com.ning.http.client.ws.WebSocketTextListen
 import org.apache.apex.shaded.ning19.com.ning.http.client.ws.WebSocketUpgradeHandler;
 
 import com.google.common.base.Throwables;
-
-import com.datatorrent.api.Component;
-import com.datatorrent.api.Context;
-import com.datatorrent.common.util.JacksonObjectMapperProvider;
-import com.datatorrent.common.util.NameableThreadFactory;
-import com.datatorrent.common.util.PubSubMessage;
-import com.datatorrent.common.util.PubSubMessageCodec;
 
 /**
  * <p>Abstract PubSubWebSocketClient class.</p>

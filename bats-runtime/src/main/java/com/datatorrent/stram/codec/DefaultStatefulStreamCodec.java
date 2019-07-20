@@ -20,6 +20,7 @@ package com.datatorrent.stram.codec;
 
 import java.util.ArrayList;
 
+import org.lealone.bats.api.Slice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +30,6 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.util.DefaultClassResolver;
 import com.esotericsoftware.kryo.util.MapReferenceResolver;
-
-import com.datatorrent.netlet.util.Slice;
 
 /**
  * Default implementation of the StreamCodec.

@@ -18,6 +18,9 @@
  */
 package com.datatorrent.stram.util;
 
+import static org.lealone.bats.api.Context.DAGContext.APPLICATION_NAME;
+import static org.lealone.bats.api.Context.DAGContext.LOGGER_APPENDER;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -58,9 +61,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import com.datatorrent.stram.client.StramClientUtils;
-
-import static com.datatorrent.api.Context.DAGContext.APPLICATION_NAME;
-import static com.datatorrent.api.Context.DAGContext.LOGGER_APPENDER;
 
 /**
  * @since 3.5.0

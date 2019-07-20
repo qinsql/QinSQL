@@ -18,8 +18,8 @@
  */
 package com.datatorrent.stram.codec;
 
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.netlet.util.Slice;
+import org.lealone.bats.api.Slice;
+import org.lealone.bats.api.StreamCodec;
 
 /**
  * <p>StatefulStreamCodec interface.</p>

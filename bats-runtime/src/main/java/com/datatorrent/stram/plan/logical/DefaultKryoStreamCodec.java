@@ -18,16 +18,15 @@
  */
 package com.datatorrent.stram.plan.logical;
 
+import org.apache.apex.common.util.SerializableObject;
+import org.lealone.bats.api.Slice;
+import org.lealone.bats.api.StreamCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.common.util.SerializableObject;
-import com.datatorrent.netlet.util.Slice;
 
 /**
  * This codec is used for serializing the objects of class which are Kryo

@@ -20,10 +20,10 @@ package com.datatorrent.bufferserver.packet;
 
 import java.util.Arrays;
 
+import org.lealone.bats.api.Slice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datatorrent.netlet.util.Slice;
 import com.datatorrent.netlet.util.VarInt;
 
 /**

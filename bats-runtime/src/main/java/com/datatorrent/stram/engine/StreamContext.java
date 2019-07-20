@@ -28,12 +28,11 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Attribute.AttributeMap;
-import com.datatorrent.api.Attribute.AttributeMap.DefaultAttributeMap;
-import com.datatorrent.api.Context;
-import com.datatorrent.api.StreamCodec;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.Attribute.AttributeMap;
+import org.lealone.bats.api.Attribute.AttributeMap.DefaultAttributeMap;
 
 import com.datatorrent.netlet.EventLoop;
 import com.datatorrent.stram.codec.DefaultStatefulStreamCodec;

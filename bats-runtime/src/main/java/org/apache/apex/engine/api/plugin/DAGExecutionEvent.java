@@ -18,14 +18,14 @@
  */
 package org.apache.apex.engine.api.plugin;
 
-import org.apache.apex.api.plugin.Event;
-
 import com.datatorrent.stram.api.StramEvent;
 import com.datatorrent.stram.api.StreamingContainerUmbilicalProtocol;
 
 import static org.apache.apex.engine.api.plugin.DAGExecutionEvent.Type.COMMIT_EVENT;
 import static org.apache.apex.engine.api.plugin.DAGExecutionEvent.Type.HEARTBEAT_EVENT;
 import static org.apache.apex.engine.api.plugin.DAGExecutionEvent.Type.STRAM_EVENT;
+
+import org.lealone.bats.api.plugin.Event;
 
 /**
  * @since 3.6.0

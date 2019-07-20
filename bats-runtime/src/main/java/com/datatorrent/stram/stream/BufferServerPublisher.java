@@ -21,12 +21,11 @@ package com.datatorrent.stram.stream;
 import java.net.InetSocketAddress;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.operator.ControlTuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.apex.api.operator.ControlTuple;
-
-import com.datatorrent.api.StreamCodec;
 import com.datatorrent.bufferserver.client.Publisher;
 import com.datatorrent.bufferserver.packet.BeginWindowTuple;
 import com.datatorrent.bufferserver.packet.DataTuple;

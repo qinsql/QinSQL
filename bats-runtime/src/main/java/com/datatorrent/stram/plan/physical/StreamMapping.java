@@ -24,6 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.apex.common.util.Pair;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.Context.PortContext;
+import org.lealone.bats.api.Partitioner.PartitionKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,14 +37,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.math.IntMath;
-
-import com.datatorrent.api.Context;
-import com.datatorrent.api.Context.PortContext;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Partitioner.PartitionKeys;
-import com.datatorrent.api.StreamCodec;
-
-import com.datatorrent.common.util.Pair;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.OperatorMeta;

@@ -40,6 +40,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.StreamingApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -50,7 +51,6 @@ import org.xml.sax.SAXException;
 
 import org.apache.commons.lang3.BooleanUtils;
 
-import com.datatorrent.api.StreamingApplication;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.plan.logical.LogicalPlanConfiguration;
 

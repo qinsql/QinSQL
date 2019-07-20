@@ -24,9 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.datatorrent.api.Partitioner.PartitionKeys;
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.netlet.util.Slice;
+import org.lealone.bats.api.Slice;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.Partitioner.PartitionKeys;
+
 import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;
 
 /**

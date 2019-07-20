@@ -18,7 +18,8 @@
  */
 package com.datatorrent.stram.engine;
 
-import com.datatorrent.api.Sink;
+import org.lealone.bats.api.Sink;
+
 import com.datatorrent.stram.tuple.Tuple;
 
 /**

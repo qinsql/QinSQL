@@ -20,10 +20,10 @@ package com.datatorrent.stram.api;
 
 import java.util.Collection;
 
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Attribute.AttributeMap;
-import com.datatorrent.api.Attribute.AttributeMap.DefaultAttributeMap;
-import com.datatorrent.api.Context;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Attribute.AttributeMap;
+import org.lealone.bats.api.Attribute.AttributeMap.DefaultAttributeMap;
 
 import com.datatorrent.stram.util.AbstractWritableAdapter;
 

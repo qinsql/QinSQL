@@ -24,16 +24,14 @@ import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.apex.api.ControlAwareDefaultInputPort;
-import org.apache.apex.api.operator.ControlTuple;
 import org.apache.commons.lang.UnhandledException;
+import org.lealone.bats.api.ControlAwareDefaultInputPort;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.Sink;
+import org.lealone.bats.api.Operator.InputPort;
+import org.lealone.bats.api.operator.ControlTuple;
 
 import com.google.common.collect.Sets;
-
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Sink;
 import com.datatorrent.stram.plan.logical.Operators.PortContextPair;
 import com.datatorrent.stram.stream.OiOStream;
 import com.datatorrent.stram.tuple.CustomControlTuple;

@@ -20,13 +20,12 @@ package com.datatorrent.stram.engine;
 
 import java.io.Serializable;
 
+import org.lealone.bats.api.DefaultOutputPort;
+import org.lealone.bats.api.Context.OperatorContext;
+import org.lealone.bats.api.Operator.Unifier;
+import org.lealone.bats.api.annotation.Stateless;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.datatorrent.api.Context.OperatorContext;
-import com.datatorrent.api.DefaultOutputPort;
-import com.datatorrent.api.Operator.Unifier;
-import com.datatorrent.api.annotation.Stateless;
 
 /**
  * Default unifier passes through all tuples received. Used when an operator has

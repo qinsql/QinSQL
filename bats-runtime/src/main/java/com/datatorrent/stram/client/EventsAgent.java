@@ -33,11 +33,10 @@ import org.codehaus.jackson.map.ser.std.ToStringSerializer;
 import org.codehaus.jettison.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.util.Pair;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.Path;
 
-import com.datatorrent.common.util.Pair;
 import com.datatorrent.stram.util.FSPartFileCollection;
 
 /**

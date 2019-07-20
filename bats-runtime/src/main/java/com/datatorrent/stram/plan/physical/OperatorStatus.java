@@ -24,10 +24,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.datatorrent.api.Stats;
-import com.datatorrent.api.Stats.OperatorStats;
-import com.datatorrent.api.StatsListener;
-import com.datatorrent.api.StatsListener.BatchedOperatorStats;
+import org.lealone.bats.api.Stats;
+import org.lealone.bats.api.StatsListener;
+import org.lealone.bats.api.Stats.OperatorStats;
+import org.lealone.bats.api.StatsListener.BatchedOperatorStats;
 
 import com.datatorrent.stram.api.StreamingContainerUmbilicalProtocol.OperatorHeartbeat;
 import com.datatorrent.stram.api.StreamingContainerUmbilicalProtocol.OperatorHeartbeat.DeployState;

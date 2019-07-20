@@ -41,6 +41,8 @@ import java.util.jar.JarEntry;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.StreamingApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,9 +62,6 @@ import org.apache.tools.ant.DirectoryScanner;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-
-import com.datatorrent.api.Context;
-import com.datatorrent.api.StreamingApplication;
 import com.datatorrent.stram.StramClient;
 import com.datatorrent.stram.StramLocalCluster;
 import com.datatorrent.stram.StramUtils;

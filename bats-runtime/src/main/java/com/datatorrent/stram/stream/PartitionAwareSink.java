@@ -20,8 +20,9 @@ package com.datatorrent.stram.stream;
 
 import java.util.Set;
 
-import com.datatorrent.api.Sink;
-import com.datatorrent.api.StreamCodec;
+import org.lealone.bats.api.Sink;
+import org.lealone.bats.api.StreamCodec;
+
 import com.datatorrent.stram.tuple.Tuple;
 
 /**

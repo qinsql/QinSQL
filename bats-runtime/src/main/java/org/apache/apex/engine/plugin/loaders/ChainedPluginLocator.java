@@ -24,10 +24,9 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.apache.apex.api.plugin.Plugin;
 import org.apache.apex.engine.api.plugin.PluginLocator;
 import org.apache.hadoop.conf.Configuration;
+import org.lealone.bats.api.plugin.Plugin;
 
 /**
  * @since 3.6.0

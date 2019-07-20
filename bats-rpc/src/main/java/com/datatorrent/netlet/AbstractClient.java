@@ -20,10 +20,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
+import org.lealone.bats.api.Slice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datatorrent.netlet.util.Slice;
 import com.datatorrent.netlet.NetletThrowable.NetletRuntimeException;
 import com.datatorrent.netlet.util.CircularBuffer;
 

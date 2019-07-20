@@ -21,8 +21,7 @@ package org.apache.apex.common.util;
 import java.io.IOException;
 
 import org.apache.hadoop.classification.InterfaceStability;
-
-import com.datatorrent.api.StorageAgent;
+import org.lealone.bats.api.StorageAgent;
 
 /**
  * Storage agent which can take checkpoints asynchronously.

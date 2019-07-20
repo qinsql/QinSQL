@@ -18,6 +18,7 @@
  */
 package com.datatorrent.bufferserver.client;
 
+import org.lealone.bats.api.Slice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,6 @@ import com.datatorrent.bufferserver.packet.PurgeRequestTuple;
 import com.datatorrent.bufferserver.packet.ResetRequestTuple;
 import com.datatorrent.bufferserver.packet.Tuple;
 import com.datatorrent.bufferserver.util.Codec;
-import com.datatorrent.netlet.util.Slice;
 
 /**
  * <p>Abstract Controller class.</p>

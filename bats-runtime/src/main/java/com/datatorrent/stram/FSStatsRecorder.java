@@ -31,13 +31,13 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import org.apache.apex.common.codec.JsonStreamCodec;
+import org.lealone.bats.api.Slice;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.annotation.RecordField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.api.annotation.RecordField;
-import com.datatorrent.common.codec.JsonStreamCodec;
-import com.datatorrent.netlet.util.Slice;
 import com.datatorrent.stram.util.FSPartFileCollection;
 import com.datatorrent.stram.webapp.ContainerInfo;
 import com.datatorrent.stram.webapp.OperatorInfo;

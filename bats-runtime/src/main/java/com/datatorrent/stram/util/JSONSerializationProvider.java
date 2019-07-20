@@ -18,7 +18,8 @@
  */
 package com.datatorrent.stram.util;
 
-import com.datatorrent.common.util.JacksonObjectMapperProvider;
+import org.apache.apex.common.util.JacksonObjectMapperProvider;
+
 import com.datatorrent.stram.codec.LogicalPlanSerializer;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 

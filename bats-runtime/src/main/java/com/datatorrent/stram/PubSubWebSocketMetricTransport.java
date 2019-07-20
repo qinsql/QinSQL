@@ -23,10 +23,10 @@ import java.io.Serializable;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.AutoMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datatorrent.api.AutoMetric;
 import com.datatorrent.stram.util.PubSubWebSocketClient;
 
 /**

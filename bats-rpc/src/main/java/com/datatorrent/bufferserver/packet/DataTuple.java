@@ -18,7 +18,7 @@
  */
 package com.datatorrent.bufferserver.packet;
 
-import com.datatorrent.netlet.util.Slice;
+import org.lealone.bats.api.Slice;
 
 /**
  * <p>DataTuple class.</p>

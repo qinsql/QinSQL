@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.util.ScheduledThreadPoolExecutor;
 import org.apache.apex.log.LogFileInformation;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -53,28 +53,27 @@ import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.security.token.Token;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
 import org.apache.log4j.LogManager;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.Component;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.Slice;
+import org.lealone.bats.api.StatsListener;
+import org.lealone.bats.api.StorageAgent;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.StreamingApplication;
+import org.lealone.bats.api.StringCodec;
+import org.lealone.bats.api.DAG.Locality;
+import org.lealone.bats.api.Operator.InputPort;
+import org.lealone.bats.api.Operator.OutputPort;
+import org.lealone.bats.api.Operator.ProcessingMode;
+import org.lealone.bats.api.StatsListener.OperatorRequest;
+import org.lealone.bats.api.annotation.Stateless;
 
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Component;
-import com.datatorrent.api.Context;
-import com.datatorrent.api.DAG.Locality;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Operator.OutputPort;
-import com.datatorrent.api.Operator.ProcessingMode;
-import com.datatorrent.api.StatsListener;
-import com.datatorrent.api.StatsListener.OperatorRequest;
-import com.datatorrent.api.StorageAgent;
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.api.StreamingApplication;
-import com.datatorrent.api.StringCodec;
-import com.datatorrent.api.annotation.Stateless;
 import com.datatorrent.bufferserver.server.Server;
 import com.datatorrent.bufferserver.storage.DiskStorage;
 import com.datatorrent.bufferserver.util.Codec;
-import com.datatorrent.common.util.ScheduledThreadPoolExecutor;
 import com.datatorrent.netlet.DefaultEventLoop;
-import com.datatorrent.netlet.util.Slice;
 import com.datatorrent.stram.ComponentContextPair;
 import com.datatorrent.stram.RecoverableRpcProxy;
 import com.datatorrent.stram.StramUtils;
@@ -1596,7 +1595,7 @@ public class StreamingContainer extends YarnContainerMain
    * @param deployInfo  Operator context if applicable otherwise null.
    * @return Value of the operator
    */
-  private <T> T getValue(Attribute<T> key, com.datatorrent.api.Context.PortContext portContext, OperatorDeployInfo deployInfo)
+  private <T> T getValue(Attribute<T> key, org.lealone.bats.api.Context.PortContext portContext, OperatorDeployInfo deployInfo)
   {
     if (portContext != null) {
       Attribute.AttributeMap attributes = portContext.getAttributes();

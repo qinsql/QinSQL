@@ -25,6 +25,8 @@ import java.util.Map;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.StreamingApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +38,6 @@ import org.apache.hadoop.yarn.exceptions.YarnException;
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.StreamingApplication;
 import com.datatorrent.stram.util.LoggerUtil;
 
 /**

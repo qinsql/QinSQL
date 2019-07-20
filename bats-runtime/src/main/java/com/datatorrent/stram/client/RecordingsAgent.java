@@ -40,7 +40,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.util.ObjectMapperString;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.mutable.MutableLong;
@@ -50,8 +50,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
 import com.sun.jersey.api.client.WebResource;
-
-import com.datatorrent.common.util.ObjectMapperString;
 import com.datatorrent.stram.client.WebServicesVersionConversion.IncompatibleVersionException;
 import com.datatorrent.stram.debug.TupleRecorder;
 import com.datatorrent.stram.util.FSPartFileCollection;

@@ -32,12 +32,11 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.util.ObjectMapperString;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 
-import com.datatorrent.common.util.ObjectMapperString;
 import com.datatorrent.stram.util.FSPartFileCollection;
 
 /**

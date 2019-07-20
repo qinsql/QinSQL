@@ -20,7 +20,7 @@ package com.datatorrent.bufferserver.packet;
 
 import java.nio.ByteBuffer;
 
-import com.datatorrent.netlet.util.Slice;
+import org.lealone.bats.api.Slice;
 
 /**
  * <p>PayloadTuple class.</p>

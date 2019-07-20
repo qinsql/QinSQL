@@ -20,12 +20,11 @@ package org.apache.apex.engine.util;
 
 import java.net.URISyntaxException;
 
+import org.lealone.bats.api.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-
-import com.datatorrent.api.Context;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.util.PubSubWebSocketClient;
 import com.datatorrent.stram.util.SharedPubSubWebSocketClient;

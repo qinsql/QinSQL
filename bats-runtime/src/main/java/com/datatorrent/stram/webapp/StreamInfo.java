@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.datatorrent.api.DAG.Locality;
+import org.lealone.bats.api.DAG.Locality;
 
 /**
  * <p>StreamInfo class.</p>

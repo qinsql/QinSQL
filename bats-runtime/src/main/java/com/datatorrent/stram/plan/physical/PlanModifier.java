@@ -23,11 +23,12 @@ import java.util.Map;
 
 import javax.validation.ValidationException;
 
-import com.datatorrent.api.Context.DAGContext;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Operator.OutputPort;
-import com.datatorrent.api.StringCodec;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.StringCodec;
+import org.lealone.bats.api.Context.DAGContext;
+import org.lealone.bats.api.Operator.InputPort;
+import org.lealone.bats.api.Operator.OutputPort;
+
 import com.datatorrent.stram.StringCodecs;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;

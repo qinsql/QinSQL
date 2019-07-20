@@ -28,9 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.commons.beanutils.BeanMap;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.StatsListener;
 
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.StatsListener;
 import com.datatorrent.stram.engine.OperatorResponse;
 
 /**

@@ -20,7 +20,7 @@ package com.datatorrent.stram.engine;
 
 import java.io.Serializable;
 
-import com.datatorrent.api.StatsListener;
+import org.lealone.bats.api.StatsListener;
 
 /**
  * <p>OperatorResponse class.</p>

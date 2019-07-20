@@ -23,11 +23,10 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.StatsListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.StatsListener;
 
 import com.datatorrent.stram.plan.logical.LogicalPlanConfiguration;
 

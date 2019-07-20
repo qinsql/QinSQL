@@ -19,14 +19,14 @@
 package com.datatorrent.stram.engine;
 
 
+import org.lealone.bats.api.Sink;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.Context.PortContext;
+import org.lealone.bats.api.Operator.InputPort;
+import org.lealone.bats.api.Operator.Unifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datatorrent.api.Context.PortContext;
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Operator.Unifier;
-import com.datatorrent.api.Sink;
-import com.datatorrent.api.StreamCodec;
 import com.datatorrent.stram.plan.logical.Operators.PortContextPair;
 
 /**

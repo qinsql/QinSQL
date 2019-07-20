@@ -26,12 +26,11 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.hadoop.yarn.webapp.util.WebAppUtils;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Context.SSLConfig;
+import org.lealone.bats.api.Context.StramHTTPAuthentication;
 
 import com.google.common.annotations.VisibleForTesting;
-
-import com.datatorrent.api.Context;
-import com.datatorrent.api.Context.SSLConfig;
-import com.datatorrent.api.Context.StramHTTPAuthentication;
 import com.datatorrent.stram.security.AuthScheme;
 import com.datatorrent.stram.security.StramUserLogin;
 import com.datatorrent.stram.security.StramWSFilterInitializer;

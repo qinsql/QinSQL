@@ -49,6 +49,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.Module;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.DAG.GenericOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
@@ -67,10 +70,6 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import com.datatorrent.api.DAG.GenericOperator;
-import com.datatorrent.api.Module;
-import com.datatorrent.api.Operator;
 import com.datatorrent.stram.util.ObjectMapperFactory;
 import com.datatorrent.stram.webapp.TypeDiscoverer.UI_TYPE;
 import com.datatorrent.stram.webapp.TypeGraph.TypeGraphVertex;
@@ -775,7 +774,7 @@ public class OperatorDiscoverer
           }
         } else {
           // yields com.datatorrent.api.Context on JDK6 and com.datatorrent.api.Context.OperatorContext with JDK7
-          if ("up".equals(pd.getName()) && com.datatorrent.api.Context.class.isAssignableFrom(pd.getPropertyType())) {
+          if ("up".equals(pd.getName()) && org.lealone.bats.api.Context.class.isAssignableFrom(pd.getPropertyType())) {
             continue;
           }
         }

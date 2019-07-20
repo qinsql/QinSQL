@@ -18,7 +18,8 @@
  */
 package com.datatorrent.stram.plan.logical.requests;
 
-import com.datatorrent.api.Operator;
+import org.lealone.bats.api.Operator;
+
 import com.datatorrent.stram.StramUtils;
 import com.datatorrent.stram.plan.physical.PlanModifier;
 

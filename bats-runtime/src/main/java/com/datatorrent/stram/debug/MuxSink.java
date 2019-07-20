@@ -21,10 +21,9 @@ package com.datatorrent.stram.debug;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 
+import org.lealone.bats.api.Sink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.datatorrent.api.Sink;
 
 /**
  * <p>MuxSink class.</p>

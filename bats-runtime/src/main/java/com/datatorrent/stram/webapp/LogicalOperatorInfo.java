@@ -26,8 +26,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.mutable.MutableInt;
-
-import com.datatorrent.api.AutoMetric;
+import org.lealone.bats.api.AutoMetric;
 
 /**
  * <p>LogicalOperatorInfo class.</p>

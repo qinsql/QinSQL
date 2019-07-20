@@ -40,37 +40,35 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.apex.common.util.AsyncStorageAgent;
 import org.apache.commons.lang.StringUtils;
+import org.lealone.bats.api.AffinityRule;
+import org.lealone.bats.api.AffinityRulesSet;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.DefaultPartition;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.Partitioner;
+import org.lealone.bats.api.StatsListener;
+import org.lealone.bats.api.StorageAgent;
+import org.lealone.bats.api.StreamCodec;
+import org.lealone.bats.api.AffinityRule.Type;
+import org.lealone.bats.api.Context.DAGContext;
+import org.lealone.bats.api.Context.OperatorContext;
+import org.lealone.bats.api.Context.PortContext;
+import org.lealone.bats.api.DAG.Locality;
+import org.lealone.bats.api.Operator.InputPort;
+import org.lealone.bats.api.Partitioner.Partition;
+import org.lealone.bats.api.Partitioner.PartitionKeys;
+import org.lealone.bats.api.StatsListener.OperatorRequest;
+import org.lealone.bats.api.StatsListener.StatsListenerContext;
+import org.lealone.bats.api.StatsListener.StatsListenerWithContext;
+import org.lealone.bats.api.annotation.Stateless;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import com.datatorrent.api.AffinityRule;
-import com.datatorrent.api.AffinityRule.Type;
-import com.datatorrent.api.AffinityRulesSet;
-import com.datatorrent.api.Context;
-import com.datatorrent.api.Context.DAGContext;
-import com.datatorrent.api.Context.OperatorContext;
-import com.datatorrent.api.Context.PortContext;
-import com.datatorrent.api.DAG.Locality;
-import com.datatorrent.api.DefaultPartition;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.Operator.InputPort;
-import com.datatorrent.api.Partitioner;
-import com.datatorrent.api.Partitioner.Partition;
-import com.datatorrent.api.Partitioner.PartitionKeys;
-import com.datatorrent.api.StatsListener;
-import com.datatorrent.api.StatsListener.OperatorRequest;
-import com.datatorrent.api.StatsListener.StatsListenerContext;
-import com.datatorrent.api.StatsListener.StatsListenerWithContext;
-import com.datatorrent.api.StorageAgent;
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.api.annotation.Stateless;
 import com.datatorrent.stram.Journal.Recoverable;
 import com.datatorrent.stram.api.Checkpoint;
 import com.datatorrent.stram.api.StramEvent;
@@ -1877,7 +1875,7 @@ public class PhysicalPlan implements Serializable
         }
         // for backward compatibility
         if (rsp.operatorCommands != null) {
-          for (@SuppressWarnings("deprecation") com.datatorrent.api.StatsListener.OperatorCommand cmd : rsp.operatorCommands) {
+          for (@SuppressWarnings("deprecation") org.lealone.bats.api.StatsListener.OperatorCommand cmd : rsp.operatorCommands) {
             StramToNodeRequest request = new StramToNodeRequest();
             request.operatorId = oper.getId();
             request.requestType = StramToNodeRequest.RequestType.CUSTOM;
@@ -1938,7 +1936,7 @@ public class PhysicalPlan implements Serializable
   {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("deprecation")
-    public com.datatorrent.api.StatsListener.OperatorCommand cmd;
+    public org.lealone.bats.api.StatsListener.OperatorCommand cmd;
     @SuppressWarnings("deprecation")
     @Override
     public StatsListener.OperatorResponse execute(Operator operator, int operatorId, long windowId) throws IOException

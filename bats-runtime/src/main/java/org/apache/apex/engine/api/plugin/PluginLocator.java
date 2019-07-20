@@ -22,8 +22,8 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-import org.apache.apex.api.plugin.Plugin;
 import org.apache.hadoop.conf.Configuration;
+import org.lealone.bats.api.plugin.Plugin;
 
 /**
  * Interface to discover plugins during Apex Master initialization. This should return set of

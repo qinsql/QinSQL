@@ -29,14 +29,12 @@ import java.util.concurrent.TimeoutException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.apache.apex.common.codec.JsonStreamCodec;
 import org.apache.commons.beanutils.BeanUtils;
+import org.lealone.bats.api.Slice;
+import org.lealone.bats.api.StreamCodec;
 
 import com.google.common.base.Throwables;
-
-import com.datatorrent.api.StreamCodec;
-import com.datatorrent.common.codec.JsonStreamCodec;
-import com.datatorrent.netlet.util.Slice;
 import com.datatorrent.stram.api.StramEvent;
 import com.datatorrent.stram.client.EventsAgent;
 import com.datatorrent.stram.util.FSPartFileCollection;

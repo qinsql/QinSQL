@@ -20,7 +20,8 @@ package com.datatorrent.stram.api;
 
 import java.util.Comparator;
 
-import com.datatorrent.api.annotation.Stateless;
+import org.lealone.bats.api.annotation.Stateless;
+
 import com.datatorrent.bufferserver.util.Codec;
 
 /**
@@ -28,7 +29,7 @@ import com.datatorrent.bufferserver.util.Codec;
  *
  * @since 0.9.4
  */
-public class Checkpoint implements com.datatorrent.api.Stats.Checkpoint
+public class Checkpoint implements org.lealone.bats.api.Stats.Checkpoint
 {
   /**
    * WindowId used to store the state of the operator which has not processed a single tuple.

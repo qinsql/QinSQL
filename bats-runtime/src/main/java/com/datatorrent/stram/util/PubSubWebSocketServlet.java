@@ -27,15 +27,14 @@ import java.util.concurrent.BlockingQueue;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.apex.common.util.PubSubMessage;
+import org.apache.apex.common.util.PubSubMessageCodec;
+import org.apache.apex.common.util.PubSubMessage.PubSubMessageType;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.eclipse.jetty.websocket.WebSocket;
 import org.eclipse.jetty.websocket.WebSocketServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.datatorrent.common.util.PubSubMessage;
-import com.datatorrent.common.util.PubSubMessage.PubSubMessageType;
-import com.datatorrent.common.util.PubSubMessageCodec;
 
 
 /**

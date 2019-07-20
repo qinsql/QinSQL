@@ -18,6 +18,13 @@
  */
 package com.datatorrent.stram.plan.logical;
 
+import static org.lealone.bats.api.plugin.DAGSetupEvent.Type.POST_CONFIGURE_DAG;
+import static org.lealone.bats.api.plugin.DAGSetupEvent.Type.POST_POPULATE_DAG;
+import static org.lealone.bats.api.plugin.DAGSetupEvent.Type.POST_VALIDATE_DAG;
+import static org.lealone.bats.api.plugin.DAGSetupEvent.Type.PRE_CONFIGURE_DAG;
+import static org.lealone.bats.api.plugin.DAGSetupEvent.Type.PRE_POPULATE_DAG;
+import static org.lealone.bats.api.plugin.DAGSetupEvent.Type.PRE_VALIDATE_DAG;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +52,20 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.DAG;
+import org.lealone.bats.api.Module;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.StreamingApplication;
+import org.lealone.bats.api.StringCodec;
+import org.lealone.bats.api.Attribute.AttributeMap.AttributeInitializer;
+import org.lealone.bats.api.Context.DAGContext;
+import org.lealone.bats.api.Context.OperatorContext;
+import org.lealone.bats.api.Context.PortContext;
+import org.lealone.bats.api.DAG.GenericOperator;
+import org.lealone.bats.api.StringCodec.JsonStringCodec;
+import org.lealone.bats.api.annotation.ApplicationAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,21 +82,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Attribute.AttributeMap.AttributeInitializer;
-import com.datatorrent.api.Context;
-import com.datatorrent.api.Context.DAGContext;
-import com.datatorrent.api.Context.OperatorContext;
-import com.datatorrent.api.Context.PortContext;
-import com.datatorrent.api.DAG;
-import com.datatorrent.api.DAG.GenericOperator;
-import com.datatorrent.api.Module;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.StreamingApplication;
-import com.datatorrent.api.StringCodec;
-import com.datatorrent.api.StringCodec.JsonStringCodec;
-import com.datatorrent.api.annotation.ApplicationAnnotation;
 import com.datatorrent.stram.StramUtils;
 import com.datatorrent.stram.client.StramClientUtils;
 import com.datatorrent.stram.plan.logical.LogicalPlan.InputPortMeta;
@@ -84,13 +90,6 @@ import com.datatorrent.stram.plan.logical.LogicalPlan.OperatorMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.OutputPortMeta;
 import com.datatorrent.stram.plan.logical.LogicalPlan.StreamMeta;
 import com.datatorrent.stram.util.ObjectMapperFactory;
-
-import static org.apache.apex.api.plugin.DAGSetupEvent.Type.POST_CONFIGURE_DAG;
-import static org.apache.apex.api.plugin.DAGSetupEvent.Type.POST_POPULATE_DAG;
-import static org.apache.apex.api.plugin.DAGSetupEvent.Type.POST_VALIDATE_DAG;
-import static org.apache.apex.api.plugin.DAGSetupEvent.Type.PRE_CONFIGURE_DAG;
-import static org.apache.apex.api.plugin.DAGSetupEvent.Type.PRE_POPULATE_DAG;
-import static org.apache.apex.api.plugin.DAGSetupEvent.Type.PRE_VALIDATE_DAG;
 
 /**
  *

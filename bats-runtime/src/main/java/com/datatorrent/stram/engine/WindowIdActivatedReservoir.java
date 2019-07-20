@@ -19,10 +19,10 @@
 package com.datatorrent.stram.engine;
 
 
+import org.lealone.bats.api.Sink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datatorrent.api.Sink;
 import com.datatorrent.bufferserver.packet.MessageType;
 import com.datatorrent.stram.tuple.EndStreamTuple;
 import com.datatorrent.stram.tuple.Tuple;

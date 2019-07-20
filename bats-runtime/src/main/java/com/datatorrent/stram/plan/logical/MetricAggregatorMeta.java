@@ -24,9 +24,9 @@ import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 
-import com.google.common.base.Preconditions;
+import org.lealone.bats.api.AutoMetric;
 
-import com.datatorrent.api.AutoMetric;
+import com.google.common.base.Preconditions;
 
 /**
  * A class that encapsulates {@link AutoMetric.Aggregator} and {@link AutoMetric.DimensionsScheme} of a particular

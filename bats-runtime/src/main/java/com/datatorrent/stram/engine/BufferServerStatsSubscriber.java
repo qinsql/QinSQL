@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.datatorrent.api.Stats.OperatorStats;
-import com.datatorrent.api.Stats.OperatorStats.PortStats;
+import org.lealone.bats.api.Stats.OperatorStats;
+import org.lealone.bats.api.Stats.OperatorStats.PortStats;
 
 import com.datatorrent.stram.ComponentContextPair;
 import com.datatorrent.stram.api.ContainerEvent.ContainerStatsEvent;

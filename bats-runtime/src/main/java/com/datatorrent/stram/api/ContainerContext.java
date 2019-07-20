@@ -18,9 +18,9 @@
  */
 package com.datatorrent.stram.api;
 
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.Attribute.AttributeMap.AttributeInitializer;
-import com.datatorrent.api.Context;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Attribute.AttributeMap.AttributeInitializer;
 
 /**
  * <p>ContainerContext interface.</p>

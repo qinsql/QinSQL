@@ -18,8 +18,9 @@
  */
 package org.apache.apex.engine.util;
 
-import com.datatorrent.api.StreamingApplication;
-import com.datatorrent.api.annotation.ApplicationAnnotation;
+import org.lealone.bats.api.StreamingApplication;
+import org.lealone.bats.api.annotation.ApplicationAnnotation;
+
 import com.datatorrent.stram.client.StramAppLauncher;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
 import com.datatorrent.stram.plan.logical.LogicalPlanConfiguration;

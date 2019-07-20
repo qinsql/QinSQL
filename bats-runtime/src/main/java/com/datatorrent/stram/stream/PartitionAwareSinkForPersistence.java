@@ -21,7 +21,8 @@ package com.datatorrent.stram.stream;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.datatorrent.api.Sink;
+import org.lealone.bats.api.Sink;
+
 import com.datatorrent.stram.plan.logical.StreamCodecWrapperForPersistance;
 
 /**

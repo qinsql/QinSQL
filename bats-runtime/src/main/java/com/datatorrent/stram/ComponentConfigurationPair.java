@@ -20,10 +20,9 @@ package com.datatorrent.stram;
 
 
 import org.apache.hadoop.conf.Configuration;
-
-import com.datatorrent.api.Component;
-import com.datatorrent.api.Component.ComponentComplementPair;
-import com.datatorrent.api.Context;
+import org.lealone.bats.api.Component;
+import org.lealone.bats.api.Context;
+import org.lealone.bats.api.Component.ComponentComplementPair;
 
 
 /**

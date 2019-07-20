@@ -18,7 +18,8 @@
  */
 package com.datatorrent.stram.debug;
 
-import com.datatorrent.api.Sink;
+import org.lealone.bats.api.Sink;
+
 import com.datatorrent.stram.engine.SweepableReservoir;
 import com.datatorrent.stram.tuple.Tuple;
 

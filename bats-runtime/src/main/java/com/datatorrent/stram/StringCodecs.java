@@ -28,10 +28,9 @@ import org.slf4j.LoggerFactory;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
+import org.lealone.bats.api.StringCodec;
 
 import com.google.common.base.Throwables;
-
-import com.datatorrent.api.StringCodec;
 
 /**
  * <p>StringCodecs class.</p>

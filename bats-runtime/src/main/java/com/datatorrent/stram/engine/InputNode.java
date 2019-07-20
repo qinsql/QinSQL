@@ -20,17 +20,16 @@ package com.datatorrent.stram.engine;
 
 import java.util.ArrayList;
 
+import org.lealone.bats.api.InputOperator;
+import org.lealone.bats.api.Sink;
+import org.lealone.bats.api.Operator.IdleTimeHandler;
+import org.lealone.bats.api.Operator.ProcessingMode;
+import org.lealone.bats.api.Operator.ShutdownException;
+import org.lealone.bats.api.annotation.Stateless;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Throwables;
-
-import com.datatorrent.api.InputOperator;
-import com.datatorrent.api.Operator.IdleTimeHandler;
-import com.datatorrent.api.Operator.ProcessingMode;
-import com.datatorrent.api.Operator.ShutdownException;
-import com.datatorrent.api.Sink;
-import com.datatorrent.api.annotation.Stateless;
 import com.datatorrent.stram.api.StreamingContainerUmbilicalProtocol.ContainerStats;
 import com.datatorrent.stram.tuple.Tuple;
 

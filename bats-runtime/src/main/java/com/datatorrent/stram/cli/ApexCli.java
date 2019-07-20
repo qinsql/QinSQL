@@ -56,6 +56,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.lealone.bats.api.Operator;
+import org.lealone.bats.api.StreamingApplication;
+import org.lealone.bats.api.DAG.GenericOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,10 +96,6 @@ import org.apache.tools.ant.DirectoryScanner;
 
 import com.google.common.base.Preconditions;
 import com.sun.jersey.api.client.WebResource;
-
-import com.datatorrent.api.DAG.GenericOperator;
-import com.datatorrent.api.Operator;
-import com.datatorrent.api.StreamingApplication;
 import com.datatorrent.stram.StramUtils;
 import com.datatorrent.stram.client.AppPackage;
 import com.datatorrent.stram.client.AppPackage.AppInfo;

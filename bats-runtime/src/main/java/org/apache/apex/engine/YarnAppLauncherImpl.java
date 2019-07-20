@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.apex.api.YarnAppLauncher;
 import org.apache.apex.engine.util.StreamingAppFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.yarn.api.records.ApplicationId;
@@ -30,11 +29,11 @@ import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.FinalApplicationStatus;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.exceptions.YarnException;
+import org.lealone.bats.api.Attribute;
+import org.lealone.bats.api.StreamingApplication;
+import org.lealone.bats.api.YarnAppLauncher;
 
 import com.google.common.base.Throwables;
-
-import com.datatorrent.api.Attribute;
-import com.datatorrent.api.StreamingApplication;
 import com.datatorrent.stram.client.StramAppLauncher;
 import com.datatorrent.stram.client.StramClientUtils;
 import com.datatorrent.stram.plan.logical.LogicalPlan;
@@ -157,8 +156,8 @@ public class YarnAppLauncherImpl extends YarnAppLauncher<YarnAppLauncherImpl.Yar
     }
 
     @Override
-    public void shutdown(org.apache.apex.api.Launcher.ShutdownMode shutdownMode)
-        throws org.apache.apex.api.Launcher.LauncherException
+    public void shutdown(org.lealone.bats.api.Launcher.ShutdownMode shutdownMode)
+        throws org.lealone.bats.api.Launcher.LauncherException
     {
       shutdownApp(this, shutdownMode);
     }

@@ -26,12 +26,10 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.apache.apex.common.util.AsyncStorageAgent;
+import org.lealone.bats.api.StorageAgent;
 
 import com.google.common.collect.Maps;
-
-import com.datatorrent.api.StorageAgent;
 
 /**
  * A StorageAgent which chains two StorageAgent. It use the current storage-agent to store

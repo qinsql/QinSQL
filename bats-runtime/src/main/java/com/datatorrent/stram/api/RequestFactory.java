@@ -20,10 +20,9 @@ package com.datatorrent.stram.api;
 
 import java.util.EnumMap;
 
+import org.lealone.bats.api.StatsListener.OperatorRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.datatorrent.api.StatsListener.OperatorRequest;
 
 import com.datatorrent.stram.api.StreamingContainerUmbilicalProtocol.StramToNodeRequest;
 import com.datatorrent.stram.engine.Node;

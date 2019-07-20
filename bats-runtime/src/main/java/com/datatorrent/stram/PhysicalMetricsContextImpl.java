@@ -20,7 +20,7 @@ package com.datatorrent.stram;
 
 import java.util.Map;
 
-import com.datatorrent.api.AutoMetric;
+import org.lealone.bats.api.AutoMetric;
 
 /**
  * Holds physical metrics of an operators.

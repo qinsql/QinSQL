@@ -35,5 +35,10 @@
             <artifactId>bats-function</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.lealone.bats</groupId>
+            <artifactId>bats-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

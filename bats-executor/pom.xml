@@ -818,6 +818,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.lealone.bats</groupId>
+            <artifactId>bats-rpc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-core</artifactId>
         </dependency>

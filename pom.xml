@@ -26,8 +26,11 @@
     <version>5.0.0-SNAPSHOT</version>
 
     <modules>
-        <module>bats-optimizer</module>
+        <module>bats-api</module>
         <module>bats-common</module>
+        <module>bats-rpc</module>
+        <module>bats-runtime</module>
+        <module>bats-optimizer</module>
         <module>bats-executor</module>
         <module>bats-function</module>
         <module>bats-vector</module>

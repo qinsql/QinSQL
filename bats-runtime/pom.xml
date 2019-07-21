@@ -30,8 +30,6 @@
     <version>5.0.0-SNAPSHOT</version>
 
     <properties>
-        <hadoop.version>2.6.0</hadoop.version>
-        <jackson.version>1.9.13</jackson.version>
         <jersey.version>1.9</jersey.version>
         <!-- do not change jetty version as later versions have problems with DefaultServlet -->
         <jetty.version>8.1.10.v20130312</jetty.version>

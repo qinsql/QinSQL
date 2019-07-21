@@ -39,6 +39,18 @@
         <module>bats-test</module>
     </modules>
 
+    <properties>
+        <janino.version>3.0.11</janino.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <jackson.version>2.9.9</jackson.version>
+        <commons.lang3.version>3.8</commons.lang3.version>
+        <guava.version>19.0</guava.version>
+        <hadoop.version>2.7.4</hadoop.version>
+        <metrics.version>4.0.2</metrics.version>
+        <antlr.version>4.7.1</antlr.version>
+        <netty.version>4.0.48.Final</netty.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -100,13 +112,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.2</version>
+            <version>${slf4j.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

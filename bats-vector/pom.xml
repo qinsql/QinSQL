@@ -34,7 +34,7 @@
             <groupId>org.lealone.bats</groupId>
             <artifactId>bats-common</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency><!-- 
         <dependency>
             <groupId>com.sun.codemodel</groupId>
             <artifactId>codemodel</artifactId>
@@ -44,47 +44,51 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
-        </dependency>
+        </dependency> -->
     </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution> <!-- copy all templates in the same location to compile them at once -->
-            <id>copy-fmpp-resources</id>
-            <phase>initialize</phase>
-            <goals><goal>copy-resources</goal></goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/codegen</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>src/main/codegen</directory>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin> <!-- generate sources from fmpp -->
-        <groupId>org.apache.drill.tools</groupId>
-        <artifactId>drill-fmpp-maven-plugin</artifactId>
-        <version>1.16.0</version>
-        <executions>
-          <execution>
-            <id>generate-fmpp</id>
-            <phase>generate-sources</phase>
-            <goals><goal>generate</goal></goals>
-            <configuration>
-              <config>src/main/codegen/config.fmpp</config>
-              <output>${project.build.directory}/generated-sources</output>
-              <templates>${project.build.directory}/codegen/templates</templates>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution> <!-- copy all templates in the same location to compile them at once -->
+                        <id>copy-fmpp-resources</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/codegen</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/codegen</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin> <!-- generate sources from fmpp -->
+                <groupId>org.apache.drill.tools</groupId>
+                <artifactId>drill-fmpp-maven-plugin</artifactId>
+                <version>1.16.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-fmpp</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <config>src/main/codegen/config.fmpp</config>
+                            <output>${project.build.directory}/generated-sources</output>
+                            <templates>${project.build.directory}/codegen/templates</templates>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

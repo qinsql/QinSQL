@@ -13,14 +13,11 @@ test
   |
   |--> engine
        |
-       |--> runtime -------|
-       |                   |
-       |                   ↓
-       |                  rpc -------------> common ---> api 
-       |                   ↑                   ↑
-       |                   |                   |
-       |--> function --> executor --> vector --|
-                           |                   |
-                           |                   |
-                           |---------------> logical --> optimizer
+       |--> runtime ---> rpc ----------------------|
+       |                  ↑                        |
+       |                  |                        ↓
+       |--> function --> executor --> vector --> common ---> api 
+                          |                        ↑
+                          |                        |
+                          |--------------------> logical --> optimizer
 ```

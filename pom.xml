@@ -31,6 +31,7 @@
         <module>bats-rpc</module>
         <module>bats-runtime</module>
         <module>bats-optimizer</module>
+        <module>bats-logical</module>
         <module>bats-executor</module>
         <module>bats-function</module>
         <module>bats-vector</module>

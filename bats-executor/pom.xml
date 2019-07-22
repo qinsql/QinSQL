@@ -1041,68 +1041,20 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution> <!-- copy all templates in the same location to compile them at once -->
-                        <id>copy-fmpp-resources</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/codegen</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/codegen</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
-            <plugin> <!-- generate sources from fmpp -->
+            <plugin>
                 <groupId>org.apache.drill.tools</groupId>
                 <artifactId>drill-fmpp-maven-plugin</artifactId>
-                <version>1.16.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-fmpp</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <config>src/main/codegen/config.fmpp</config>
-                            <output>${project.build.directory}/generated-sources</output>
-                            <templates>${project.build.directory}/codegen/templates</templates>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
-            <plugin> <!-- generate the parser (Parser.jj is itself generated wit fmpp above) -->
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javacc-maven-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <id>javacc</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>javacc</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${project.build.directory}/generated-sources/</sourceDirectory>
-                            <includes>
-                                <include>**/Parser.jj</include>
-                            </includes>
-                            <lookAhead>2</lookAhead>
-                            <isStatic>false</isStatic>
-                            <outputDirectory>${project.build.directory}/generated-sources/</outputDirectory>
-                            <!-- <debugParser>true</debugParser> <debugLookAhead>true</debugLookAhead> <debugTokenManager>true</debugTokenManager> -->
-                        </configuration>
-                    </execution>
-                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

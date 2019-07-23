@@ -29,6 +29,10 @@ import org.apache.drill.exec.server.RemoteServiceSet;
 
 public class BatsEngine {
 
+    public static void main(String[] args) throws Exception {
+        start();
+    }
+
     public static SqlNode parse(String sql) throws SqlParseException {
         SqlParser.Config config = SqlParser.configBuilder().setUnquotedCasing(org.apache.calcite.util.Casing.TO_LOWER)
                 .build();

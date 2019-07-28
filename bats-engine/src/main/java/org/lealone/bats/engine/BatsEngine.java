@@ -29,6 +29,8 @@ import org.apache.drill.exec.server.RemoteServiceSet;
 
 public class BatsEngine {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatsEngine.class);
+
     public static void main(String[] args) throws Exception {
         start();
     }
@@ -45,11 +47,11 @@ public class BatsEngine {
     }
 
     public static void start() throws Exception {
-        startH2();
-        startDrillbit();
+        Drillbit drillbit = startDrillbit();
+        startH2(drillbit);
     }
 
-    private static void startDrillbit() throws Exception {
+    public static Drillbit startDrillbit() throws Exception {
         // 能查看org.apache.calcite.rel.metadata.JaninoRelMetadataProvider生成的代码
         // System.setProperty("calcite.debug", "true");
 
@@ -57,9 +59,10 @@ public class BatsEngine {
         RemoteServiceSet serviceSet = RemoteServiceSet.getLocalServiceSet();
         Drillbit drillbit = new Drillbit(drillConfig, serviceSet);
         drillbit.run();
+        return drillbit;
     }
 
-    private static void startH2() throws SQLException {
+    public static void startH2(Drillbit drillbit) throws SQLException {
         // System.setProperty("DATABASE_TO_UPPER", "false");
         // System.setProperty("h2.lobInDatabase", "false");
         // System.setProperty("h2.lobClientMaxSizeMemory", "1024");
@@ -79,6 +82,10 @@ public class BatsEngine {
         list.add("-tcp");
         // list.add("-web");
         // list.add("-ifExists");
-        org.h2.tools.Server.main(list.toArray(new String[list.size()]));
+        String[] args = list.toArray(new String[list.size()]);
+        // org.h2.tools.Server.main(args);
+        org.h2.tools.Server server = new org.h2.tools.Server(new BatsServer(drillbit), args);
+        server.start();
+        logger.info(server.getStatus());
     }
 }

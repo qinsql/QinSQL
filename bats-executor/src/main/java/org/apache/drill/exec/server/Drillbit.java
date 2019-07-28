@@ -101,7 +101,17 @@ public class Drillbit implements AutoCloseable {
   private GracefulShutdownThread gracefulShutdownThread;
   private Thread shutdownHook;
   private boolean interruptPollShutdown = true;
-
+  
+  private final DrillConfig config;
+  
+  public DrillConfig getConfig() {
+      return config;
+  }
+  
+  public WorkManager getWorkManager() {
+      return manager;
+  }
+  
   public void setQuiescentMode(boolean quiescentMode) {
     this.quiescentMode = quiescentMode;
   }
@@ -146,7 +156,7 @@ public class Drillbit implements AutoCloseable {
     final CaseInsensitiveMap<OptionDefinition> definitions,
     final RemoteServiceSet serviceSet,
     final ScanResult classpathScan) throws Exception {
-
+    this.config = config;
     //Must start up with access to JDK Compiler
     if (ToolProvider.getSystemJavaCompiler() == null) {
       throw new DrillbitStartupException("JDK Java compiler not available. Ensure Drill is running with the java executable from a JDK and not a JRE");

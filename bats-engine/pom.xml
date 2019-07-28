@@ -45,20 +45,5 @@
             <artifactId>h2</artifactId>
             <version>1.4.197</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.drill.exec</groupId>
-            <artifactId>drill-jdbc-all</artifactId>
-            <version>1.16.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.drill.exec</groupId>
-            <artifactId>drill-jdbc</artifactId>
-            <version>1.16.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.calcite.avatica</groupId>
-            <artifactId>avatica</artifactId>
-            <version>1.13.0</version>
-        </dependency>
     </dependencies>
 </project>

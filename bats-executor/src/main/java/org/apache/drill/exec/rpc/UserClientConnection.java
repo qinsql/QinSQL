@@ -21,6 +21,7 @@ import io.netty.channel.ChannelFuture;
 import org.apache.drill.exec.physical.impl.materialize.QueryWritableBatch;
 import org.apache.drill.exec.proto.GeneralRPCProtos.Ack;
 import org.apache.drill.exec.proto.UserBitShared.QueryResult;
+import org.apache.drill.exec.record.RecordBatch;
 import org.apache.drill.exec.rpc.user.UserSession;
 
 import java.net.SocketAddress;
@@ -66,4 +67,11 @@ public interface UserClientConnection {
    * @return Return the client node address.
    */
   SocketAddress getRemoteAddress();
+  
+  default boolean needsRawData() {
+    return false;
+  }
+  
+  default void sendData(RpcOutcomeListener<Ack> listener, RecordBatch result) {
+  }
 }

@@ -15,15 +15,16 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.drill.exec.proto.UserProtos;
 import org.apache.drill.exec.server.Drillbit;
 import org.apache.drill.exec.work.user.UserWorker;
 import org.h2.api.ErrorCode;
 import org.h2.command.Command;
+import org.h2.engine.BatsSessionFactory;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Constants;
-import org.h2.engine.Engine;
 import org.h2.engine.GeneratedKeysMode;
 import org.h2.engine.Session;
 import org.h2.engine.SessionRemote;
@@ -62,6 +63,9 @@ public class BatsServerThread implements Runnable {
     private final int threadId;
     private int clientVersion;
     private String sessionId;
+
+    private final boolean useBatsEngineForQuery = Boolean
+            .parseBoolean(System.getProperty("use.bats.engine.for.query", "true"));
 
     BatsServerThread(Socket socket, BatsServer server, int id) {
         this.server = server;
@@ -153,7 +157,7 @@ public class BatsServerThread implements Runnable {
                         ci.setFileEncryptionKey(transfer.readBytes());
                     }
                 }
-                session = Engine.getInstance().createSession(ci);
+                session = BatsSessionFactory.getInstance().createSession(ci);
                 transfer.setSession(session);
                 server.addConnection(threadId, originalURL, ci.getUserName());
                 trace("Connected");
@@ -334,21 +338,26 @@ public class BatsServerThread implements Runnable {
             int old = session.getModificationId();
             ResultInterface result;
             synchronized (session) {
-                result = command.executeQuery(maxRows, false);
-
-                Drillbit drillbit = server.getDrillbit();
-                // DrillClient drillClient = new DrillClient(drillbit.getConfig());
-                // drillClient.connect();
-                // List<QueryDataBatch> results = drillClient.runQuery(QueryType.SQL, sql);
-
-                // sql = "SELECT * FROM h2.MYDB.PUBLIC.MY_TABLE";
-                // TODO 按H2的协议发回查询结果集
-                UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
-                        .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
-                UserWorker userWorker = drillbit.getWorkManager().getUserWorker();
-                BatsClientConnection clientConnection = new BatsClientConnection(session.getUser().getName(),
-                        userWorker, transfer.getSocket().getRemoteSocketAddress());
-                userWorker.submitWork(clientConnection, runQuery);
+                if (useBatsEngineForQuery) {
+                    Drillbit drillbit = server.getDrillbit();
+                    // TODO 修改H2的Parser，支持drill的插件名前缀
+                    sql = "SELECT * FROM h2.MYDB.PUBLIC.MY_TABLE";
+                    // 把drill向量化执行后的批量结果转换成H2能理解的结果集
+                    UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
+                            .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
+                    UserWorker userWorker = drillbit.getWorkManager().getUserWorker();
+                    final CountDownLatch resultReceived = new CountDownLatch(1);
+                    BatsClientConnection clientConnection = new BatsClientConnection(session.getUser().getName(),
+                            userWorker, transfer.getSocket().getRemoteSocketAddress(), resultReceived);
+                    userWorker.submitWork(clientConnection, runQuery);
+                    try {
+                        resultReceived.await();
+                    } catch (InterruptedException e) {
+                    }
+                    result = clientConnection.getResult();
+                } else {
+                    result = command.executeQuery(maxRows, false);
+                }
             }
             cache.addObject(objectId, result);
             int columnCount = result.getVisibleColumnCount();

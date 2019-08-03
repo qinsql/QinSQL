@@ -39,108 +39,125 @@ import org.apache.drill.exec.testing.ControlsInjectorFactory;
 import org.apache.drill.shaded.guava.com.google.common.base.Preconditions;
 
 public class ScreenCreator implements RootCreator<Screen> {
-  private static final ControlsInjector injector = ControlsInjectorFactory.getInjector(ScreenCreator.class);
-
-  @Override
-  public RootExec getRoot(ExecutorFragmentContext context, Screen config, List<RecordBatch> children)
-      throws ExecutionSetupException {
-    Preconditions.checkNotNull(children);
-    Preconditions.checkArgument(children.size() == 1);
-    return new ScreenRoot(context, children.iterator().next(), config);
-  }
-
-  public static class ScreenRoot extends BaseRootExec {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ScreenRoot.class);
-    private final RecordBatch incoming;
-    private final RootFragmentContext context;
-    private final AccountingUserConnection userConnection;
-    private RecordMaterializer materializer;
-
-    private boolean firstBatch = true;
-
-    public enum Metric implements MetricDef {
-      BYTES_SENT;
-
-      @Override
-      public int metricId() {
-        return ordinal();
-      }
-    }
-
-    public ScreenRoot(RootFragmentContext context, RecordBatch incoming, Screen config) throws OutOfMemoryException {
-      super(context, config);
-      this.context = context;
-      this.incoming = incoming;
-      userConnection = context.getUserDataTunnel();
-    }
-
-    public RootFragmentContext getContext() {
-      return context;
-    }
+    private static final ControlsInjector injector = ControlsInjectorFactory.getInjector(ScreenCreator.class);
 
     @Override
-    public boolean innerNext() {
-      IterOutcome outcome = next(incoming);
-      logger.trace("Screen Outcome {}", outcome);
-      switch (outcome) {
-      case OUT_OF_MEMORY:
-        throw new OutOfMemoryException();
-      case STOP:
-        return false;
-      case NONE:
-        if (firstBatch) {
-          // this is the only data message sent to the client and may contain the schema
-          QueryWritableBatch batch;
-          QueryData header = QueryData.newBuilder()
-            .setQueryId(context.getHandle().getQueryId())
-            .setRowCount(0)
-            .setDef(RecordBatchDef.getDefaultInstance())
-            .build();
-          batch = new QueryWritableBatch(header);
+    public RootExec getRoot(ExecutorFragmentContext context, Screen config, List<RecordBatch> children)
+            throws ExecutionSetupException {
+        Preconditions.checkNotNull(children);
+        Preconditions.checkArgument(children.size() == 1);
+        return new ScreenRoot(context, children.iterator().next(), config);
+    }
 
-          stats.startWait();
-          try {
-            userConnection.sendData(batch);
-          } finally {
-            stats.stopWait();
-          }
-          firstBatch = false; // we don't really need to set this. But who knows!
+    public static class ScreenRoot extends BaseRootExec {
+        private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ScreenRoot.class);
+        private final RecordBatch incoming;
+        private final RootFragmentContext context;
+        private final AccountingUserConnection userConnection;
+        private RecordMaterializer materializer;
+
+        private boolean firstBatch = true;
+
+        public enum Metric implements MetricDef {
+            BYTES_SENT;
+
+            @Override
+            public int metricId() {
+                return ordinal();
+            }
         }
 
-        return false;
-      case OK_NEW_SCHEMA:
-        materializer = new VectorRecordMaterializer(context, oContext, incoming);
-        //$FALL-THROUGH$
-      case OK:
-        injector.injectPause(context.getExecutionControls(), "sending-data", logger);
-        final QueryWritableBatch batch = materializer.convertNext();
-        updateStats(batch);
-        stats.startWait();
-        try {
-          userConnection.sendData(batch);
-        } finally {
-          stats.stopWait();
+        public ScreenRoot(RootFragmentContext context, RecordBatch incoming, Screen config)
+                throws OutOfMemoryException {
+            super(context, config);
+            this.context = context;
+            this.incoming = incoming;
+            userConnection = context.getUserDataTunnel();
         }
-        firstBatch = false;
 
-        return true;
-      default:
-        throw new UnsupportedOperationException();
-      }
-    }
+        public RootFragmentContext getContext() {
+            return context;
+        }
 
-    public void updateStats(QueryWritableBatch queryBatch) {
-      stats.addLongStat(Metric.BYTES_SENT, queryBatch.getByteCount());
-    }
+        @Override
+        public boolean innerNext() {
+            IterOutcome outcome = next(incoming);
+            logger.trace("Screen Outcome {}", outcome);
+            switch (outcome) {
+            case OUT_OF_MEMORY:
+                throw new OutOfMemoryException();
+            case STOP:
+                return false;
+            case NONE:
+                if (firstBatch) {
+                    if (userConnection.needsRawData()) {
+                        stats.startWait();
+                        try {
+                            userConnection.sendData(incoming);
+                        } finally {
+                            stats.stopWait();
+                        }
+                    } else {
+                        // this is the only data message sent to the client and may contain the schema
+                        QueryWritableBatch batch;
+                        QueryData header = QueryData.newBuilder().setQueryId(context.getHandle().getQueryId())
+                                .setRowCount(0).setDef(RecordBatchDef.getDefaultInstance()).build();
+                        batch = new QueryWritableBatch(header);
 
-    RecordBatch getIncoming() {
-      return incoming;
-    }
+                        stats.startWait();
+                        try {
+                            userConnection.sendData(batch);
+                        } finally {
+                            stats.stopWait();
+                        }
+                    }
 
-    @Override
-    public void close() throws Exception {
-      injector.injectPause(context.getExecutionControls(), "send-complete", logger);
-      super.close();
+                    firstBatch = false; // we don't really need to set this. But who knows!
+                }
+
+                return false;
+            case OK_NEW_SCHEMA:
+                materializer = new VectorRecordMaterializer(context, oContext, incoming);
+                //$FALL-THROUGH$
+            case OK:
+                injector.injectPause(context.getExecutionControls(), "sending-data", logger);
+                if (userConnection.needsRawData()) {
+                    stats.startWait();
+                    try {
+                        userConnection.sendData(incoming);
+                    } finally {
+                        stats.stopWait();
+                    }
+                } else {
+                    final QueryWritableBatch batch = materializer.convertNext();
+                    updateStats(batch);
+                    stats.startWait();
+                    try {
+                        userConnection.sendData(batch);
+                    } finally {
+                        stats.stopWait();
+                    }
+                }
+                firstBatch = false;
+
+                return true;
+            default:
+                throw new UnsupportedOperationException();
+            }
+        }
+
+        public void updateStats(QueryWritableBatch queryBatch) {
+            stats.addLongStat(Metric.BYTES_SENT, queryBatch.getByteCount());
+        }
+
+        RecordBatch getIncoming() {
+            return incoming;
+        }
+
+        @Override
+        public void close() throws Exception {
+            injector.injectPause(context.getExecutionControls(), "send-complete", logger);
+            super.close();
+        }
     }
-  }
 }

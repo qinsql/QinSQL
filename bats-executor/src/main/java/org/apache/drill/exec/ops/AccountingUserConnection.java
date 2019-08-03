@@ -19,6 +19,7 @@ package org.apache.drill.exec.ops;
 
 import org.apache.drill.exec.physical.impl.materialize.QueryWritableBatch;
 import org.apache.drill.exec.proto.GeneralRPCProtos.Ack;
+import org.apache.drill.exec.record.RecordBatch;
 import org.apache.drill.exec.rpc.RpcOutcomeListener;
 import org.apache.drill.exec.rpc.UserClientConnection;
 
@@ -38,6 +39,15 @@ public class AccountingUserConnection {
   }
 
   public void sendData(QueryWritableBatch batch) {
+    sendingAccountor.increment();
+    connection.sendData(statusHandler, batch);
+  }
+  
+  public boolean needsRawData() {
+    return connection.needsRawData();
+  }
+  
+  public void sendData(RecordBatch batch) {
     sendingAccountor.increment();
     connection.sendData(statusHandler, batch);
   }

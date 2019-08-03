@@ -33,6 +33,7 @@ import org.apache.drill.exec.store.AbstractStoragePlugin;
 import org.apache.drill.exec.store.SchemaConfig;
 import org.apache.drill.exec.store.SystemPlugin;
 import org.apache.drill.shaded.guava.com.google.common.base.Joiner;
+import org.h2.engine.BatsSessionFactory;
 import org.h2.engine.ConnectionInfo;
 import org.h2.engine.Constants;
 import org.h2.engine.Database;
@@ -48,7 +49,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class H2StoragePlugin extends AbstractStoragePlugin {
 
     static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(H2StoragePlugin.class);
-    private static final Map<String, Database> DATABASES = new HashMap<>();
+    private static final Map<String, Database> DATABASES = BatsSessionFactory.DATABASES;
     private final H2StoragePluginConfig engineConfig;
 
     static Database getDatabase(String dbName) {

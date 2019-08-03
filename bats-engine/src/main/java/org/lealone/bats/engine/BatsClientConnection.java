@@ -18,6 +18,7 @@
 package org.lealone.bats.engine;
 
 import java.net.SocketAddress;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -26,9 +27,11 @@ import org.apache.drill.exec.physical.impl.materialize.QueryWritableBatch;
 import org.apache.drill.exec.proto.GeneralRPCProtos.Ack;
 import org.apache.drill.exec.proto.UserBitShared.QueryResult;
 import org.apache.drill.exec.proto.UserBitShared.UserCredentials;
+import org.apache.drill.exec.record.RecordBatch;
 import org.apache.drill.exec.rpc.RpcOutcomeListener;
 import org.apache.drill.exec.rpc.user.UserSession;
 import org.apache.drill.exec.work.user.UserWorker;
+import org.h2.result.ResultInterface;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -36,10 +39,17 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClientConnection {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatsClientConnection.class);
+
     private final UserSession session;
     private final SocketAddress remoteAddress;
+    private final CountDownLatch resultReceived;
 
-    public BatsClientConnection(String userName, UserWorker userWorker, SocketAddress remoteAddress) {
+    private ResultInterface result;
+
+    public BatsClientConnection(String userName, UserWorker userWorker, SocketAddress remoteAddress,
+            final CountDownLatch resultReceived) {
         session = UserSession.Builder.newBuilder()
                 .withCredentials(UserCredentials.newBuilder().setUserName(userName).build())
                 .withOptionManager(userWorker.getSystemOptions())
@@ -47,6 +57,7 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
                 // .setSupportComplexTypes(inbound.getSupportComplexTypes())
                 .build();
         this.remoteAddress = remoteAddress;
+        this.resultReceived = resultReceived;
     }
 
     @Override
@@ -56,12 +67,27 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
 
     @Override
     public void sendResult(RpcOutcomeListener<Ack> listener, QueryResult result) {
-        System.out.println("sendResult");
+        logger.info("sendResult");
     }
 
     @Override
     public void sendData(RpcOutcomeListener<Ack> listener, QueryWritableBatch result) {
-        System.out.println("sendResult");
+        throw new UnsupportedOperationException("sendData");
+    }
+
+    @Override
+    public boolean needsRawData() {
+        return true;
+    }
+
+    @Override
+    public void sendData(RpcOutcomeListener<Ack> listener, RecordBatch data) {
+        result = new BatsResult(data);
+        resultReceived.countDown();
+    }
+
+    public ResultInterface getResult() {
+        return result;
     }
 
     @Override

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine;
+package org.lealone.bats.engine.server;
 
 import org.apache.drill.common.types.TypeProtos;
 import org.apache.drill.common.types.TypeProtos.MajorType;
@@ -28,26 +28,25 @@ import org.apache.drill.exec.vector.ValueVector;
 import org.apache.drill.exec.vector.accessor.BoundCheckingAccessor;
 import org.apache.drill.exec.vector.accessor.InvalidAccessException;
 import org.apache.drill.exec.vector.accessor.SqlAccessor;
-import org.h2.engine.SessionInterface;
-import org.h2.result.ResultInterface;
-import org.h2.value.DataType;
-import org.h2.value.Value;
-import org.h2.value.ValueBoolean;
-import org.h2.value.ValueByte;
-import org.h2.value.ValueBytes;
-import org.h2.value.ValueDate;
-import org.h2.value.ValueDecimal;
-import org.h2.value.ValueDouble;
-import org.h2.value.ValueFloat;
-import org.h2.value.ValueInt;
-import org.h2.value.ValueLong;
-import org.h2.value.ValueNull;
-import org.h2.value.ValueShort;
-import org.h2.value.ValueString;
-import org.h2.value.ValueTime;
-import org.h2.value.ValueTimestamp;
+import org.lealone.db.result.Result;
+import org.lealone.db.value.DataType;
+import org.lealone.db.value.Value;
+import org.lealone.db.value.ValueBoolean;
+import org.lealone.db.value.ValueByte;
+import org.lealone.db.value.ValueBytes;
+import org.lealone.db.value.ValueDate;
+import org.lealone.db.value.ValueDecimal;
+import org.lealone.db.value.ValueDouble;
+import org.lealone.db.value.ValueFloat;
+import org.lealone.db.value.ValueInt;
+import org.lealone.db.value.ValueLong;
+import org.lealone.db.value.ValueNull;
+import org.lealone.db.value.ValueShort;
+import org.lealone.db.value.ValueString;
+import org.lealone.db.value.ValueTime;
+import org.lealone.db.value.ValueTimestamp;
 
-public class BatsResult implements org.h2.result.ResultInterface {
+public class BatsResult implements Result {
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatsResult.class);
 
     static class BatsSqlAccessor {
@@ -115,12 +114,11 @@ public class BatsResult implements org.h2.result.ResultInterface {
         int column = 0;
         for (VectorWrapper<?> vw : data) {
             final ValueVector vector = vw.getValueVector();
-            final SqlAccessor acc = new TypeConvertingSqlAccessor(
-                    new BoundCheckingAccessor(vector, TypeHelper.getSqlAccessor(vector)));
+            final SqlAccessor acc = new BoundCheckingAccessor(vector, TypeHelper.getSqlAccessor(vector));
             MajorType majorType = acc.getType();
             final String sqlTypeName = Types.getSqlTypeName(majorType);
             final int jdbcTypeId = Types.getJdbcTypeCode(sqlTypeName);
-            int valueType = DataType.convertSQLTypeToValueType(jdbcTypeId, sqlTypeName);
+            int valueType = DataType.convertSQLTypeToValueType(jdbcTypeId);
 
             accessors[column++] = new BatsSqlAccessor(acc, valueType);
         }
@@ -162,7 +160,7 @@ public class BatsResult implements org.h2.result.ResultInterface {
         return index;
     }
 
-    @Override
+    // @Override
     public boolean isAfterLast() {
         return index >= rowCount;
     }
@@ -177,7 +175,7 @@ public class BatsResult implements org.h2.result.ResultInterface {
         return rowCount;
     }
 
-    @Override
+    // @Override
     public boolean hasNext() {
         return index < rowCount;
     }
@@ -249,25 +247,4 @@ public class BatsResult implements org.h2.result.ResultInterface {
     public int getFetchSize() {
         return 0;
     }
-
-    @Override
-    public boolean isLazy() {
-        return false;
-    }
-
-    @Override
-    public boolean isClosed() {
-        return false;
-    }
-
-    @Override
-    public ResultInterface createShallowCopy(SessionInterface targetSession) {
-        return null;
-    }
-
-    @Override
-    public boolean containsDistinct(Value[] values) {
-        return false;
-    }
-
 }

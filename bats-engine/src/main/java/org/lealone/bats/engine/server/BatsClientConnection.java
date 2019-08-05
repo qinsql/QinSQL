@@ -15,10 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine;
+package org.lealone.bats.engine.server;
 
 import java.net.SocketAddress;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -31,7 +30,9 @@ import org.apache.drill.exec.record.RecordBatch;
 import org.apache.drill.exec.rpc.RpcOutcomeListener;
 import org.apache.drill.exec.rpc.user.UserSession;
 import org.apache.drill.exec.work.user.UserWorker;
-import org.h2.result.ResultInterface;
+import org.lealone.db.async.AsyncHandler;
+import org.lealone.db.async.AsyncResult;
+import org.lealone.db.result.Result;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -44,12 +45,11 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
 
     private final UserSession session;
     private final SocketAddress remoteAddress;
-    private final CountDownLatch resultReceived;
-
-    private ResultInterface result;
+    private final AsyncHandler<AsyncResult<Result>> asyncHandler;
+    private org.lealone.db.result.Result result;
 
     public BatsClientConnection(String userName, UserWorker userWorker, SocketAddress remoteAddress,
-            final CountDownLatch resultReceived) {
+            AsyncHandler<AsyncResult<Result>> asyncHandler) {
         session = UserSession.Builder.newBuilder()
                 .withCredentials(UserCredentials.newBuilder().setUserName(userName).build())
                 .withOptionManager(userWorker.getSystemOptions())
@@ -57,7 +57,7 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
                 // .setSupportComplexTypes(inbound.getSupportComplexTypes())
                 .build();
         this.remoteAddress = remoteAddress;
-        this.resultReceived = resultReceived;
+        this.asyncHandler = asyncHandler;
     }
 
     @Override
@@ -83,10 +83,13 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
     @Override
     public void sendData(RpcOutcomeListener<Ack> listener, RecordBatch data) {
         result = new BatsResult(data);
-        resultReceived.countDown();
+
+        AsyncResult<Result> ar = new AsyncResult<>();
+        ar.setResult(result);
+        asyncHandler.handle(ar);
     }
 
-    public ResultInterface getResult() {
+    public org.lealone.db.result.Result getResult() {
         return result;
     }
 

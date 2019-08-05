@@ -17,20 +17,56 @@
  */
 package org.lealone.bats.engine;
 
+import java.util.ArrayList;
+
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
+import org.lealone.bats.engine.server.BatsServer;
+import org.lealone.bats.engine.server.BatsServerEngine;
+import org.lealone.common.exceptions.ConfigException;
+import org.lealone.p2p.config.Config;
+import org.lealone.p2p.config.Config.PluggableEngineDef;
+import org.lealone.test.start.NodeBase;
 
-public class BatsEngineTest {
+public class BatsEngineTest extends NodeBase {
+
+    // YamlConfigLoader的子类必须有一个无参数的构造函数
+    public BatsEngineTest() {
+        nodeBaseDirPrefix = "bats";
+    }
+
+    @Override
+    public void applyConfig(Config config) throws ConfigException {
+        enableBatsServer(config);
+        super.applyConfig(config);
+    }
 
     public static void main(String[] args) throws Exception {
         // parse();
-        BatsEngine.start();
+        NodeBase.run(BatsEngineTest.class, null);
     }
 
-    static void parse() throws SqlParseException {
+    public static void parse() throws SqlParseException {
         String sql = "select * from test where f1=1 or f2=2 order by f3 limit 2";
         SqlNode sqlNode = BatsEngine.parse(sql);
         System.out.println(sqlNode);
     }
 
+    public static void enableBatsServer(Config config) {
+        enableProtocolServer(config, BatsServerEngine.NAME, BatsServer.DEFAULT_TCP_PORT);
+    }
+
+    private static void enableProtocolServer(Config config, String protocolServerName, int port) {
+        if (config.protocol_server_engines == null) {
+            config.protocol_server_engines = new ArrayList<>(1);
+        }
+
+        PluggableEngineDef def = new PluggableEngineDef();
+        def.enabled = true;
+        def.name = protocolServerName;
+        def.getParameters().put("port", port + "");
+        def.getParameters().put("allow_others", "true");
+
+        config.protocol_server_engines.add(def);
+    }
 }

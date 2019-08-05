@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine.h2;
+package org.lealone.bats.engine.storage;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,24 +27,35 @@ import org.apache.drill.exec.physical.impl.ScanBatch;
 import org.apache.drill.exec.record.RecordBatch;
 import org.apache.drill.exec.store.RecordReader;
 import org.apache.drill.shaded.guava.com.google.common.base.Preconditions;
-import org.lealone.bats.engine.h2.H2SubScan.H2SubScanSpec;
+import org.lealone.bats.engine.storage.LealoneSubScan.LealoneSubScanSpec;
 
-public class H2ScanBatchCreator implements BatchCreator<H2SubScan> {
+public class LealoneScanBatchCreator implements BatchCreator<LealoneSubScan> {
+    static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LealoneScanBatchCreator.class);
 
     @Override
-    public ScanBatch getBatch(ExecutorFragmentContext context, H2SubScan config, List<RecordBatch> children)
+    public ScanBatch getBatch(ExecutorFragmentContext context, LealoneSubScan config, List<RecordBatch> children)
             throws ExecutionSetupException {
         Preconditions.checkArgument(children.isEmpty());
         List<RecordReader> readers = new LinkedList<>();
+        // List<SchemaPath> columns = null;
 
-        for (H2SubScanSpec scanSpec : config.getTabletScanSpecList()) {
+        for (LealoneSubScanSpec scanSpec : config.getTabletScanSpecList()) {
             try {
-                RecordReader reader = new H2RecordReader(scanSpec.getScanSpec(), null);
+                // if ((columns = scanSpec.getColumns())==null) {
+                // columns = GroupScan.ALL_COLUMNS;
+                // }
+
+                RecordReader reader = new LealoneRecordReader(scanSpec.getScanSpec(), null);
                 readers.add(reader);
             } catch (Exception e1) {
                 throw new ExecutionSetupException(e1);
             }
         }
         return new ScanBatch(config, context, readers);
+
+        // Preconditions.checkArgument(children.isEmpty());
+        // //LealoneStoragePlugin plugin = config.getPlugin();
+        // RecordReader reader = new LealoneRecordReader(config.get, config.getSql(), plugin.getName());
+        // return new ScanBatch(config, context, Collections.singletonList(reader));
     }
 }

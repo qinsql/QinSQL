@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine.h2;
+package org.lealone.bats.engine.storage;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -50,16 +50,17 @@ import org.apache.drill.exec.vector.ValueVector;
 import org.apache.drill.shaded.guava.com.google.common.base.Charsets;
 import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableList;
 import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableMap;
-import org.h2.engine.Database;
-import org.h2.index.Cursor;
-import org.h2.result.Row;
-import org.h2.table.Column;
-import org.h2.table.Table;
-import org.h2.value.DataType;
+import org.lealone.db.Database;
+import org.lealone.db.LealoneDatabase;
+import org.lealone.db.index.Cursor;
+import org.lealone.db.result.Row;
+import org.lealone.db.table.Column;
+import org.lealone.db.table.Table;
+import org.lealone.db.value.DataType;
 
 @SuppressWarnings("unchecked")
-public class H2RecordReader extends AbstractRecordReader {
-    static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(H2RecordReader.class);
+public class LealoneRecordReader extends AbstractRecordReader {
+    static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LealoneRecordReader.class);
 
     private static class ResultSet {
         Row row;
@@ -125,11 +126,9 @@ public class H2RecordReader extends AbstractRecordReader {
     private final Table table;
     private Cursor cursor;
 
-    public H2RecordReader(H2ScanSpec scanSpec, String storagePluginName) {
+    public LealoneRecordReader(LealoneScanSpec scanSpec, String storagePluginName) {
         this.storagePluginName = storagePluginName;
-        // ConnectionInfo ci = new ConnectionInfo(scanSpec.getDbName());
-        // Database db = Engine.getInstance().createSession(ci).getDatabase();
-        Database db = H2StoragePlugin.getDatabase(scanSpec.getDbName());
+        Database db = LealoneDatabase.getInstance().getDatabase(scanSpec.getDbName());
         table = db.getSchema(scanSpec.getSchemaName()).findTableOrView(null, scanSpec.getTableName());
     }
 
@@ -174,6 +173,7 @@ public class H2RecordReader extends AbstractRecordReader {
         }
 
         return Integer.toString(javaSqlType);
+
     }
 
     private Copier<?> getCopier(int jdbcType, int offset, ResultSet result, ValueVector v) {
@@ -305,7 +305,7 @@ public class H2RecordReader extends AbstractRecordReader {
 
     @Override
     public String toString() {
-        return "H2RecordReader[Plugin=" + storagePluginName + "]";
+        return "LealoneRecordReader[Plugin=" + storagePluginName + "]";
     }
 
     private abstract class Copier<T extends ValueVector.Mutator> {

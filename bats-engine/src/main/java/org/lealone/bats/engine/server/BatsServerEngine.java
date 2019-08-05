@@ -15,38 +15,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine.h2;
+package org.lealone.bats.engine.server;
 
-import org.apache.drill.common.logical.StoragePluginConfigBase;
+import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.lealone.bats.engine.sql.BatsSQLEngine;
+import org.lealone.server.ProtocolServer;
+import org.lealone.server.ProtocolServerEngineBase;
 
-@JsonTypeName(H2StoragePluginConfig.NAME)
-public class H2StoragePluginConfig extends StoragePluginConfigBase {
+public class BatsServerEngine extends ProtocolServerEngineBase {
 
-    public static final String NAME = "h2";
+    public static final String NAME = BatsSQLEngine.NAME;
 
-    @JsonCreator
-    public H2StoragePluginConfig() {
+    private final BatsServer server = new BatsServer();
+
+    public BatsServerEngine() {
+        super(BatsSQLEngine.NAME);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        return false;
+    public ProtocolServer getProtocolServer() {
+        return server;
     }
 
     @Override
-    public int hashCode() {
-        return 31;
+    protected ProtocolServer getProtocolServer(int port) {
+        return server;
     }
+
+    @Override
+    public void init(Map<String, String> config) {
+        server.init(config);
+    }
+
+    @Override
+    public void close() {
+        server.stop();
+    }
+
 }

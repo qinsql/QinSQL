@@ -15,19 +15,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine.h2;
+package org.lealone.bats.engine.storage;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class H2ScanSpec {
+public class LealoneScanSpec {
 
     private final String dbName;
     private final String schemaName;
     private final String tableName;
 
     @JsonCreator
-    public H2ScanSpec(@JsonProperty("dbName") String dbName, @JsonProperty("schemaName") String schemaName,
+    public LealoneScanSpec(@JsonProperty("dbName") String dbName, @JsonProperty("schemaName") String schemaName,
             @JsonProperty("tableName") String tableName) {
         this.dbName = dbName;
         this.schemaName = schemaName;

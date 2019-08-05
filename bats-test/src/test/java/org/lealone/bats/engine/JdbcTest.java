@@ -22,10 +22,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import org.lealone.bats.engine.server.BatsServer;
+
 public class JdbcTest {
 
     public static void main(String[] args) throws Exception {
-        Connection conn = DriverManager.getConnection("jdbc:h2:tcp://localhost:9092/mydb", "sa", "");
+        Connection conn = DriverManager
+                .getConnection("jdbc:lealone:tcp://localhost:" + BatsServer.DEFAULT_TCP_PORT + "/lealone", "root", "");
         Statement stmt = conn.createStatement();
         stmt.executeUpdate("DROP TABLE IF EXISTS my_table");
         stmt.executeUpdate("CREATE TABLE IF NOT EXISTS my_table(name varchar(20))");

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine.h2;
+package org.lealone.bats.engine.storage;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,36 +38,39 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("h2-sub-scan")
-public class H2SubScan extends AbstractBase implements SubScan {
+// Class containing information for reading a single Lealone tablet
+@JsonTypeName("lealone-sub-scan")
+public class LealoneSubScan extends AbstractBase implements SubScan {
+    static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LealoneSubScan.class);
 
-    private final H2StoragePlugin kuduStoragePlugin;
-    private final List<H2SubScanSpec> tabletScanSpecList;
+    private final LealoneStoragePlugin lealoneStoragePlugin;
+    private final List<LealoneSubScanSpec> tabletScanSpecList;
     private final List<SchemaPath> columns;
 
     @JsonCreator
-    public H2SubScan(@JacksonInject StoragePluginRegistry registry,
-            @JsonProperty("h2StoragePluginConfig") H2StoragePluginConfig kuduStoragePluginConfig,
-            @JsonProperty("tabletScanSpecList") LinkedList<H2SubScanSpec> tabletScanSpecList,
+    public LealoneSubScan(@JacksonInject StoragePluginRegistry registry,
+            @JsonProperty("lealoneStoragePluginConfig") LealoneStoragePluginConfig lealoneStoragePluginConfig,
+            @JsonProperty("tabletScanSpecList") LinkedList<LealoneSubScanSpec> tabletScanSpecList,
             @JsonProperty("columns") List<SchemaPath> columns) throws ExecutionSetupException {
         super((String) null);
-        kuduStoragePlugin = (H2StoragePlugin) registry.getPlugin(kuduStoragePluginConfig);
+        lealoneStoragePlugin = (LealoneStoragePlugin) registry.getPlugin(lealoneStoragePluginConfig);
         this.tabletScanSpecList = tabletScanSpecList;
         this.columns = columns;
     }
 
-    public H2SubScan(H2StoragePlugin plugin, List<H2SubScanSpec> tabletInfoList, List<SchemaPath> columns) {
+    public LealoneSubScan(LealoneStoragePlugin plugin, List<LealoneSubScanSpec> tabletInfoList,
+            List<SchemaPath> columns) {
         super((String) null);
-        this.kuduStoragePlugin = plugin;
+        this.lealoneStoragePlugin = plugin;
         this.tabletScanSpecList = tabletInfoList;
         this.columns = columns;
     }
 
-    public H2StoragePluginConfig getLealoneStoragePluginConfig() {
-        return kuduStoragePlugin.getConfig();
+    public LealoneStoragePluginConfig getLealoneStoragePluginConfig() {
+        return lealoneStoragePlugin.getConfig();
     }
 
-    public List<H2SubScanSpec> getTabletScanSpecList() {
+    public List<LealoneSubScanSpec> getTabletScanSpecList() {
         return tabletScanSpecList;
     }
 
@@ -81,8 +84,8 @@ public class H2SubScan extends AbstractBase implements SubScan {
     }
 
     @JsonIgnore
-    public H2StoragePlugin getStorageEngine() {
-        return kuduStoragePlugin;
+    public LealoneStoragePlugin getStorageEngine() {
+        return lealoneStoragePlugin;
     }
 
     @Override
@@ -93,7 +96,7 @@ public class H2SubScan extends AbstractBase implements SubScan {
     @Override
     public PhysicalOperator getNewWithChildren(List<PhysicalOperator> children) {
         Preconditions.checkArgument(children.isEmpty());
-        return new H2SubScan(kuduStoragePlugin, tabletScanSpecList, columns);
+        return new LealoneSubScan(lealoneStoragePlugin, tabletScanSpecList, columns);
     }
 
     @Override
@@ -101,24 +104,25 @@ public class H2SubScan extends AbstractBase implements SubScan {
         return ImmutableSet.<PhysicalOperator> of().iterator();
     }
 
-    public static class H2SubScanSpec {
+    public static class LealoneSubScanSpec {
 
-        private final H2ScanSpec scanSpec;
+        private final LealoneScanSpec scanSpec;
 
         private final String tableName;
         private final byte[] startKey;
         private final byte[] endKey;
 
         @JsonCreator
-        public H2SubScanSpec(@JsonProperty("scanSpec") H2ScanSpec scanSpec, @JsonProperty("tableName") String tableName,
-                @JsonProperty("startKey") byte[] startKey, @JsonProperty("endKey") byte[] endKey) {
+        public LealoneSubScanSpec(@JsonProperty("scanSpec") LealoneScanSpec scanSpec,
+                @JsonProperty("tableName") String tableName, @JsonProperty("startKey") byte[] startKey,
+                @JsonProperty("endKey") byte[] endKey) {
             this.scanSpec = scanSpec;
             this.tableName = tableName;
             this.startKey = startKey;
             this.endKey = endKey;
         }
 
-        public H2ScanSpec getScanSpec() {
+        public LealoneScanSpec getScanSpec() {
             return scanSpec;
         }
 

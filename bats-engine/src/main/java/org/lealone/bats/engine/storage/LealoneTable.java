@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine.h2;
+package org.lealone.bats.engine.storage;
 
 import java.util.List;
 
@@ -24,16 +24,16 @@ import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.drill.exec.planner.logical.DynamicDrillTable;
 import org.apache.drill.shaded.guava.com.google.common.collect.Lists;
-import org.h2.schema.Schema;
-import org.h2.table.Column;
-import org.h2.value.DataType;
+import org.lealone.db.schema.Schema;
+import org.lealone.db.table.Column;
+import org.lealone.db.value.DataType;
 
-public class H2Table extends DynamicDrillTable {
+public class LealoneTable extends DynamicDrillTable {
     // private final Schema schema;
-    org.h2.table.Table table;
+    org.lealone.db.table.Table table;
 
-    public H2Table(org.h2.table.Table table, String storageEngineName, H2StoragePlugin plugin, Schema schema,
-            H2ScanSpec scanSpec) {
+    public LealoneTable(org.lealone.db.table.Table table, String storageEngineName, LealoneStoragePlugin plugin,
+            Schema schema, LealoneScanSpec scanSpec) {
         super(plugin, storageEngineName, scanSpec);
         // this.schema = schema;
         this.table = table;
@@ -57,5 +57,6 @@ public class H2Table extends DynamicDrillTable {
         int sqlType = DataType.convertTypeToSQLType(type);
         SqlTypeName typeName = SqlTypeName.getNameForJdbcType(sqlType);
         return typeFactory.createSqlType(typeName);
+        // throw new UnsupportedOperationException("Unsupported type.");
     }
 }

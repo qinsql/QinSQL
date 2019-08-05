@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine.h2;
+package org.lealone.bats.engine.storage;
 
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +39,7 @@ import org.apache.drill.shaded.guava.com.google.common.annotations.VisibleForTes
 import org.apache.drill.shaded.guava.com.google.common.base.Preconditions;
 import org.apache.drill.shaded.guava.com.google.common.collect.ListMultimap;
 import org.apache.drill.shaded.guava.com.google.common.collect.Lists;
-import org.lealone.bats.engine.h2.H2SubScan.H2SubScanSpec;
+import org.lealone.bats.engine.storage.LealoneSubScan.LealoneSubScanSpec;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -47,40 +47,74 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-@JsonTypeName("h2-scan")
-public class H2GroupScan extends AbstractGroupScan {
-    static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(H2GroupScan.class);
+@JsonTypeName("lealone-scan")
+public class LealoneGroupScan extends AbstractGroupScan {
+    static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LealoneGroupScan.class);
     private static final long DEFAULT_TABLET_SIZE = 1000;
 
-    private H2StoragePlugin h2StoragePlugin;
+    private LealoneStoragePlugin lealoneStoragePlugin;
     private List<SchemaPath> columns;
-    private H2ScanSpec scanSpec;
+    private LealoneScanSpec scanSpec;
 
     private boolean filterPushedDown = false;
-    private List<H2Work> h2WorkList = Lists.newArrayList();
-    private ListMultimap<Integer, H2Work> assignments;
+    private List<LealoneWork> lealoneWorkList = Lists.newArrayList();
+    private ListMultimap<Integer, LealoneWork> assignments;
     private List<EndpointAffinity> affinities;
 
     @JsonCreator
-    public H2GroupScan(@JsonProperty("scanSpec") H2ScanSpec scanSpec,
-            @JsonProperty("h2StoragePluginConfig") H2StoragePluginConfig h2StoragePluginConfig,
+    public LealoneGroupScan(@JsonProperty("scanSpec") LealoneScanSpec scanSpec,
+            @JsonProperty("lealoneStoragePluginConfig") LealoneStoragePluginConfig lealoneStoragePluginConfig,
             @JsonProperty("columns") List<SchemaPath> columns, @JacksonInject StoragePluginRegistry pluginRegistry)
             throws IOException, ExecutionSetupException {
-        this((H2StoragePlugin) pluginRegistry.getPlugin(h2StoragePluginConfig), scanSpec, columns);
+        this((LealoneStoragePlugin) pluginRegistry.getPlugin(lealoneStoragePluginConfig), scanSpec, columns);
     }
 
-    public H2GroupScan(H2StoragePlugin h2StoragePlugin, H2ScanSpec scanSpec, List<SchemaPath> columns) {
+    public LealoneGroupScan(LealoneStoragePlugin lealoneStoragePlugin, LealoneScanSpec scanSpec,
+            List<SchemaPath> columns) {
         super((String) null);
-        this.h2StoragePlugin = h2StoragePlugin;
+        this.lealoneStoragePlugin = lealoneStoragePlugin;
         this.scanSpec = scanSpec;
         this.columns = columns == null || columns.size() == 0 ? ALL_COLUMNS : columns;
+        init();
     }
 
-    private static class H2Work implements CompleteWork {
+    private void init() {
+        // String tableName = scanSpec.getTableName();
+        // Collection<DrillbitEndpoint> endpoints = lealoneStoragePlugin.getContext().getBits();
+        // Map<String,DrillbitEndpoint> endpointMap = Maps.newHashMap();
+        // for (DrillbitEndpoint endpoint : endpoints) {
+        // endpointMap.put(endpoint.getAddress(), endpoint);
+        // }
+        // try {
+        // List<LocatedTablet> locations =
+        // lealoneStoragePlugin.getClient().openTable(tableName).getTabletsLocations(10000);
+        // for (LocatedTablet tablet : locations) {
+        // LealoneWork work = new LealoneWork(tablet.getPartition().getPartitionKeyStart(),
+        // tablet.getPartition().getPartitionKeyEnd());
+        // for (Replica replica : tablet.getReplicas()) {
+        // String host = replica.getRpcHost();
+        // DrillbitEndpoint ep = endpointMap.get(host);
+        // if (ep != null) {
+        // work.getByteMap().add(ep, DEFAULT_TABLET_SIZE);
+        // }
+        // }
+        // lealoneWorkList.add(work);
+        // }
+        // } catch (Exception e) {
+        // throw new RuntimeException(e);
+        // }
+    }
+
+    private static class LealoneWork implements CompleteWork {
 
         private final EndpointByteMapImpl byteMap = new EndpointByteMapImpl();
         private byte[] partitionKeyStart;
         private byte[] partitionKeyEnd;
+
+        // public LealoneWork(byte[] partitionKeyStart, byte[] partitionKeyEnd) {
+        // this.partitionKeyStart = partitionKeyStart;
+        // this.partitionKeyEnd = partitionKeyEnd;
+        // }
 
         public byte[] getPartitionKeyStart() {
             return partitionKeyStart;
@@ -108,21 +142,21 @@ public class H2GroupScan extends AbstractGroupScan {
 
     /**
      * Private constructor, used for cloning.
-     * @param that The H2GroupScan to clone
+     * @param that The LealoneGroupScan to clone
      */
-    private H2GroupScan(H2GroupScan that) {
+    private LealoneGroupScan(LealoneGroupScan that) {
         super(that);
-        this.h2StoragePlugin = that.h2StoragePlugin;
+        this.lealoneStoragePlugin = that.lealoneStoragePlugin;
         this.columns = that.columns;
         this.scanSpec = that.scanSpec;
         this.filterPushedDown = that.filterPushedDown;
-        this.h2WorkList = that.h2WorkList;
+        this.lealoneWorkList = that.lealoneWorkList;
         this.assignments = that.assignments;
     }
 
     @Override
     public GroupScan clone(List<SchemaPath> columns) {
-        H2GroupScan newScan = new H2GroupScan(this);
+        LealoneGroupScan newScan = new LealoneGroupScan(this);
         newScan.columns = columns;
         return newScan;
     }
@@ -130,14 +164,14 @@ public class H2GroupScan extends AbstractGroupScan {
     @Override
     public List<EndpointAffinity> getOperatorAffinity() {
         if (affinities == null) {
-            affinities = AffinityCreator.getAffinityMap(h2WorkList);
+            affinities = AffinityCreator.getAffinityMap(lealoneWorkList);
         }
         return affinities;
     }
 
     @Override
     public int getMaxParallelizationWidth() {
-        return h2WorkList.size();
+        return lealoneWorkList.size();
     }
 
     /**
@@ -146,26 +180,28 @@ public class H2GroupScan extends AbstractGroupScan {
      */
     @Override
     public void applyAssignments(List<DrillbitEndpoint> incomingEndpoints) {
-        assignments = AssignmentCreator.getMappings(incomingEndpoints, h2WorkList);
+        assignments = AssignmentCreator.getMappings(incomingEndpoints, lealoneWorkList);
     }
 
     @Override
-    public H2SubScan getSpecificScan(int minorFragmentId) {
-        List<H2Work> workList = assignments.get(minorFragmentId);
+    public LealoneSubScan getSpecificScan(int minorFragmentId) {
+        List<LealoneWork> workList = assignments.get(minorFragmentId);
 
-        List<H2SubScanSpec> scanSpecList = Lists.newArrayList();
+        List<LealoneSubScanSpec> scanSpecList = Lists.newArrayList();
 
-        for (H2Work work : workList) {
-            scanSpecList.add(new H2SubScanSpec(scanSpec, getTableName(), work.getPartitionKeyStart(),
+        for (LealoneWork work : workList) {
+            scanSpecList.add(new LealoneSubScanSpec(scanSpec, getTableName(), work.getPartitionKeyStart(),
                     work.getPartitionKeyEnd()));
         }
-        scanSpecList.add(new H2SubScanSpec(scanSpec, getTableName(), null, null));
-        return new H2SubScan(h2StoragePlugin, scanSpecList, this.columns);
+        scanSpecList.add(new LealoneSubScanSpec(scanSpec, getTableName(), null, null));
+        return new LealoneSubScan(lealoneStoragePlugin, scanSpecList, this.columns);
     }
 
+    // LealoneStoragePlugin plugin, LealoneStoragePluginConfig config,
+    // List<LealoneSubScanSpec> tabletInfoList, List<SchemaPath> columns
     @Override
     public ScanStats getScanStats() {
-        long recordCount = 100000 * h2WorkList.size();
+        long recordCount = 100000 * lealoneWorkList.size();
         return new ScanStats(GroupScanProperty.NO_EXACT_ROW_COUNT, recordCount, 1, recordCount);
     }
 
@@ -173,17 +209,17 @@ public class H2GroupScan extends AbstractGroupScan {
     @JsonIgnore
     public PhysicalOperator getNewWithChildren(List<PhysicalOperator> children) {
         Preconditions.checkArgument(children.isEmpty());
-        return new H2GroupScan(this);
+        return new LealoneGroupScan(this);
     }
 
     @JsonIgnore
-    public H2StoragePlugin getStoragePlugin() {
-        return h2StoragePlugin;
+    public LealoneStoragePlugin getStoragePlugin() {
+        return lealoneStoragePlugin;
     }
 
     @JsonIgnore
     public String getTableName() {
-        return getH2ScanSpec().getTableName();
+        return getLealoneScanSpec().getTableName();
     }
 
     @Override
@@ -193,12 +229,12 @@ public class H2GroupScan extends AbstractGroupScan {
 
     @Override
     public String toString() {
-        return "H2GroupScan [H2ScanSpec=" + scanSpec + ", columns=" + columns + "]";
+        return "LealoneGroupScan [LealoneScanSpec=" + scanSpec + ", columns=" + columns + "]";
     }
 
     @JsonProperty
-    public H2StoragePluginConfig getH2StoragePluginConfig() {
-        return h2StoragePlugin.getConfig();
+    public LealoneStoragePluginConfig getLealoneStoragePluginConfig() {
+        return lealoneStoragePlugin.getConfig();
     }
 
     @Override
@@ -208,7 +244,7 @@ public class H2GroupScan extends AbstractGroupScan {
     }
 
     @JsonProperty
-    public H2ScanSpec getH2ScanSpec() {
+    public LealoneScanSpec getLealoneScanSpec() {
         return scanSpec;
     }
 
@@ -232,7 +268,7 @@ public class H2GroupScan extends AbstractGroupScan {
      * Empty constructor, do not use, only for testing.
      */
     @VisibleForTesting
-    public H2GroupScan() {
+    public LealoneGroupScan() {
         super((String) null);
     }
 
@@ -240,7 +276,7 @@ public class H2GroupScan extends AbstractGroupScan {
      * Do not use, only for testing.
      */
     @VisibleForTesting
-    public void setH2ScanSpec(H2ScanSpec scanSpec) {
+    public void setLealoneScanSpec(LealoneScanSpec scanSpec) {
         this.scanSpec = scanSpec;
     }
 

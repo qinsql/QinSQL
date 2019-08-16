@@ -46,7 +46,7 @@ public class DrillConfig extends NestedConfig {
 
   private final ImmutableList<String> startupArguments;
 
-  @SuppressWarnings("restriction")
+  //@SuppressWarnings("restriction")
   private static final long MAX_DIRECT_MEMORY = PlatformDependent.maxDirectMemory();
 
   @VisibleForTesting

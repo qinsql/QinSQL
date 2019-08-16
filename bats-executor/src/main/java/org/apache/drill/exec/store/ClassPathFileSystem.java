@@ -130,6 +130,7 @@ public class ClassPathFileSystem extends FileSystem{
   }
 
   public static void main(String[] args) throws Exception{
+    @SuppressWarnings("unused")
     URI uri = new URI("classpath:///");
   }
 }

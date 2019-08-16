@@ -49,7 +49,7 @@ public class SystemTablePlugin extends AbstractStoragePlugin {
   private final SystemTablePluginConfig config;
   private final SystemSchema schema;
 
-  @SuppressWarnings("unused") // used in StoragePluginRegistryImpl to dynamically init system plugins
+  // used in StoragePluginRegistryImpl to dynamically init system plugins
   public SystemTablePlugin(DrillbitContext context) {
     this(SystemTablePluginConfig.INSTANCE, context, SYS_SCHEMA_NAME);
   }

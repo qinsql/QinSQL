@@ -52,7 +52,7 @@ public class SubSchemaWrapper extends AbstractSchema {
     if (defaultSchema instanceof AbstractSchema) {
       return ((AbstractSchema) defaultSchema).getSubPartitions(table, partitionColumns, partitionValues);
     } else {
-      return Collections.EMPTY_LIST;
+      return Collections.emptyList();
     }
 
   }

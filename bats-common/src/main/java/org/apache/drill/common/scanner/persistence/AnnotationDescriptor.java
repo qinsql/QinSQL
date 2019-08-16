@@ -143,7 +143,6 @@ public final class AnnotationDescriptor {
         if (c.equals(String.class)) {
           return value;
         } else if (c.isEnum()) {
-          @SuppressWarnings("unchecked")
           Enum<?> enumValue = Enum.valueOf(c.asSubclass(Enum.class), value);
           return enumValue;
         } else if (c.equals(boolean.class)) {

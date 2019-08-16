@@ -57,7 +57,7 @@ public class VersionedDelegatingStore<V> implements VersionedPersistentStore<V> 
 
   @Override
   public void delete(final String key) {
-    try (@SuppressWarnings("unused") Closeable lock = writeLock.open()) {
+    try (Closeable lock = writeLock.open()) {
       store.delete(key);
       version++;
     }
@@ -65,7 +65,7 @@ public class VersionedDelegatingStore<V> implements VersionedPersistentStore<V> 
 
   @Override
   public boolean contains(final String key, final DataChangeVersion dataChangeVersion) {
-    try (@SuppressWarnings("unused") Closeable lock = readLock.open()) {
+    try (Closeable lock = readLock.open()) {
       boolean contains = store.contains(key);
       dataChangeVersion.setVersion(version);
       return contains;
@@ -74,7 +74,7 @@ public class VersionedDelegatingStore<V> implements VersionedPersistentStore<V> 
 
   @Override
   public V get(final String key, final DataChangeVersion dataChangeVersion) {
-    try (@SuppressWarnings("unused") Closeable lock = readLock.open()) {
+    try (Closeable lock = readLock.open()) {
       V value = store.get(key);
       dataChangeVersion.setVersion(version);
       return value;
@@ -83,7 +83,7 @@ public class VersionedDelegatingStore<V> implements VersionedPersistentStore<V> 
 
   @Override
   public void put(final String key, final V value, final DataChangeVersion dataChangeVersion) {
-    try (@SuppressWarnings("unused") Closeable lock = writeLock.open()) {
+    try (Closeable lock = writeLock.open()) {
       if (dataChangeVersion.getVersion() != version) {
         throw new VersionMismatchException("Version mismatch detected", dataChangeVersion.getVersion());
       }
@@ -94,7 +94,7 @@ public class VersionedDelegatingStore<V> implements VersionedPersistentStore<V> 
 
   @Override
   public boolean putIfAbsent(String key, V value) {
-    try (@SuppressWarnings("unused") Closeable lock = writeLock.open()) {
+    try (Closeable lock = writeLock.open()) {
       if (store.putIfAbsent(key, value)) {
         version++;
         return true;
@@ -105,7 +105,7 @@ public class VersionedDelegatingStore<V> implements VersionedPersistentStore<V> 
 
   @Override
   public Iterator<Map.Entry<String, V>> getRange(final int skip, final int take) {
-    try (@SuppressWarnings("unused") Closeable lock = readLock.open()) {
+    try (Closeable lock = readLock.open()) {
       return store.getRange(skip, take);
     }
   }
@@ -113,7 +113,7 @@ public class VersionedDelegatingStore<V> implements VersionedPersistentStore<V> 
   @Override
   public void close() throws Exception
   {
-    try (@SuppressWarnings("unused") Closeable lock = writeLock.open()) {
+    try (Closeable lock = writeLock.open()) {
       store.close();
       version = DataChangeVersion.NOT_AVAILABLE;
     }

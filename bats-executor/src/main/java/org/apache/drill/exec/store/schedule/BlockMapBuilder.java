@@ -158,6 +158,7 @@ public class BlockMapBuilder {
   private class FileStatusWork implements FileWork{
     private FileStatus status;
 
+    @SuppressWarnings("deprecation")
     public FileStatusWork(FileStatus status) {
       Preconditions.checkArgument(!status.isDir(), "FileStatus work only works with files, not directories.");
       this.status = status;

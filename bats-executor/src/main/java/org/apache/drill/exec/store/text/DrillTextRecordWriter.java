@@ -47,7 +47,7 @@ public class DrillTextRecordWriter extends StringOutputRecordWriter {
   private String fieldDelimiter;
   private String extension;
 
-  private static String eol = System.getProperty("line.separator");
+  //private static String eol = System.getProperty("line.separator");
   private int index;
   private PrintStream stream = null;
   private FileSystem fs = null;

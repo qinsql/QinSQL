@@ -263,7 +263,6 @@ public final class ClassPathScanner {
         }
         if (isAnnotated) {
           List<AnnotationDescriptor> classAnnotations = getAnnotationDescriptors(annotations);
-          @SuppressWarnings("unchecked")
           List<FieldInfo> classFields = classFile.getFields();
           List<FieldDescriptor> fieldDescriptors = new ArrayList<>(classFields.size());
           for (FieldInfo field : classFields) {
@@ -283,7 +282,6 @@ public final class ClassPathScanner {
       List<AnnotationDescriptor> annotationDescriptors = new ArrayList<>(annotationsAttr.numAnnotations());
       for (javassist.bytecode.annotation.Annotation annotation : annotationsAttr.getAnnotations()) {
         // Sigh: javassist uses raw collections (is this 2002?)
-        @SuppressWarnings("unchecked")
         Set<String> memberNames = annotation.getMemberNames();
         List<AttributeDescriptor> attributes = new ArrayList<>();
         if (memberNames != null) {

@@ -63,6 +63,7 @@ public class LocalSyncableFileSystem extends FileSystem {
     return new FSDataInputStream(new LocalInputStream(path));
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public FSDataOutputStream create(Path path, FsPermission fsPermission, boolean b, int i, short i2, long l, Progressable progressable) throws IOException {
     return new FSDataOutputStream(new LocalSyncableOutputStream(path));

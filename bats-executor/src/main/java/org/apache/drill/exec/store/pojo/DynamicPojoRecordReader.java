@@ -93,6 +93,7 @@ public class DynamicPojoRecordReader<T> extends AbstractPojoRecordReader<List<T>
    * An utility class that converts from {@link com.fasterxml.jackson.databind.JsonNode}
    * to DynamicPojoRecordReader during physical plan fragment deserialization.
    */
+  @SuppressWarnings("rawtypes")
   public static class Converter extends StdConverter<JsonNode, DynamicPojoRecordReader> {
     private static final TypeReference<LinkedHashMap<String, Class<?>>> schemaType =
         new TypeReference<LinkedHashMap<String, Class<?>>>() {};
@@ -104,6 +105,7 @@ public class DynamicPojoRecordReader<T> extends AbstractPojoRecordReader<List<T>
       this.mapper = mapper;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public DynamicPojoRecordReader convert(JsonNode value) {
       LinkedHashMap<String, Class<?>> schema = mapper.convertValue(value.get("schema"), schemaType);

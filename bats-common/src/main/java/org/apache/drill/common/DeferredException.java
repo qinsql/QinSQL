@@ -31,7 +31,6 @@ import org.apache.drill.shaded.guava.com.google.common.base.Supplier;
  * <p>This class is thread safe.
  */
 public class DeferredException implements AutoCloseable {
-  private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DeferredException.class);
 
   private Exception exception = null;
   private boolean isClosed = false;

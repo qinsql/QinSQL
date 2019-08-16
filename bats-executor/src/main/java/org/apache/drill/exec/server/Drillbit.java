@@ -86,7 +86,7 @@ public class Drillbit implements AutoCloseable {
 
   public final static String SYSTEM_OPTIONS_NAME = "org.apache.drill.exec.server.Drillbit.system_options";
 
-  private boolean isClosed = false;
+  //private boolean isClosed = false;
 
   private final ClusterCoordinator coord;
   private final ServiceEngine engine;

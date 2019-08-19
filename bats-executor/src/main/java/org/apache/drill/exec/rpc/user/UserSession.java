@@ -59,6 +59,7 @@ public class UserSession implements AutoCloseable {
   private SessionOptionManager sessionOptions;
   private final AtomicInteger queryCount;
   private final String sessionId;
+  private SchemaPlus defaultSchema;
 
   /** Stores list of temporary tables, key is original table name converted to lower case to achieve case-insensitivity,
    *  value is generated table name. **/
@@ -248,6 +249,9 @@ public class UserSession implements AutoCloseable {
    * @return A {@link org.apache.calcite.schema.SchemaPlus} object.
    */
   public SchemaPlus getDefaultSchema(SchemaPlus rootSchema) {
+    if(defaultSchema != null)
+      return defaultSchema;
+
     final String defaultSchemaPath = getDefaultSchemaPath();
 
     if (Strings.isNullOrEmpty(defaultSchemaPath)) {
@@ -257,6 +261,10 @@ public class UserSession implements AutoCloseable {
     return SchemaUtilites.findSchema(rootSchema, defaultSchemaPath);
   }
 
+  public void setDefaultSchema(SchemaPlus defaultSchema) {
+    this.defaultSchema = defaultSchema;
+  }
+  
   /**
    * Set the option of a session level.
    * Note: Option's kind is automatically detected if such option exists.

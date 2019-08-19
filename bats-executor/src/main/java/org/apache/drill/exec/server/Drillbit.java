@@ -123,6 +123,10 @@ public class Drillbit implements AutoCloseable {
   public RegistrationHandle getRegistrationHandle() {
     return registrationHandle;
   }
+  
+  public StoragePluginRegistry getStoragePluginRegistry() {
+    return storageRegistry;
+  }
 
   private RegistrationHandle registrationHandle;
   private volatile StoragePluginRegistry storageRegistry;

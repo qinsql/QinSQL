@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.calcite.schema.CalciteSchema;
 import org.apache.calcite.schema.SchemaPlus;
 import org.apache.drill.common.JSONOptions;
 import org.apache.drill.exec.server.DrillbitContext;
@@ -33,6 +34,7 @@ import org.apache.drill.exec.store.AbstractStoragePlugin;
 import org.apache.drill.exec.store.SchemaConfig;
 import org.apache.drill.exec.store.SystemPlugin;
 import org.apache.drill.shaded.guava.com.google.common.base.Joiner;
+import org.lealone.db.Constants;
 import org.lealone.db.Database;
 import org.lealone.db.LealoneDatabase;
 import org.lealone.db.schema.Schema;
@@ -260,6 +262,7 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
         public boolean areTableNamesCaseSensitive() {
             return defaultSchema.areTableNamesCaseSensitive();
         }
+
     }
 
     @Override
@@ -269,5 +272,24 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
         schema.setHolder(holder);
 
         // schemaFactory.registerSchemas(config, parent);
+    }
+
+    public void registerSchema(SchemaPlus parent, String dbName, SchemaPlus defaultSchema) throws IOException {
+        Database db = LealoneDatabase.getInstance().getDatabase(dbName);
+        for (Schema schema : db.getAllSchemas()) {
+            final String schemaName = schema.getName();
+            final SchemaPlus subSchema;
+            if (schemaName.equalsIgnoreCase(Constants.SCHEMA_MAIN)) {
+                subSchema = defaultSchema;
+            } else {
+                subSchema = CalciteSchema.createRootSchema(false, true, schemaName).plus();
+            }
+            for (Table table : schema.getAllTablesAndViews()) {
+                LealoneTable t = new LealoneTable(table, getName(), this, schema,
+                        new LealoneScanSpec(dbName, schemaName, table.getName()));
+                subSchema.add(table.getName(), t);
+            }
+            parent.add(schemaName, subSchema);
+        }
     }
 }

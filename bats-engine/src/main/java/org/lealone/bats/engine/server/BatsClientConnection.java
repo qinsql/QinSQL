@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.calcite.schema.SchemaPlus;
 import org.apache.drill.exec.physical.impl.materialize.QueryWritableBatch;
 import org.apache.drill.exec.proto.GeneralRPCProtos.Ack;
 import org.apache.drill.exec.proto.UserBitShared.QueryResult;
@@ -48,7 +49,7 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
     private final AsyncHandler<AsyncResult<Result>> asyncHandler;
     private org.lealone.db.result.Result result;
 
-    public BatsClientConnection(String userName, UserWorker userWorker, SocketAddress remoteAddress,
+    public BatsClientConnection(SchemaPlus schema, String userName, UserWorker userWorker, SocketAddress remoteAddress,
             AsyncHandler<AsyncResult<Result>> asyncHandler) {
         session = UserSession.Builder.newBuilder()
                 .withCredentials(UserCredentials.newBuilder().setUserName(userName).build())
@@ -56,6 +57,7 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
                 // .withUserProperties(inbound.getProperties())
                 // .setSupportComplexTypes(inbound.getSupportComplexTypes())
                 .build();
+        session.setDefaultSchema(schema);
         this.remoteAddress = remoteAddress;
         this.asyncHandler = asyncHandler;
     }

@@ -20,9 +20,16 @@ package org.lealone.bats.engine.server;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.calcite.schema.CalciteSchema;
+import org.apache.calcite.schema.SchemaPlus;
+import org.apache.drill.common.exceptions.ExecutionSetupException;
 import org.apache.drill.exec.proto.UserProtos;
 import org.apache.drill.exec.server.Drillbit;
 import org.apache.drill.exec.work.user.UserWorker;
+import org.lealone.bats.engine.storage.LealoneStoragePlugin;
+import org.lealone.bats.engine.storage.LealoneStoragePluginConfig;
+import org.lealone.common.exceptions.DbException;
+import org.lealone.db.Constants;
 import org.lealone.db.Session;
 import org.lealone.db.result.Result;
 import org.lealone.net.Transfer;
@@ -74,13 +81,24 @@ public class BatsServerConnection extends TcpServerConnection {
         if (useBatsEngineForQuery) {
             Drillbit drillbit = server.getDrillbit();
             // TODO 支持drill的插件名前缀
-            String sql = "SELECT * FROM lealone.lealone.PUBLIC.MY_TABLE";
-            // sql = command.getSQL();
-            // 把drill向量化执行后的批量结果转换成H2能理解的结果集
+            // String sql = "SELECT * FROM lealone.lealone.PUBLIC.MY_TABLE";
+            String sql = command.getSQL();
             UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
                     .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
             UserWorker userWorker = drillbit.getWorkManager().getUserWorker();
-            BatsClientConnection clientConnection = new BatsClientConnection(session.getUserName(), userWorker,
+            LealoneStoragePlugin lsp;
+            try {
+                lsp = (LealoneStoragePlugin) drillbit.getStoragePluginRegistry()
+                        .getPlugin(LealoneStoragePluginConfig.NAME);
+            } catch (ExecutionSetupException e) {
+                throw DbException.throwInternalError();
+            }
+
+            SchemaPlus defaultSchema = CalciteSchema.createRootSchema(false, true, Constants.SCHEMA_MAIN).plus();
+            String dbName = session.getDatabase().getShortName();
+            SchemaPlus schema = CalciteSchema.createRootSchema(defaultSchema, false, true, dbName).plus();
+            lsp.registerSchema(schema, dbName, defaultSchema);
+            BatsClientConnection clientConnection = new BatsClientConnection(schema, session.getUserName(), userWorker,
                     getWritableChannel().getSocketChannel().getRemoteAddress(), res -> {
                         if (res.isSucceeded()) {
                             Result result = res.getResult();

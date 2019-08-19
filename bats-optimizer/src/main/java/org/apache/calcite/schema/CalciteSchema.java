@@ -486,6 +486,20 @@ public abstract class CalciteSchema {
     }
     return rootSchema;
   }
+
+    public static CalciteSchema createRootSchema(Schema schema, boolean addMetadataSchema, boolean cache, String name) {
+        CalciteSchema rootSchema;
+        if (cache) {
+            rootSchema = new CachingCalciteSchema(null, schema, name);
+        } else {
+            rootSchema = new SimpleCalciteSchema(null, schema, name);
+        }
+        if (addMetadataSchema) {
+            // rootSchema.add("metadata", MetadataSchema.INSTANCE);
+        }
+        return rootSchema;
+    }
+  
   /** Schema that has no parents. */
   static class RootSchema extends AbstractSchema {
     RootSchema() {

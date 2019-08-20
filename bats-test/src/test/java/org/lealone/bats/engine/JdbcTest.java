@@ -30,16 +30,28 @@ public class JdbcTest {
         Connection conn = DriverManager
                 .getConnection("jdbc:lealone:tcp://localhost:" + BatsServer.DEFAULT_TCP_PORT + "/lealone", "root", "");
         Statement stmt = conn.createStatement();
-        stmt.executeUpdate("DROP TABLE IF EXISTS my_table");
-        stmt.executeUpdate("CREATE TABLE IF NOT EXISTS my_table(name varchar(20))");
-        stmt.executeUpdate("INSERT INTO my_table(name) VALUES('abc')");
+        init(stmt);
 
-        ResultSet rs = stmt.executeQuery("SELECT name FROM my_table");
-        rs.next();
-        System.out.println(rs.getString(1));
+        String sql = "SELECT name FROM my_table";
+        query(stmt, sql);
+
+        sql = "SELECT * FROM cp.`employee.json`";
+        query(stmt, sql);
 
         stmt.close();
         conn.close();
     }
 
+    static void init(Statement stmt) throws Exception {
+        stmt.executeUpdate("DROP TABLE IF EXISTS my_table");
+        stmt.executeUpdate("CREATE TABLE IF NOT EXISTS my_table(name varchar(20))");
+        stmt.executeUpdate("INSERT INTO my_table(name) VALUES('abc')");
+    }
+
+    static void query(Statement stmt, String sql) throws Exception {
+        ResultSet rs = stmt.executeQuery(sql);
+        rs.next();
+        System.out.println(rs.getString(1));
+        rs.close();
+    }
 }

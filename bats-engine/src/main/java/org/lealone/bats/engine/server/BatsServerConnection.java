@@ -29,6 +29,7 @@ import org.apache.drill.exec.work.user.UserWorker;
 import org.lealone.bats.engine.storage.LealoneStoragePlugin;
 import org.lealone.bats.engine.storage.LealoneStoragePluginConfig;
 import org.lealone.common.exceptions.DbException;
+import org.lealone.common.exceptions.UnsupportedSchemaException;
 import org.lealone.db.Constants;
 import org.lealone.db.Session;
 import org.lealone.db.result.Result;
@@ -49,6 +50,18 @@ public class BatsServerConnection extends TcpServerConnection {
     protected BatsServerConnection(BatsServer server, WritableChannel writableChannel, boolean isServer) {
         super(writableChannel, isServer);
         this.server = server;
+    }
+
+    @Override
+    protected void handleRequest(Transfer transfer, int id, int operation) throws IOException {
+        try {
+            super.handleRequest(transfer, id, operation);
+        } catch (UnsupportedSchemaException e) {
+            Session session = e.getSession();
+            String sql = e.getSql();
+            executeQueryAsync(session, session.getSessionId(), sql, transfer, id, operation, 0, Integer.MAX_VALUE,
+                    false);
+        }
     }
 
     @SuppressWarnings("unused")
@@ -79,13 +92,21 @@ public class BatsServerConnection extends TcpServerConnection {
 
         List<PageKey> pageKeys = readPageKeys(transfer);
         if (useBatsEngineForQuery) {
-            Drillbit drillbit = server.getDrillbit();
-            // TODO 支持drill的插件名前缀
-            // String sql = "SELECT * FROM lealone.lealone.PUBLIC.MY_TABLE";
             String sql = command.getSQL();
-            UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
-                    .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
-            UserWorker userWorker = drillbit.getWorkManager().getUserWorker();
+            executeQueryAsync(session, sessionId, sql, transfer, id, operation, resultId, fetchSize, true);
+        } else {
+            super.executeQueryAsync(transfer, session, sessionId, id, operation, prepared);
+        }
+    }
+
+    private void executeQueryAsync(Session session, int sessionId, String sql, Transfer transfer, int id, int operation,
+            int resultId, int fetchSize, boolean useDefaultSchema) throws IOException {
+        Drillbit drillbit = server.getDrillbit();
+        UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
+                .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
+        UserWorker userWorker = drillbit.getWorkManager().getUserWorker();
+        SchemaPlus schema = null;
+        if (useDefaultSchema) {
             LealoneStoragePlugin lsp;
             try {
                 lsp = (LealoneStoragePlugin) drillbit.getStoragePluginRegistry()
@@ -96,18 +117,16 @@ public class BatsServerConnection extends TcpServerConnection {
 
             SchemaPlus defaultSchema = CalciteSchema.createRootSchema(false, true, Constants.SCHEMA_MAIN).plus();
             String dbName = session.getDatabase().getShortName();
-            SchemaPlus schema = CalciteSchema.createRootSchema(defaultSchema, false, true, dbName).plus();
+            schema = CalciteSchema.createRootSchema(defaultSchema, false, true, dbName).plus();
             lsp.registerSchema(schema, dbName, defaultSchema);
-            BatsClientConnection clientConnection = new BatsClientConnection(schema, session.getUserName(), userWorker,
-                    getWritableChannel().getSocketChannel().getRemoteAddress(), res -> {
-                        if (res.isSucceeded()) {
-                            Result result = res.getResult();
-                            sendResult(transfer, session, sessionId, id, operation, result, resultId, fetchSize);
-                        }
-                    });
-            userWorker.submitWork(clientConnection, runQuery);
-        } else {
-            super.executeQueryAsync(transfer, session, sessionId, id, operation, prepared);
         }
+        BatsClientConnection clientConnection = new BatsClientConnection(schema, session.getUserName(), userWorker,
+                getWritableChannel().getSocketChannel().getRemoteAddress(), res -> {
+                    if (res.isSucceeded()) {
+                        Result result = res.getResult();
+                        sendResult(transfer, session, sessionId, id, operation, result, resultId, fetchSize);
+                    }
+                });
+        userWorker.submitWork(clientConnection, runQuery);
     }
 }

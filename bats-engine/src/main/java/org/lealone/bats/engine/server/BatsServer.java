@@ -23,9 +23,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.drill.common.config.DrillConfig;
 import org.apache.drill.exec.server.Drillbit;
 import org.apache.drill.exec.server.RemoteServiceSet;
+import org.apache.drill.exec.store.StoragePlugin;
 import org.lealone.common.exceptions.DbException;
 import org.lealone.common.logging.Logger;
 import org.lealone.common.logging.LoggerFactory;
+import org.lealone.db.LealoneDatabase;
 import org.lealone.db.api.ErrorCode;
 import org.lealone.net.AsyncConnection;
 import org.lealone.net.AsyncConnectionManager;
@@ -117,5 +119,9 @@ public class BatsServer extends DelegatedProtocolServer implements AsyncConnecti
         RemoteServiceSet serviceSet = RemoteServiceSet.getLocalServiceSet();
         drillbit = new Drillbit(drillConfig, serviceSet);
         drillbit.run();
+
+        for (Map.Entry<String, StoragePlugin> e : drillbit.getStoragePluginRegistry()) {
+            LealoneDatabase.addUnsupportedSchema(e.getKey());
+        }
     }
 }

@@ -37,6 +37,8 @@ public class JdbcTest {
 
         sql = "SELECT * FROM cp.`employee.json`";
         query(stmt, sql);
+        sql = "SELECT count(*) FROM cp.`employee.json`";
+        query(stmt, sql);
 
         stmt.close();
         conn.close();

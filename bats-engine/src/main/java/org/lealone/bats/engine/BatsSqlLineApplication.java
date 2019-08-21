@@ -26,6 +26,11 @@ import sqlline.PromptHandler;
 import sqlline.SqlLine;
 
 public class BatsSqlLineApplication extends DrillSqlLineApplication {
+
+    public BatsSqlLineApplication() {
+        super("bats-sqlline.conf", "bats-sqlline-override.conf");
+    }
+
     @Override
     public PromptHandler getPromptHandler(SqlLine sqlLine) {
         // if (config.hasPath(PROMPT_WITH_SCHEMA) && config.getBoolean(PROMPT_WITH_SCHEMA)) {

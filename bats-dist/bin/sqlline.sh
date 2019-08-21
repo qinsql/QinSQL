@@ -24,7 +24,7 @@ if [ "x$JAVA_HOME" = "x" ]; then
     exit 1;
 fi
 
-BATS_MAIN=sqlline.SqlLine -ac org.apache.drill.exec.client.DrillSqlLineApplication
+BATS_MAIN=sqlline.SqlLine -ac org.lealone.bats.engine.BatsSqlLineApplication
 
 JAVA_OPTS=-Xms10M
 JAVA_OPTS="$JAVA_OPTS -Dlogback.configurationFile=logback.xml"

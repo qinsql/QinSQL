@@ -23,7 +23,7 @@ pushd %~dp0..
 if NOT DEFINED BATS_HOME set BATS_HOME=%CD%
 popd
 
-if NOT DEFINED BATS_MAIN set BATS_MAIN=sqlline.SqlLine -ac org.apache.drill.exec.client.DrillSqlLineApplication
+if NOT DEFINED BATS_MAIN set BATS_MAIN=sqlline.SqlLine -ac org.lealone.bats.engine.BatsSqlLineApplication
 
 set JAVA_OPTS=-Xms10M^
  -Dlogback.configurationFile=logback.xml^
@@ -36,7 +36,7 @@ set CLASSPATH="%BATS_HOME%\conf;%BATS_HOME%\lib\*"
 goto okClasspath
 
 :okClasspath
-set BATS_PARAMS=%1 %2
+set BATS_PARAMS=%1 %2 %3 %4
 goto runShell
 
 set BATS_PARAMS=

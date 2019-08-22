@@ -17,15 +17,20 @@
  */
 package org.lealone.bats.engine.server;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+
 import org.apache.drill.common.types.TypeProtos;
 import org.apache.drill.common.types.TypeProtos.MajorType;
 import org.apache.drill.common.types.Types;
-import org.apache.drill.exec.expr.TypeHelper;
 import org.apache.drill.exec.record.BatchSchema;
 import org.apache.drill.exec.record.RecordBatch;
 import org.apache.drill.exec.record.VectorWrapper;
 import org.apache.drill.exec.vector.ValueVector;
-import org.apache.drill.exec.vector.accessor.BoundCheckingAccessor;
+import org.apache.drill.exec.vector.ValueVector.Accessor;
 import org.apache.drill.exec.vector.accessor.InvalidAccessException;
 import org.apache.drill.exec.vector.accessor.SqlAccessor;
 import org.lealone.db.result.Result;
@@ -47,8 +52,9 @@ import org.lealone.db.value.ValueTime;
 import org.lealone.db.value.ValueTimestamp;
 
 public class BatsResult implements Result {
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatsResult.class);
+    // private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatsResult.class);
 
+    // SqlAccessor直接访问ValueVector
     static class BatsSqlAccessor {
         final SqlAccessor accessor;
         final int valueType;
@@ -93,7 +99,56 @@ public class BatsResult implements Result {
                 return ValueString.get(accessor.getString(rowOffset));
             // 从BLOB到ENUM全转成字节
             default:
-                return ValueByte.get(accessor.getByte(rowOffset));
+                return ValueBytes.get(accessor.getBytes(rowOffset));
+            }
+        }
+    }
+
+    static class BatsAccessor {
+        final Accessor accessor;
+        final int valueType;
+
+        public BatsAccessor(Accessor accessor, int valueType) {
+            this.accessor = accessor;
+            this.valueType = valueType;
+        }
+
+        Value getValue(int rowOffset) {
+            if (accessor.isNull(rowOffset))
+                return ValueNull.INSTANCE;
+
+            switch (valueType) {
+            case Value.BOOLEAN:
+                return (Boolean) accessor.getObject(rowOffset) ? ValueBoolean.TRUE : ValueBoolean.FALSE;
+            case Value.BYTE:
+                return ValueByte.get((Byte) accessor.getObject(rowOffset));
+            case Value.SHORT:
+                return ValueShort.get((Short) accessor.getObject(rowOffset));
+            case Value.INT:
+                return ValueInt.get((Integer) accessor.getObject(rowOffset));
+            case Value.LONG:
+                return ValueLong.get((Long) accessor.getObject(rowOffset));
+            case Value.DECIMAL:
+                return ValueDecimal.get((BigDecimal) accessor.getObject(rowOffset));
+            case Value.DOUBLE:
+                return ValueDouble.get((Double) accessor.getObject(rowOffset));
+            case Value.FLOAT:
+                return ValueFloat.get((Float) accessor.getObject(rowOffset));
+            case Value.TIME:
+                return ValueTime.get((Time) accessor.getObject(rowOffset));
+            case Value.DATE:
+                return ValueDate.get((Date) accessor.getObject(rowOffset));
+            case Value.TIMESTAMP:
+                return ValueTimestamp.get((Timestamp) accessor.getObject(rowOffset));
+            case Value.BYTES:
+                return ValueBytes.get((byte[]) accessor.getObject(rowOffset));
+            case Value.STRING:
+            case Value.STRING_IGNORECASE:
+            case Value.STRING_FIXED:
+                return ValueString.get(accessor.getObject(rowOffset).toString());
+            // 从BLOB到ENUM全转成字节
+            default:
+                return ValueBytes.get((byte[]) accessor.getObject(rowOffset));
             }
         }
     }
@@ -103,26 +158,49 @@ public class BatsResult implements Result {
     int columnCount;
     int rowCount;
     int index;
-    BatsSqlAccessor[] accessors;
+    BatsAccessor[] accessors;
     Value[] current;
+    ArrayList<Value[]> rows = new ArrayList<>();
 
     public BatsResult(RecordBatch data) {
         // this.data = data;
         schema = data.getSchema();
         columnCount = schema.getFieldCount();
-        accessors = new BatsSqlAccessor[columnCount];
+        accessors = new BatsAccessor[columnCount];
         int column = 0;
         for (VectorWrapper<?> vw : data) {
+            // final ValueVector vector = vw.getValueVector();
+            // final SqlAccessor acc = new BoundCheckingAccessor(vector, TypeHelper.getSqlAccessor(vector));
+            // final Accessor accessor = vector.getAccessor();
+            // if (data.getRecordCount() > 0)
+            // accessor.getObject(0);
+            // MajorType majorType = acc.getType();
+            // final String sqlTypeName = Types.getSqlTypeName(majorType);
+            // final int jdbcTypeId = Types.getJdbcTypeCode(sqlTypeName);
+            // int valueType = DataType.convertSQLTypeToValueType(jdbcTypeId);
+
             final ValueVector vector = vw.getValueVector();
-            final SqlAccessor acc = new BoundCheckingAccessor(vector, TypeHelper.getSqlAccessor(vector));
-            MajorType majorType = acc.getType();
+            final Accessor acc = vector.getAccessor();
+            // if (data.getRecordCount() > 0)
+            // acc.getObject(0);
+            MajorType majorType = vector.getField().getType();
             final String sqlTypeName = Types.getSqlTypeName(majorType);
             final int jdbcTypeId = Types.getJdbcTypeCode(sqlTypeName);
             int valueType = DataType.convertSQLTypeToValueType(jdbcTypeId);
 
-            accessors[column++] = new BatsSqlAccessor(acc, valueType);
+            accessors[column++] = new BatsAccessor(acc, valueType);
         }
+        // 提前获取所有记录，否则ValueVector内部会发生变化，延迟获取时会导致错误的值
         rowCount = data.getRecordCount();
+        if (rowCount > 0) {
+            for (int r = 0; r < rowCount; r++) {
+                Value[] row = new Value[columnCount];
+                for (int c = 0; c < columnCount; c++) {
+                    row[c] = accessors[c].getValue(r);
+                }
+                rows.add(row);
+            }
+        }
     }
 
     @Override
@@ -138,16 +216,17 @@ public class BatsResult implements Result {
     @Override
     public boolean next() {
         if (hasNext()) {
-            current = new Value[columnCount];
-            for (int i = 0; i < columnCount; i++) {
-                try {
-                    current[i] = accessors[i].getValue(index);
-                } catch (InvalidAccessException e) {
-                    logger.warn(e.getMessage());
-                    current[i] = ValueNull.INSTANCE;
-                }
-            }
-            index++;
+            // current = new Value[columnCount];
+            // for (int i = 0; i < columnCount; i++) {
+            // try {
+            // current[i] = accessors[i].getValue(index);
+            // } catch (Exception e) {
+            // logger.warn(e.getMessage());
+            // current[i] = ValueNull.INSTANCE;
+            // }
+            // }
+            // index++;
+            current = rows.get(index++);
             return true;
         } else {
             current = null;

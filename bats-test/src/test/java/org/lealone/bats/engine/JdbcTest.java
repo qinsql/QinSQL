@@ -37,6 +37,11 @@ public class JdbcTest {
 
         sql = "SELECT * FROM cp.`employee.json`";
         query(stmt, sql);
+        sql = "SELECT full_name FROM cp.`employee.json` where employee_id=1";
+        query(stmt, sql);
+        sql = "SELECT * FROM cp.`employee.json` where employee_id=10000";
+        query(stmt, sql);
+
         sql = "SELECT count(*) FROM cp.`employee.json`";
         query(stmt, sql);
 
@@ -52,8 +57,10 @@ public class JdbcTest {
 
     static void query(Statement stmt, String sql) throws Exception {
         ResultSet rs = stmt.executeQuery(sql);
-        rs.next();
-        System.out.println(rs.getString(1));
+        if (rs.next())
+            System.out.println(rs.getString(1));
+        else
+            System.out.println("no data");
         rs.close();
     }
 }

@@ -42,12 +42,12 @@ import io.netty.util.concurrent.GenericFutureListener;
 
 public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClientConnection {
 
-    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatsClientConnection.class);
+    // private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatsClientConnection.class);
 
+    private final BatsBatchResult batchResult = new BatsBatchResult();
     private final UserSession session;
     private final SocketAddress remoteAddress;
     private final AsyncHandler<AsyncResult<Result>> asyncHandler;
-    private org.lealone.db.result.Result result;
 
     public BatsClientConnection(SchemaPlus schema, String userName, UserWorker userWorker, SocketAddress remoteAddress,
             AsyncHandler<AsyncResult<Result>> asyncHandler) {
@@ -69,7 +69,10 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
 
     @Override
     public void sendResult(RpcOutcomeListener<Ack> listener, QueryResult result) {
-        logger.info("sendResult");
+        // logger.info("sendResult");
+        AsyncResult<Result> ar = new AsyncResult<>();
+        ar.setResult(batchResult);
+        asyncHandler.handle(ar);
     }
 
     @Override
@@ -84,15 +87,12 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
 
     @Override
     public void sendData(RpcOutcomeListener<Ack> listener, RecordBatch data) {
-        result = new BatsResult(data);
-
-        AsyncResult<Result> ar = new AsyncResult<>();
-        ar.setResult(result);
-        asyncHandler.handle(ar);
+        BatsResult result = new BatsResult(data);
+        batchResult.addBatsResult(result);
     }
 
     public org.lealone.db.result.Result getResult() {
-        return result;
+        return batchResult;
     }
 
     @Override

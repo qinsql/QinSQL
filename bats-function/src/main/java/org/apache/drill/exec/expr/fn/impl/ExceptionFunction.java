@@ -15,8 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.drill.exec.expr.fn;
+package org.apache.drill.exec.expr.fn.impl;
 
+import org.apache.drill.exec.expr.DrillFunc;
 import org.apache.drill.exec.expr.DrillSimpleFunc;
 import org.apache.drill.exec.expr.annotations.FunctionTemplate;
 import org.apache.drill.exec.expr.annotations.FunctionTemplate.FunctionScope;
@@ -27,25 +28,28 @@ import org.apache.drill.exec.expr.holders.VarCharHolder;
 
 public class ExceptionFunction {
 
-  public static final String EXCEPTION_FUNCTION_NAME = "__throwException";
+    @FunctionTemplate(name = DrillFunc.EXCEPTION_FUNCTION_NAME, isRandom = true, //
+            scope = FunctionScope.SIMPLE, nulls = FunctionTemplate.NullHandling.NULL_IF_NULL)
+    public static class ThrowException implements DrillSimpleFunc {
 
-  @FunctionTemplate(name = EXCEPTION_FUNCTION_NAME, isRandom = true,
-          scope = FunctionScope.SIMPLE, nulls = FunctionTemplate.NullHandling.NULL_IF_NULL)
-  public static class ThrowException implements DrillSimpleFunc {
+        @Param
+        VarCharHolder message;
+        @Output
+        BigIntHolder out;
 
-    @Param VarCharHolder message;
-    @Output BigIntHolder out;
+        @Override
+        public void setup() {
+        }
 
-    public void setup() {
+        @Override
+        public void eval() {
+            String msg = org.apache.drill.exec.expr.fn.impl.StringFunctionHelpers.toStringFromUTF8(message.start,
+                    message.end, message.buffer);
+            org.apache.drill.exec.expr.fn.impl.ExceptionFunction.throwException(msg);
+        }
     }
 
-    public void eval() {
-      String msg = org.apache.drill.exec.expr.fn.impl.StringFunctionHelpers.toStringFromUTF8(message.start, message.end, message.buffer);
-      org.apache.drill.exec.expr.fn.ExceptionFunction.throwException(msg);
+    public static void throwException(String message) {
+        throw new org.apache.drill.common.exceptions.DrillRuntimeException(message);
     }
-  }
-
-  public static void throwException(String message) {
-    throw new org.apache.drill.common.exceptions.DrillRuntimeException(message);
-  }
 }

@@ -18,4 +18,5 @@
 package org.apache.drill.exec.expr;
 
 public interface DrillFunc {
+    public static final String EXCEPTION_FUNCTION_NAME = "__throwException";
 }

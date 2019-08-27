@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.drill.exec.store.easy.text.compliant.v3;
+package org.apache.drill.exec.store.easy.text.reader;
 
 import io.netty.buffer.DrillBuf;
 import io.netty.util.internal.PlatformDependent;
@@ -42,7 +42,7 @@ final class TextInput {
 
   private final byte[] lineSeparator;
   private final byte normalizedLineSeparator;
-  private final TextParsingSettingsV3 settings;
+  private final TextParsingSettings settings;
 
   private long lineCount;
   private long charCount;
@@ -92,7 +92,7 @@ final class TextInput {
    * {@link Format#getNormalizedNewline()}) that is used to replace any
    * lineSeparator sequence found in the input.
    */
-  public TextInput(TextParsingSettingsV3 settings, InputStream input, DrillBuf readBuffer, long startPos, long endPos) {
+  public TextInput(TextParsingSettings settings, InputStream input, DrillBuf readBuffer, long startPos, long endPos) {
     this.lineSeparator = settings.getNewLineDelimiter();
     byte normalizedLineSeparator = settings.getNormalizedNewLine();
     Preconditions.checkArgument(input instanceof Seekable, "Text input only supports an InputStream that supports Seekable.");

@@ -46,22 +46,16 @@ import org.apache.drill.exec.proto.ExecProtos.FragmentHandle;
 import org.apache.drill.exec.proto.UserBitShared.CoreOperatorType;
 import org.apache.drill.exec.server.DrillbitContext;
 import org.apache.drill.exec.server.options.OptionManager;
-import org.apache.drill.exec.store.RecordReader;
 import org.apache.drill.exec.store.RecordWriter;
-import org.apache.drill.exec.store.dfs.DrillFileSystem;
 import org.apache.drill.exec.store.dfs.FileSelection;
 import org.apache.drill.exec.store.dfs.easy.EasyFormatPlugin;
 import org.apache.drill.exec.store.dfs.easy.EasyGroupScan;
 import org.apache.drill.exec.store.dfs.easy.EasySubScan;
 import org.apache.drill.exec.store.dfs.easy.EasyWriter;
-import org.apache.drill.exec.store.dfs.easy.FileWork;
-import org.apache.drill.exec.store.easy.text.compliant.CompliantTextRecordReader;
-import org.apache.drill.exec.store.easy.text.compliant.TextParsingSettings;
-import org.apache.drill.exec.store.easy.text.compliant.v3.CompliantTextBatchReader;
-import org.apache.drill.exec.store.easy.text.compliant.v3.TextParsingSettingsV3;
-import org.apache.drill.exec.store.schedule.CompleteFileWork;
-import org.apache.drill.exec.store.text.DrillTextRecordReader;
-import org.apache.drill.exec.store.text.DrillTextRecordWriter;
+import org.apache.drill.exec.store.easy.text.reader.CompliantTextBatchReader;
+import org.apache.drill.exec.store.easy.text.reader.TextParsingSettings;
+import org.apache.drill.exec.store.easy.text.writer.TextRecordWriter;
+import org.apache.drill.exec.store.schedule.CompleteFileWork; 
 import org.apache.drill.exec.vector.accessor.convert.AbstractConvertFromString;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -192,7 +186,7 @@ public class TextFormatPlugin extends EasyFormatPlugin<TextFormatPlugin.TextForm
     @Override
     public ManagedReader<? extends FileSchemaNegotiator> newReader(
         FileSplit split) {
-      TextParsingSettingsV3 settings = new TextParsingSettingsV3();
+      TextParsingSettings settings = new TextParsingSettings();
       settings.set(plugin.getConfig());
       return new CompliantTextBatchReader(split, fileSystem(), settings);
     }
@@ -301,26 +295,6 @@ public class TextFormatPlugin extends EasyFormatPlugin<TextFormatPlugin.TextForm
     }
   }
 
-  // TODO: Remove this once the V2 reader is removed.
-  @Override
-  public RecordReader getRecordReader(FragmentContext context,
-                                      DrillFileSystem dfs,
-                                      FileWork fileWork,
-                                      List<SchemaPath> columns,
-                                      String userName) {
-    Path path = dfs.makeQualified(fileWork.getPath());
-    FileSplit split = new FileSplit(path, fileWork.getStart(), fileWork.getLength(), new String[]{""});
-
-    if (context.getOptions().getBoolean(ExecConstants.ENABLE_NEW_TEXT_READER_KEY)) {
-      TextParsingSettings settings = new TextParsingSettings();
-      settings.set(formatConfig);
-      return new CompliantTextRecordReader(split, dfs, settings, columns);
-    } else {
-      char delim = formatConfig.getFieldDelimiter();
-      return new DrillTextRecordReader(split, dfs.getConf(), context, delim, columns);
-    }
-  }
-
   @Override
   public RecordWriter getRecordWriter(final FragmentContext context, final EasyWriter writer) throws IOException {
     final Map<String, String> options = new HashMap<>();
@@ -332,7 +306,7 @@ public class TextFormatPlugin extends EasyFormatPlugin<TextFormatPlugin.TextForm
     options.put("separator", getConfig().getFieldDelimiterAsString());
     options.put("extension", getConfig().getExtensions().get(0));
 
-    RecordWriter recordWriter = new DrillTextRecordWriter(
+    RecordWriter recordWriter = new TextRecordWriter(
         context.getAllocator(), writer.getStorageStrategy(), writer.getFormatPlugin().getFsConf());
     recordWriter.init(options);
 

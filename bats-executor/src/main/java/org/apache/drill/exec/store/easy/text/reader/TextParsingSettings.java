@@ -15,16 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.drill.exec.store.easy.text.compliant.v3;
+package org.apache.drill.exec.store.easy.text.reader;
 
 import org.apache.drill.exec.store.easy.text.TextFormatPlugin.TextFormatConfig;
 
 import org.apache.drill.shaded.guava.com.google.common.base.Charsets;
 
-// TODO: Remove the "V3" suffix once the V2 version is retired.
-public class TextParsingSettingsV3 {
+public class TextParsingSettings {
 
-  public static final TextParsingSettingsV3 DEFAULT = new TextParsingSettingsV3();
+  public static final TextParsingSettings DEFAULT = new TextParsingSettings();
 
   private String emptyValue = null;
   private boolean parseUnescapedQuotes = true;

@@ -485,6 +485,7 @@ public class DrillFileSystem extends FileSystem implements OpenFileTracker {
     return underlyingFs.getDefaultReplication(path);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean mkdirs(Path folderPath) throws IOException {
     if (!underlyingFs.exists(folderPath)) {

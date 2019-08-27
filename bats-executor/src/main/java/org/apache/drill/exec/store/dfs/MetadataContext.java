@@ -51,8 +51,9 @@ public class MetadataContext {
   }
 
   public boolean getStatus(String dir) {
-    if (dirModifCheckMap.containsKey(dir)) {
-      return dirModifCheckMap.get(dir);
+    Path path = new Path(dir);
+    if (dirModifCheckMap.containsKey(path)) {
+      return dirModifCheckMap.get(path);
     }
     return false;
   }

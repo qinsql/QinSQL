@@ -193,6 +193,7 @@ public class DrillParquetReader extends AbstractRecordReader {
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setup(OperatorContext context, OutputMutator output) throws ExecutionSetupException {
 

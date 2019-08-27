@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.drill.exec.store.easy.text.compliant.v3;
+package org.apache.drill.exec.store.easy.text.reader;
 
 import io.netty.buffer.DrillBuf;
 
@@ -42,7 +42,7 @@ public final class TextReader {
 
   private final TextParsingContext context;
 
-  private final TextParsingSettingsV3 settings;
+  private final TextParsingSettings settings;
 
   private final TextInput input;
   private final TextOutput output;
@@ -66,14 +66,14 @@ public final class TextReader {
   private final byte newLine;
 
   /**
-   * The CsvParser supports all settings provided by {@link TextParsingSettingsV3},
+   * The CsvParser supports all settings provided by {@link TextParsingSettings},
    * and requires this configuration to be properly initialized.
    * @param settings  the parser configuration
    * @param input  input stream
    * @param output  interface to produce output record batch
    * @param workBuf  working buffer to handle whitespace
    */
-  public TextReader(TextParsingSettingsV3 settings, TextInput input, TextOutput output, DrillBuf workBuf) {
+  public TextReader(TextParsingSettings settings, TextInput input, TextOutput output, DrillBuf workBuf) {
     this.context = new TextParsingContext(input, output);
     this.workBuf = workBuf;
     this.settings = settings;

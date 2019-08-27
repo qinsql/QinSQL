@@ -41,6 +41,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import org.apache.drill.shaded.guava.com.google.common.collect.Lists;
 
+@SuppressWarnings("unused")
 public class JsonRecordWriter extends JSONOutputRecordWriter implements RecordWriter {
 
   private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(JsonRecordWriter.class);

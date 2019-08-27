@@ -40,6 +40,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
  * Describes the options for a format plugin
  * extracted from the FormatPluginConfig subclass
  */
+@SuppressWarnings("deprecation")
 final class FormatPluginOptionsDescriptor {
   private static final Logger logger = org.slf4j.LoggerFactory.getLogger(FormatPluginOptionsDescriptor.class);
 

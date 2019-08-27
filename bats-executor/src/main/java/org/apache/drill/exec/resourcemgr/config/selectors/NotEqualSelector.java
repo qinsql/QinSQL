@@ -17,10 +17,10 @@
  */
 package org.apache.drill.exec.resourcemgr.config.selectors;
 
-import avro.shaded.com.google.common.annotations.VisibleForTesting;
 import com.typesafe.config.Config;
 import org.apache.drill.exec.ops.QueryContext;
 import org.apache.drill.exec.resourcemgr.config.exception.RMConfigException;
+import org.apache.drill.shaded.guava.com.google.common.annotations.VisibleForTesting;
 
 /**
  * Simple selector whose value is another Simple or Complex Selectors. It does NOT of result of its child selector

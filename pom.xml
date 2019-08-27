@@ -38,6 +38,7 @@
         <module>bats-engine</module>
         <module>bats-test</module>
         <module>bats-dist</module>
+        <module>bats-plugins/format</module>
     </modules>
 
     <properties>

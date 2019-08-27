@@ -59,7 +59,6 @@ import org.apache.drill.exec.store.dfs.FormatPlugin;
 import org.apache.drill.exec.store.dfs.FormatSelection;
 import org.apache.drill.exec.store.dfs.MagicString;
 import org.apache.drill.exec.store.dfs.MetadataContext;
-import org.apache.drill.exec.store.mock.MockStorageEngine;
 import org.apache.drill.exec.store.parquet.metadata.Metadata;
 import org.apache.drill.exec.store.parquet.metadata.ParquetTableMetadataDirs;
 import org.apache.drill.exec.util.DrillFileSystemUtil;
@@ -76,7 +75,7 @@ import org.apache.parquet.hadoop.ParquetFileWriter;
 
 public class ParquetFormatPlugin implements FormatPlugin {
 
-  private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(MockStorageEngine.class);
+  private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(ParquetFormatPlugin.class);
 
   public static final ParquetMetadataConverter parquetMetadataConverter = new ParquetMetadataConverter();
 

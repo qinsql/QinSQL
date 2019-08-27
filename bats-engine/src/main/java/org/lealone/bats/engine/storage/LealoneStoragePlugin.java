@@ -133,6 +133,8 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
 
         @Override
         public Set<String> getTableNames() {
+            if (inner == null)
+                return Collections.emptySet();
             Set<String> names = new HashSet<>();
             for (Table t : inner.getAllTablesAndViews()) {
                 names.add(t.getName());

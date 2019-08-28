@@ -28,7 +28,7 @@ import org.apache.drill.exec.physical.impl.BatchCreator;
 import org.apache.drill.exec.physical.impl.ScanBatch;
 import org.apache.drill.exec.record.RecordBatch;
 import org.apache.drill.exec.store.RecordReader;
-import org.apache.drill.exec.store.easy.json.JSONRecordReader;
+import org.apache.drill.exec.store.dfs.json.JSONRecordReader;
 
 public class ValuesBatchCreator implements BatchCreator<Values> {
   @Override

@@ -17,10 +17,10 @@
  */
 package org.apache.drill.exec.store.schedule;
 
-import org.apache.drill.exec.store.dfs.easy.FileWork;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.apache.drill.exec.store.dfs.easy.FileWork;
 import org.apache.hadoop.fs.Path;
 
 public class CompleteFileWork implements FileWork, CompleteWork {

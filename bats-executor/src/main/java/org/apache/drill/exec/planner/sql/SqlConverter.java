@@ -88,12 +88,13 @@ import org.apache.drill.exec.planner.logical.DrillTable;
 import org.apache.drill.exec.planner.physical.DrillDistributionTraitDef;
 import org.apache.drill.exec.planner.physical.PlannerSettings;
 import org.apache.drill.exec.rpc.user.UserSession;
-import org.apache.drill.exec.store.dfs.FileSelection;
+
 import static org.apache.calcite.util.Static.RESOURCE;
 
 import org.apache.drill.shaded.guava.com.google.common.base.Joiner;
 import org.apache.drill.exec.store.ColumnExplorer;
 import org.apache.drill.exec.store.DynamicSchema;
+import org.apache.drill.exec.store.dfs.FileSelection;
 import org.apache.drill.exec.util.DecimalUtility;
 
 /**

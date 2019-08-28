@@ -18,10 +18,10 @@
 package org.apache.drill.exec.store.parquet;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import org.apache.drill.exec.store.dfs.ReadEntryFromHDFS;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.apache.drill.exec.store.dfs.ReadEntryFromHDFS;
 import org.apache.hadoop.fs.Path;
 
 public class RowGroupReadEntry extends ReadEntryFromHDFS {

@@ -26,10 +26,10 @@ import org.apache.drill.common.logical.FormatPluginConfig;
 import org.apache.drill.exec.physical.base.AbstractWriter;
 import org.apache.drill.exec.physical.base.PhysicalOperator;
 import org.apache.drill.exec.store.StorageStrategy;
-import org.apache.drill.exec.physical.base.Writer;
-import org.apache.drill.exec.store.StoragePluginRegistry;
 import org.apache.drill.exec.store.dfs.FileSystemConfig;
 import org.apache.drill.exec.store.dfs.FormatPlugin;
+import org.apache.drill.exec.physical.base.Writer;
+import org.apache.drill.exec.store.StoragePluginRegistry;
 
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;

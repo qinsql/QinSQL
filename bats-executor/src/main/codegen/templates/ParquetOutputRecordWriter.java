@@ -22,10 +22,10 @@ import java.lang.RuntimeException;
 import java.util.Arrays;
 
 <@pp.dropOutputFile />
-<@pp.changeOutputFile name="org/apache/drill/exec/store/ParquetOutputRecordWriter.java" />
+<@pp.changeOutputFile name="org/apache/drill/exec/store/parquet/ParquetOutputRecordWriter.java" />
 <#include "/@includes/license.ftl" />
 
-package org.apache.drill.exec.store;
+package org.apache.drill.exec.store.parquet;
 
 import org.apache.drill.shaded.guava.com.google.common.collect.Lists;
 import org.apache.drill.shaded.guava.com.google.common.primitives.Ints;

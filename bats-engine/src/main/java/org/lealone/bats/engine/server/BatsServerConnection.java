@@ -37,6 +37,7 @@ import org.lealone.net.Transfer;
 import org.lealone.net.WritableChannel;
 import org.lealone.server.TcpServerConnection;
 import org.lealone.sql.PreparedStatement;
+import org.lealone.sql.dml.Query;
 import org.lealone.storage.PageKey;
 
 public class BatsServerConnection extends TcpServerConnection {
@@ -58,6 +59,16 @@ public class BatsServerConnection extends TcpServerConnection {
             super.handleRequest(transfer, id, operation);
         } catch (UnsupportedSchemaException e) {
             Session session = e.getSession();
+            if (operation == Session.COMMAND_PREPARE_READ_PARAMS || operation == Session.COMMAND_PREPARE) {
+                writeResponseHeader(transfer, session, id);
+                transfer.writeBoolean(true);
+                if (operation == Session.COMMAND_PREPARE_READ_PARAMS) {
+                    transfer.writeInt(0);
+                }
+                transfer.flush();
+                return;
+            }
+
             String sql = e.getSql();
             executeQueryAsync(session, session.getSessionId(), sql, transfer, id, operation, 0, Integer.MAX_VALUE,
                     false);
@@ -65,8 +76,8 @@ public class BatsServerConnection extends TcpServerConnection {
     }
 
     @SuppressWarnings("unused")
-    @Override
-    protected void executeQueryAsync(Transfer transfer, Session session, int sessionId, int id, int operation,
+    // @Override
+    protected void executeQueryAsync2(Transfer transfer, Session session, int sessionId, int id, int operation,
             boolean prepared) throws IOException {
         int resultId = transfer.readInt();
         int maxRows = transfer.readInt();
@@ -97,6 +108,16 @@ public class BatsServerConnection extends TcpServerConnection {
         } else {
             super.executeQueryAsync(transfer, session, sessionId, id, operation, prepared);
         }
+    }
+
+    @Override
+    protected boolean executeQueryAsync(Session session, int sessionId, PreparedStatement command, Transfer transfer,
+            int id, int operation, int resultId, int fetchSize) throws IOException {
+        if (useBatsEngineForQuery && command instanceof Query) {
+            executeQueryAsync(session, sessionId, command.getSQL(), transfer, id, operation, resultId, fetchSize, true);
+            return true;
+        }
+        return false;
     }
 
     private void executeQueryAsync(Session session, int sessionId, String sql, Transfer transfer, int id, int operation,

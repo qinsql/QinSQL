@@ -91,16 +91,17 @@ public class BatsOptimizerTest {
 
     static void testSqlParser() throws Exception {
         String sql = "select * from test where f1=1 or f2=2 order by f3 limit 2";
-        SqlParser sqlParser = SqlParser.create(sql);
+        SqlParser sqlParser = createSqlParser(sql);
         SqlNode sqlNode = sqlParser.parseQuery();
         System.out.println(sqlNode);
         System.out.println();
 
-        sql = "insert into test(f1,f2,f3) values(1,2,3)";
-        sqlParser = SqlParser.create(sql);
-        sqlNode = sqlParser.parseStmt();
-        System.out.println(sqlNode);
-        System.out.println();
+        // drill的parser不支持
+        // sql = "insert into test(f1,f2,f3) values(1,2,3)";
+        // sqlParser = createSqlParser(sql);
+        // sqlNode = sqlParser.parseStmt();
+        // System.out.println(sqlNode);
+        // System.out.println();
 
         sql = "delete from test where f1=1";
         sqlNode = sqlParser.parseQuery(sql);
@@ -218,10 +219,15 @@ public class BatsOptimizerTest {
     }
 
     static SqlNode parse(String sql) throws Exception {
-        SqlParser.Config config = SqlParser.configBuilder().setUnquotedCasing(org.apache.calcite.util.Casing.TO_LOWER)
-                .build();
-        SqlParser sqlParser = SqlParser.create(sql, config);
+        SqlParser sqlParser = createSqlParser(sql);
         return sqlParser.parseQuery();
+    }
+
+    static SqlParser createSqlParser(String sql) throws Exception {
+        SqlParser.Config config = SqlParser.configBuilder().setUnquotedCasing(org.apache.calcite.util.Casing.TO_LOWER)
+                .setParserFactory(org.apache.drill.exec.planner.sql.parser.impl.DrillParserImpl.FACTORY).build();
+        SqlParser sqlParser = SqlParser.create(sql, config);
+        return sqlParser;
     }
 
     static Table createTable() {

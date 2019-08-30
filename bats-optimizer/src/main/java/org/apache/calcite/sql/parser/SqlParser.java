@@ -18,7 +18,7 @@ package org.apache.calcite.sql.parser;
 
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.parser.impl.SqlParserImpl;
+//import org.apache.calcite.sql.parser.impl.SqlParserImpl;
 import org.apache.calcite.sql.validate.SqlConformance;
 import org.apache.calcite.sql.validate.SqlConformanceEnum;
 import org.apache.calcite.sql.validate.SqlDelegatingConformance;
@@ -233,7 +233,7 @@ public class SqlParser {
     private int identifierMaxLength = DEFAULT_IDENTIFIER_MAX_LENGTH;
     private boolean caseSensitive = Lex.ORACLE.caseSensitive;
     private SqlConformance conformance = SqlConformanceEnum.DEFAULT;
-    private SqlParserImplFactory parserFactory = SqlParserImpl.FACTORY;
+    private SqlParserImplFactory parserFactory;// = SqlParserImpl.FACTORY;
 
     private ConfigBuilder() {}
 

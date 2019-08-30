@@ -89,7 +89,7 @@ public class BasicFormatMatcher extends FormatMatcher {
    */
   @Override
   public boolean isFileReadable(DrillFileSystem fs, FileStatus status) throws IOException {
-  CompressionCodec codec = null;
+    CompressionCodec codec = null;
     if (compressible) {
       codec = codecFactory.getCodec(status.getPath());
     }

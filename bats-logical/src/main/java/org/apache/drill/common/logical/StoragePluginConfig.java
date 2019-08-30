@@ -17,7 +17,6 @@
  */
 package org.apache.drill.common.logical;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

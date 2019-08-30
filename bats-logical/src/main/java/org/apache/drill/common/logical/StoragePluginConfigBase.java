@@ -21,7 +21,6 @@ import java.util.Set;
 
 import org.apache.drill.common.scanner.persistence.ScanResult;
 
-
 public abstract class StoragePluginConfigBase extends StoragePluginConfig {
   private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(StoragePluginConfigBase.class);
 

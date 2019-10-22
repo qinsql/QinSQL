@@ -26,7 +26,6 @@ import org.lealone.bats.engine.server.BatsServerEngine;
 import org.lealone.common.exceptions.ConfigException;
 import org.lealone.p2p.config.Config;
 import org.lealone.p2p.config.Config.PluggableEngineDef;
-import org.lealone.test.start.NodeBase;
 
 //加上-Xbootclasspath/p:../bats-function/target/generated-sources;../bats-function/src/main/java
 public class BatsEngineTest extends NodeBase {

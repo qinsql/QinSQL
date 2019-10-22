@@ -35,9 +35,9 @@ import org.lealone.net.NetFactory;
 import org.lealone.net.NetFactoryManager;
 import org.lealone.net.NetServer;
 import org.lealone.net.WritableChannel;
-import org.lealone.server.DelegatedProtocolServer;
+import org.lealone.server.TcpServer;
 
-public class BatsServer extends DelegatedProtocolServer implements AsyncConnectionManager {
+public class BatsServer extends TcpServer implements AsyncConnectionManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BatsServer.class);
     public static final int DEFAULT_TCP_PORT = 7216;

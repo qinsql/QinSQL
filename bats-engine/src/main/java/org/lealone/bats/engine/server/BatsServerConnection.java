@@ -18,7 +18,6 @@
 package org.lealone.bats.engine.server;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.apache.calcite.schema.CalciteSchema;
 import org.apache.calcite.schema.SchemaPlus;
@@ -33,12 +32,12 @@ import org.lealone.common.exceptions.UnsupportedSchemaException;
 import org.lealone.db.Constants;
 import org.lealone.db.Session;
 import org.lealone.db.result.Result;
-import org.lealone.net.Transfer;
+import org.lealone.net.TransferInputStream;
+import org.lealone.net.TransferOutputStream;
 import org.lealone.net.WritableChannel;
 import org.lealone.server.TcpServerConnection;
 import org.lealone.sql.PreparedStatement;
 import org.lealone.sql.dml.Query;
-import org.lealone.storage.PageKey;
 
 public class BatsServerConnection extends TcpServerConnection {
 
@@ -49,79 +48,45 @@ public class BatsServerConnection extends TcpServerConnection {
     private final BatsServer server;
 
     protected BatsServerConnection(BatsServer server, WritableChannel writableChannel, boolean isServer) {
-        super(writableChannel, isServer);
+        super(server, writableChannel, isServer);
         this.server = server;
     }
 
     @Override
-    protected void handleRequest(Transfer transfer, int id, int operation) throws IOException {
+    protected void handleRequest(TransferInputStream in, int packetId, int operation) throws IOException {
         try {
-            super.handleRequest(transfer, id, operation);
+            super.handleRequest(in, packetId, operation);
         } catch (UnsupportedSchemaException e) {
             Session session = e.getSession();
             if (operation == Session.COMMAND_PREPARE_READ_PARAMS || operation == Session.COMMAND_PREPARE) {
-                writeResponseHeader(transfer, session, id);
-                transfer.writeBoolean(true);
+                TransferOutputStream out = createTransferOutputStream(session);
+                writeResponseHeader(out, session, packetId);
+                out.writeBoolean(true);
                 if (operation == Session.COMMAND_PREPARE_READ_PARAMS) {
-                    transfer.writeInt(0);
+                    out.writeInt(0);
                 }
-                transfer.flush();
+                out.flush();
                 return;
             }
-
             String sql = e.getSql();
-            executeQueryAsync(session, session.getSessionId(), sql, transfer, id, operation, 0, Integer.MAX_VALUE,
-                    false);
-        }
-    }
-
-    @SuppressWarnings("unused")
-    // @Override
-    protected void executeQueryAsync2(Transfer transfer, Session session, int sessionId, int id, int operation,
-            boolean prepared) throws IOException {
-        int resultId = transfer.readInt();
-        int maxRows = transfer.readInt();
-        int fetchSize = transfer.readInt();
-        boolean scrollable = transfer.readBoolean();
-
-        if (operation == Session.COMMAND_DISTRIBUTED_TRANSACTION_QUERY
-                || operation == Session.COMMAND_DISTRIBUTED_TRANSACTION_PREPARED_QUERY) {
-            session.setAutoCommit(false);
-            session.setRoot(false);
-        }
-
-        PreparedStatement command;
-        if (prepared) {
-            command = (PreparedStatement) getCache().getObject(id, false);
-            setParameters(transfer, command);
-        } else {
-            String sql = transfer.readString();
-            command = session.prepareStatement(sql, fetchSize);
-            getCache().addObject(id, command);
-        }
-        command.setFetchSize(fetchSize);
-
-        List<PageKey> pageKeys = readPageKeys(transfer);
-        if (useBatsEngineForQuery) {
-            String sql = command.getSQL();
-            executeQueryAsync(session, sessionId, sql, transfer, id, operation, resultId, fetchSize, true);
-        } else {
-            super.executeQueryAsync(transfer, session, sessionId, id, operation, prepared);
+            int fetchSize = Integer.MAX_VALUE;
+            PreparedStatement stmt = session.prepareStatement(sql, fetchSize);
+            executeQueryAsync(in, packetId, operation, session, session.getSessionId(), stmt, fetchSize, 0);
         }
     }
 
     @Override
-    protected boolean executeQueryAsync(Session session, int sessionId, PreparedStatement command, Transfer transfer,
-            int id, int operation, int resultId, int fetchSize) throws IOException {
-        if (useBatsEngineForQuery && command instanceof Query) {
-            executeQueryAsync(session, sessionId, command.getSQL(), transfer, id, operation, resultId, fetchSize, true);
+    protected boolean executeQueryAsync(TransferInputStream in, int packetId, int operation, Session session,
+            int sessionId, PreparedStatement stmt, int resultId, int fetchSize) throws IOException {
+        if (useBatsEngineForQuery && stmt instanceof Query) {
+            executeQueryAsync(session, sessionId, stmt.getSQL(), in, packetId, operation, resultId, fetchSize, true);
             return true;
         }
         return false;
     }
 
-    private void executeQueryAsync(Session session, int sessionId, String sql, Transfer transfer, int id, int operation,
-            int resultId, int fetchSize, boolean useDefaultSchema) throws IOException {
+    private void executeQueryAsync(Session session, int sessionId, String sql, TransferInputStream in, int packetId,
+            int operation, int resultId, int fetchSize, boolean useDefaultSchema) throws IOException {
         Drillbit drillbit = server.getDrillbit();
         UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
                 .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
@@ -141,11 +106,12 @@ public class BatsServerConnection extends TcpServerConnection {
             schema = CalciteSchema.createRootSchema(defaultSchema, false, true, dbName).plus();
             lsp.registerSchema(schema, dbName, defaultSchema);
         }
+        TransferOutputStream out = createTransferOutputStream(session);
         BatsClientConnection clientConnection = new BatsClientConnection(schema, session.getUserName(), userWorker,
                 getWritableChannel().getSocketChannel().getRemoteAddress(), res -> {
                     if (res.isSucceeded()) {
                         Result result = res.getResult();
-                        sendResult(transfer, session, sessionId, id, operation, result, resultId, fetchSize);
+                        sendResult(out, packetId, operation, session, sessionId, result, resultId, fetchSize);
                     }
                 });
         userWorker.submitWork(clientConnection, runQuery);

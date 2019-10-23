@@ -71,15 +71,15 @@ public class BatsServerConnection extends TcpServerConnection {
             String sql = e.getSql();
             int fetchSize = Integer.MAX_VALUE;
             PreparedStatement stmt = session.prepareStatement(sql, fetchSize);
-            executeQueryAsync(in, packetId, operation, session, session.getSessionId(), stmt, fetchSize, 0);
+            executeQueryAsync(packetId, operation, session, session.getSessionId(), stmt, 0, fetchSize);
         }
     }
 
     @Override
-    protected boolean executeQueryAsync(TransferInputStream in, int packetId, int operation, Session session,
+    protected boolean executeQueryAsync(int packetId, int operation, Session session,
             int sessionId, PreparedStatement stmt, int resultId, int fetchSize) throws IOException {
         if (useBatsEngineForQuery && stmt instanceof Query) {
-            executeQueryAsync(session, sessionId, stmt.getSQL(), in, packetId, operation, resultId, fetchSize, true);
+            executeQueryAsync(session, sessionId, stmt.getSQL(), packetId, operation, resultId, fetchSize, true);
             return true;
         }
         return false;
@@ -106,12 +106,11 @@ public class BatsServerConnection extends TcpServerConnection {
             schema = CalciteSchema.createRootSchema(defaultSchema, false, true, dbName).plus();
             lsp.registerSchema(schema, dbName, defaultSchema);
         }
-        TransferOutputStream out = createTransferOutputStream(session);
         BatsClientConnection clientConnection = new BatsClientConnection(schema, session.getUserName(), userWorker,
                 getWritableChannel().getSocketChannel().getRemoteAddress(), res -> {
                     if (res.isSucceeded()) {
                         Result result = res.getResult();
-                        sendResult(out, packetId, operation, session, sessionId, result, resultId, fetchSize);
+                        sendResult(packetId, operation, session, sessionId, result, resultId, fetchSize);
                     }
                 });
         userWorker.submitWork(clientConnection, runQuery);

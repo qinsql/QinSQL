@@ -34,7 +34,7 @@
         <shaded.guava.version>23.0</shaded.guava.version>
         <parquet.version>1.10.0</parquet.version>
         <sqlline.version>1.7.0</sqlline.version>
-        <jackson.databind.version>2.9.5</jackson.databind.version>
+        <jackson.databind.version>2.9.10.3</jackson.databind.version>
         <zookeeper.version>3.4.12</zookeeper.version>
         <ojai.version>3.0-mapr-1808</ojai.version>
         <kerby.version>1.0.0-RC2</kerby.version>

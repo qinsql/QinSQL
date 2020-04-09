@@ -30,13 +30,15 @@ import org.lealone.bats.engine.storage.LealoneStoragePluginConfig;
 import org.lealone.common.exceptions.DbException;
 import org.lealone.common.exceptions.UnsupportedSchemaException;
 import org.lealone.db.Constants;
-import org.lealone.db.Session;
 import org.lealone.db.result.Result;
+import org.lealone.db.session.Session;
 import org.lealone.net.TransferInputStream;
 import org.lealone.net.TransferOutputStream;
 import org.lealone.net.WritableChannel;
 import org.lealone.server.TcpServerConnection;
-import org.lealone.sql.PreparedStatement;
+import org.lealone.server.protocol.PacketType;
+import org.lealone.server.protocol.statement.StatementQueryAck;
+import org.lealone.sql.PreparedSQLStatement;
 import org.lealone.sql.dml.Query;
 
 public class BatsServerConnection extends TcpServerConnection {
@@ -53,16 +55,17 @@ public class BatsServerConnection extends TcpServerConnection {
     }
 
     @Override
-    protected void handleRequest(TransferInputStream in, int packetId, int operation) throws IOException {
+    protected void handleRequest(TransferInputStream in, int packetId, int packetType) throws IOException {
         try {
-            super.handleRequest(in, packetId, operation);
+            super.handleRequest(in, packetId, packetType);
         } catch (UnsupportedSchemaException e) {
             Session session = e.getSession();
-            if (operation == Session.COMMAND_PREPARE_READ_PARAMS || operation == Session.COMMAND_PREPARE) {
+            if (packetType == PacketType.PREPARED_STATEMENT_PREPARE.value
+                    || packetType == PacketType.PREPARED_STATEMENT_PREPARE_READ_PARAMS.value) {
                 TransferOutputStream out = createTransferOutputStream(session);
-                writeResponseHeader(out, session, packetId);
+                out.writeResponseHeader(packetId, Session.STATUS_OK);
                 out.writeBoolean(true);
-                if (operation == Session.COMMAND_PREPARE_READ_PARAMS) {
+                if (packetType == PacketType.PREPARED_STATEMENT_PREPARE_READ_PARAMS.value) {
                     out.writeInt(0);
                 }
                 out.flush();
@@ -70,23 +73,15 @@ public class BatsServerConnection extends TcpServerConnection {
             }
             String sql = e.getSql();
             int fetchSize = Integer.MAX_VALUE;
-            PreparedStatement stmt = session.prepareStatement(sql, fetchSize);
-            executeQueryAsync(packetId, operation, session, session.getSessionId(), stmt, 0, fetchSize);
+            PreparedSQLStatement stmt = session.prepareStatement(sql, fetchSize);
+            if (useBatsEngineForQuery && stmt instanceof Query) {
+                executeQueryAsync(session, sql, packetId, fetchSize, true);
+            }
         }
     }
 
-    @Override
-    protected boolean executeQueryAsync(int packetId, int operation, Session session,
-            int sessionId, PreparedStatement stmt, int resultId, int fetchSize) throws IOException {
-        if (useBatsEngineForQuery && stmt instanceof Query) {
-            executeQueryAsync(session, sessionId, stmt.getSQL(), packetId, operation, resultId, fetchSize, true);
-            return true;
-        }
-        return false;
-    }
-
-    private void executeQueryAsync(Session session, int sessionId, String sql, TransferInputStream in, int packetId,
-            int operation, int resultId, int fetchSize, boolean useDefaultSchema) throws IOException {
+    private void executeQueryAsync(Session session, String sql, int packetId, int fetchSize, boolean useDefaultSchema)
+            throws IOException {
         Drillbit drillbit = server.getDrillbit();
         UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
                 .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
@@ -110,7 +105,19 @@ public class BatsServerConnection extends TcpServerConnection {
                 getWritableChannel().getSocketChannel().getRemoteAddress(), res -> {
                     if (res.isSucceeded()) {
                         Result result = res.getResult();
-                        sendResult(packetId, operation, session, sessionId, result, resultId, fetchSize);
+                        try {
+                            int rowCount = result.getRowCount();
+                            int fetch = fetchSize;
+                            if (rowCount != -1)
+                                fetch = Math.min(rowCount, fetchSize);
+                            StatementQueryAck ack = new StatementQueryAck(result, rowCount, fetch);
+                            TransferOutputStream out = createTransferOutputStream(session);
+                            out.writeResponseHeader(packetId, Session.STATUS_OK);
+                            ack.encode(out, session.getProtocolVersion());
+                            out.flush();
+                        } catch (Exception e) {
+                            sendError(session, packetId, e);
+                        }
                     }
                 });
         userWorker.submitWork(clientConnection, runQuery);

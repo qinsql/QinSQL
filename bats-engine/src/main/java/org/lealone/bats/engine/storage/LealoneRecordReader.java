@@ -503,6 +503,5 @@ public class LealoneRecordReader extends AbstractRecordReader {
                 mutator.setNull(index);
             }
         }
-
     }
 }

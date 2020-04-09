@@ -17,7 +17,7 @@
  */
 package org.lealone.bats.engine.sql;
 
-import org.lealone.db.ServerSession;
+import org.lealone.db.session.ServerSession;
 import org.lealone.db.table.Column;
 import org.lealone.db.table.Table;
 import org.lealone.sql.Parser;

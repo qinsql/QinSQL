@@ -20,9 +20,9 @@ package org.lealone.bats.engine.sql;
 import java.util.Map;
 
 import org.lealone.db.CommandParameter;
-import org.lealone.db.ServerSession;
-import org.lealone.db.Session;
 import org.lealone.db.schema.Sequence;
+import org.lealone.db.session.ServerSession;
+import org.lealone.db.session.Session;
 import org.lealone.db.value.Value;
 import org.lealone.sql.IExpression;
 import org.lealone.sql.Parser;
@@ -85,5 +85,4 @@ public class BatsSQLEngine implements SQLEngine {
     @Override
     public void close() {
     }
-
 }

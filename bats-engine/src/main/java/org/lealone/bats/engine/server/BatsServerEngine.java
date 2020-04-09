@@ -52,5 +52,4 @@ public class BatsServerEngine extends ProtocolServerEngineBase {
     public void close() {
         server.stop();
     }
-
 }

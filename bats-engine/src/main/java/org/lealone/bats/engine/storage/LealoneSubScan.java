@@ -137,12 +137,10 @@ public class LealoneSubScan extends AbstractBase implements SubScan {
         public byte[] getEndKey() {
             return endKey;
         }
-
     }
 
     @Override
     public int getOperatorType() {
         return CoreOperatorType.KUDU_SUB_SCAN_VALUE;
     }
-
 }

@@ -279,5 +279,4 @@ public class LealoneGroupScan extends AbstractGroupScan {
     public void setLealoneScanSpec(LealoneScanSpec scanSpec) {
         this.scanSpec = scanSpec;
     }
-
 }

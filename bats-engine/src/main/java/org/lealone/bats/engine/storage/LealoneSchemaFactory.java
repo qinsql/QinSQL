@@ -36,5 +36,4 @@ public class LealoneSchemaFactory extends AbstractSchemaFactory {
         SchemaPlus hPlus = parent.add(getName(), schema);
         schema.setHolder(hPlus);
     }
-
 }

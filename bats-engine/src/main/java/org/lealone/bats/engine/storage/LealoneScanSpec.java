@@ -45,5 +45,4 @@ public class LealoneScanSpec {
     public String getTableName() {
         return tableName;
     }
-
 }

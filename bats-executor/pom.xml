@@ -35,7 +35,7 @@
         <parquet.version>1.10.0</parquet.version>
         <sqlline.version>1.7.0</sqlline.version>
         <jackson.databind.version>2.9.5</jackson.databind.version>
-        <zookeeper.version>3.4.12</zookeeper.version>
+        <zookeeper.version>3.4.14</zookeeper.version>
         <ojai.version>3.0-mapr-1808</ojai.version>
         <kerby.version>1.0.0-RC2</kerby.version>
         <findbugs.version>3.0.0</findbugs.version>

@@ -29,7 +29,6 @@ import org.apache.drill.exec.store.StoragePluginRegistry;
 import org.apache.drill.exec.store.dfs.FileSystemConfig;
 import org.apache.drill.exec.store.dfs.FileSystemPlugin;
 import org.apache.drill.exec.store.dfs.WorkspaceConfig;
-import org.apache.drill.exec.store.dfs.sequencefile.SequenceFileFormatConfig;
 import org.apache.drill.exec.store.dfs.text.TextFormatPlugin;
 import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableList;
 
@@ -114,10 +113,6 @@ public class StoragePluginTestUtils {
         psvConfig.extensions = ImmutableList.of("tbl");
         psvConfig.fieldDelimiter = '|';
         newFormats.put("psv", psvConfig);
-
-        SequenceFileFormatConfig seqConfig = new SequenceFileFormatConfig();
-        seqConfig.extensions = ImmutableList.of("seq");
-        newFormats.put("sequencefile", seqConfig);
 
         TextFormatPlugin.TextFormatConfig csvhtestConfig = new TextFormatPlugin.TextFormatConfig();
         csvhtestConfig.extensions = ImmutableList.of("csvh-test");

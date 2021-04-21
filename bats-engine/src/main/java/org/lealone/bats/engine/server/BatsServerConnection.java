@@ -31,6 +31,7 @@ import org.lealone.common.exceptions.DbException;
 import org.lealone.common.exceptions.UnsupportedSchemaException;
 import org.lealone.db.Constants;
 import org.lealone.db.result.Result;
+import org.lealone.db.session.ServerSession;
 import org.lealone.db.session.Session;
 import org.lealone.net.TransferInputStream;
 import org.lealone.net.TransferOutputStream;
@@ -59,7 +60,7 @@ public class BatsServerConnection extends TcpServerConnection {
         try {
             super.handleRequest(in, packetId, packetType);
         } catch (UnsupportedSchemaException e) {
-            Session session = e.getSession();
+            ServerSession session = (ServerSession) e.getSession();
             if (packetType == PacketType.PREPARED_STATEMENT_PREPARE.value
                     || packetType == PacketType.PREPARED_STATEMENT_PREPARE_READ_PARAMS.value) {
                 TransferOutputStream out = createTransferOutputStream(session);
@@ -80,8 +81,8 @@ public class BatsServerConnection extends TcpServerConnection {
         }
     }
 
-    private void executeQueryAsync(Session session, String sql, int packetId, int fetchSize, boolean useDefaultSchema)
-            throws IOException {
+    private void executeQueryAsync(ServerSession session, String sql, int packetId, int fetchSize,
+            boolean useDefaultSchema) throws IOException {
         Drillbit drillbit = server.getDrillbit();
         UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
                 .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();

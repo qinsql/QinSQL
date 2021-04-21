@@ -129,7 +129,7 @@ public class LealoneRecordReader extends AbstractRecordReader {
     public LealoneRecordReader(LealoneScanSpec scanSpec, String storagePluginName) {
         this.storagePluginName = storagePluginName;
         Database db = LealoneDatabase.getInstance().getDatabase(scanSpec.getDbName());
-        table = db.getSchema(scanSpec.getSchemaName()).findTableOrView(null, scanSpec.getTableName());
+        table = db.getSchema(null, scanSpec.getSchemaName()).findTableOrView(null, scanSpec.getTableName());
     }
 
     static {

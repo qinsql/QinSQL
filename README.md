@@ -2,6 +2,8 @@
 
 面向 OLAP 场景的 SQL 引擎
 
+改编自从 [Apache Calcite](https://calcite.apache.org/) 和 [Apache Drill](http://drill.apache.org/)
+
 
 
 ## 开发环境

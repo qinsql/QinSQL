@@ -2,7 +2,7 @@
 
 面向 OLAP 场景的 SQL 引擎
 
-改编自从 [Apache Calcite](https://calcite.apache.org/) 和 [Apache Drill](http://drill.apache.org/)
+改编自 [Apache Calcite](https://calcite.apache.org/) 和 [Apache Drill](http://drill.apache.org/)
 
 
 
@@ -18,9 +18,9 @@
 
 ## 运行
 
-代码导入 IDE 后，直接运行 bats-test/src/test/java/org/lealone/bats/test/start/BatsEngineStart.java 
+代码导入 IDE 后，直接运行 [BatsEngineStart](https://github.com/lealone/Bats/blob/master/bats-test/src/test/java/org/lealone/bats/test/start/BatsEngineStart.java) 
 
-然后执行 bats-test/src/test/java/org/lealone/bats/test/jdbc/JdbcTest.java 通过标准 JDBC API 访问数据库。
+然后执行 [JdbcTest](https://github.com/lealone/Bats/blob/master/bats-test/src/test/java/org/lealone/bats/test/jdbc/JdbcTest.java) 通过标准 JDBC API 访问数据库。
 
 
 

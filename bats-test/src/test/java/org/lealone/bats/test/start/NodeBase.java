@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine;
+package org.lealone.bats.test.start;
 
 import org.lealone.common.exceptions.ConfigException;
 import org.lealone.main.Lealone;

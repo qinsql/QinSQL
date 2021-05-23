@@ -15,23 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.executor;
+package org.lealone.bats.test;
 
-import org.apache.drill.common.config.DrillConfig;
-import org.apache.drill.exec.server.Drillbit;
-import org.apache.drill.exec.server.RemoteServiceSet;
+import java.io.File;
+import java.io.IOException;
 
-// 加-Xbootclasspath/p:../bats-executor/src/main/java;../bats-test/target/test-data
-public class ExecutorTest {
+import org.lealone.storage.fs.FileUtils;
 
-    public static void main(String[] args) throws Throwable {
-        // 能查看org.apache.calcite.rel.metadata.JaninoRelMetadataProvider生成的代码
-        System.setProperty("calcite.debug", "true");
+public class DeleteTestData {
 
-        DrillConfig drillConfig = DrillConfig.create();
-        RemoteServiceSet serviceSet = RemoteServiceSet.getLocalServiceSet();
-        Drillbit drillbit = new Drillbit(drillConfig, serviceSet);
-        drillbit.run();
+    public static void main(String[] args) throws IOException {
+        FileUtils.deleteRecursive(TestBase.TEST_BASE_DIR, true);
+        if (!FileUtils.exists(TestBase.TEST_BASE_DIR)) {
+            System.out.println("dir '" + new File(TestBase.TEST_BASE_DIR).getCanonicalPath() + "' deleted");
+        }
     }
 
 }

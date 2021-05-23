@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine;
+package org.lealone.bats.test.jdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -32,17 +32,13 @@ public class JdbcTest {
         Statement stmt = conn.createStatement();
         init(stmt);
 
-        String sql = "SELECT name FROM my_table";
+        String sql = "SELECT name FROM my_table"; // 用OLTP的SQL引擎
         query(stmt, sql);
 
-        sql = "SELECT * FROM cp.`employee.json`";
-        query(stmt, sql);
-        sql = "SELECT full_name FROM cp.`employee.json` where employee_id=1";
-        query(stmt, sql);
-        sql = "SELECT * FROM cp.`employee.json` where employee_id=10000";
+        sql = "SELECT name FROM olap.my_table"; // 用OLAP的SQL引擎
         query(stmt, sql);
 
-        sql = "SELECT count(*) FROM cp.`employee.json`";
+        sql = "SELECT count(*) FROM cp.`test.csvh`"; // 用OLAP的SQL引擎
         query(stmt, sql);
 
         stmt.close();

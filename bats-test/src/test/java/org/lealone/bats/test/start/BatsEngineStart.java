@@ -15,12 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.engine;
+package org.lealone.bats.test.start;
 
 import java.util.ArrayList;
 
-import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.parser.SqlParseException;
 import org.lealone.bats.engine.server.BatsServer;
 import org.lealone.bats.engine.server.BatsServerEngine;
 import org.lealone.common.exceptions.ConfigException;
@@ -28,10 +26,10 @@ import org.lealone.p2p.config.Config;
 import org.lealone.p2p.config.Config.PluggableEngineDef;
 
 //加上-Xbootclasspath/p:../bats-function/target/generated-sources;../bats-function/src/main/java
-public class BatsEngineTest extends NodeBase {
+public class BatsEngineStart extends NodeBase {
 
     // YamlConfigLoader的子类必须有一个无参数的构造函数
-    public BatsEngineTest() {
+    public BatsEngineStart() {
         nodeBaseDirPrefix = "bats";
     }
 
@@ -42,14 +40,7 @@ public class BatsEngineTest extends NodeBase {
     }
 
     public static void main(String[] args) throws Exception {
-        // parse();
-        NodeBase.run(BatsEngineTest.class, null);
-    }
-
-    public static void parse() throws SqlParseException {
-        String sql = "select * from test where f1=1 or f2=2 order by f3 limit 2";
-        SqlNode sqlNode = BatsEngine.parse(sql);
-        System.out.println(sqlNode);
+        NodeBase.run(BatsEngineStart.class, null);
     }
 
     public static void enableBatsServer(Config config) {

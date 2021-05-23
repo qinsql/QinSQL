@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.optimizer;
+package org.lealone.bats.test.optimizer;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -15,24 +15,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.lealone.bats.executor;
+package org.lealone.bats.test.executor;
 
-import org.apache.drill.exec.expr.fn.impl.GMathFunctions;
-import org.apache.drill.exec.expr.fn.interpreter.InterpreterEvaluator;
-import org.apache.drill.exec.expr.holders.IntHolder;
+import org.apache.drill.common.config.DrillConfig;
+import org.apache.drill.exec.server.Drillbit;
+import org.apache.drill.exec.server.RemoteServiceSet;
 
-public class DrillFuncTest {
+// 加-Xbootclasspath/p:../bats-executor/src/main/java;../bats-test/target/test-data
+public class ExecutorTest {
 
-    public static void main(String[] args) {
-        IntHolder in = new IntHolder();
-        in.value = -1;
-        Object[] args2 = { in };
-        GMathFunctions.AbsInt abs = new GMathFunctions.AbsInt();
-        try {
-            IntHolder v = (IntHolder) InterpreterEvaluator.evaluateFunction(abs, args2, "abs");
-            System.out.println(v.value);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws Throwable {
+        // 能查看org.apache.calcite.rel.metadata.JaninoRelMetadataProvider生成的代码
+        System.setProperty("calcite.debug", "true");
+
+        DrillConfig drillConfig = DrillConfig.create();
+        RemoteServiceSet serviceSet = RemoteServiceSet.getLocalServiceSet();
+        Drillbit drillbit = new Drillbit(drillConfig, serviceSet);
+        drillbit.run();
     }
+
 }

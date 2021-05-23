@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName(LealoneStoragePluginConfig.NAME)
 public class LealoneStoragePluginConfig extends StoragePluginConfigBase {
 
-    public static final String NAME = "lealone";
+    public static final String NAME = "olap";
 
     @JsonCreator
     public LealoneStoragePluginConfig() {

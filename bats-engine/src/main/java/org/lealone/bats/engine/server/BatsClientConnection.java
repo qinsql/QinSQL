@@ -71,7 +71,11 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
     public void sendResult(RpcOutcomeListener<Ack> listener, QueryResult result) {
         // logger.info("sendResult");
         AsyncResult<Result> ar = new AsyncResult<>();
-        ar.setResult(batchResult);
+        if (result.getQueryState() == QueryResult.QueryState.FAILED) {
+            ar.setCause(new RuntimeException(result.getErrorList().get(0).getMessage()));
+        } else {
+            ar.setResult(batchResult);
+        }
         asyncHandler.handle(ar);
     }
 
@@ -218,7 +222,6 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
 
             @Override
             public boolean isVoid() {
-                // TODO Auto-generated method stub
                 return false;
             }
         };

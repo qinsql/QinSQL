@@ -18,31 +18,25 @@
 package org.lealone.bats.engine.server;
 
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.drill.common.config.DrillConfig;
 import org.apache.drill.exec.server.Drillbit;
 import org.apache.drill.exec.server.RemoteServiceSet;
 import org.apache.drill.exec.store.StoragePlugin;
-import org.lealone.common.exceptions.DbException;
 import org.lealone.common.logging.Logger;
 import org.lealone.common.logging.LoggerFactory;
 import org.lealone.db.LealoneDatabase;
-import org.lealone.db.api.ErrorCode;
-import org.lealone.net.AsyncConnection;
 import org.lealone.net.AsyncConnectionManager;
 import org.lealone.net.NetFactory;
 import org.lealone.net.NetFactoryManager;
 import org.lealone.net.NetServer;
-import org.lealone.net.WritableChannel;
 import org.lealone.server.TcpServer;
 
 public class BatsServer extends TcpServer implements AsyncConnectionManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BatsServer.class);
-    public static final int DEFAULT_TCP_PORT = 7216;
+    public static final int DEFAULT_TCP_PORT = 9216;
 
-    private final CopyOnWriteArrayList<AsyncConnection> connections = new CopyOnWriteArrayList<>();
     private Drillbit drillbit;
 
     public Drillbit getDrillbit() {
@@ -91,24 +85,6 @@ public class BatsServer extends TcpServer implements AsyncConnectionManager {
         if (isStopped())
             return;
         super.stop();
-    }
-
-    @Override
-    public AsyncConnection createConnection(WritableChannel writableChannel, boolean isServer) {
-        if (getAllowOthers() || allow(writableChannel.getHost())) {
-            BatsServerConnection conn = new BatsServerConnection(this, writableChannel, isServer);
-            connections.add(conn);
-            return conn;
-        } else {
-            writableChannel.close();
-            throw DbException.get(ErrorCode.REMOTE_CONNECTION_NOT_ALLOWED);
-        }
-    }
-
-    @Override
-    public void removeConnection(AsyncConnection conn) {
-        connections.remove(conn);
-        conn.close();
     }
 
     private void startDrillbit() throws Exception {

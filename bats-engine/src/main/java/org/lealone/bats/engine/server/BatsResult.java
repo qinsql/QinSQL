@@ -270,7 +270,7 @@ public class BatsResult implements Result {
 
     @Override
     public String getAlias(int i) {
-        return null;
+        return getColumnName(i);
     }
 
     @Override

@@ -192,7 +192,6 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
 
                 addSchemas(catalogName, db);
             }
-
             defaultSchema = schemaMap.values().iterator().next();
         }
 
@@ -250,7 +249,6 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
                     logger.warn("Failure while attempting to read table '{}' from JDBC source.", name, e);
                 }
             }
-
             // no table was found.
             return null;
         }
@@ -264,7 +262,6 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
         public boolean areTableNamesCaseSensitive() {
             return defaultSchema.areTableNamesCaseSensitive();
         }
-
     }
 
     @Override
@@ -272,11 +269,10 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
         JdbcCatalogSchema schema = new JdbcCatalogSchema(getName());
         SchemaPlus holder = parent.add(getName(), schema);
         schema.setHolder(holder);
-
         // schemaFactory.registerSchemas(config, parent);
     }
 
-    public void registerSchema(SchemaPlus parent, String dbName, SchemaPlus defaultSchema) throws IOException {
+    public void registerSchema(SchemaPlus parent, String dbName, SchemaPlus defaultSchema) {
         Database db = LealoneDatabase.getInstance().getDatabase(dbName);
         for (Schema schema : db.getAllSchemas()) {
             final String schemaName = schema.getName();
@@ -289,7 +285,8 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
             for (Table table : schema.getAllTablesAndViews()) {
                 LealoneTable t = new LealoneTable(table, getName(), this, schema,
                         new LealoneScanSpec(dbName, schemaName, table.getName()));
-                subSchema.add(table.getName(), t);
+                subSchema.add(table.getName().toUpperCase(), t);
+                subSchema.add(table.getName().toLowerCase(), t);
             }
             parent.add(schemaName, subSchema);
         }

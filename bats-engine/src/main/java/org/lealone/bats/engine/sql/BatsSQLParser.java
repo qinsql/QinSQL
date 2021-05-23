@@ -17,43 +17,23 @@
  */
 package org.lealone.bats.engine.sql;
 
+import org.lealone.common.exceptions.UnsupportedSchemaException;
 import org.lealone.db.session.ServerSession;
-import org.lealone.db.table.Column;
-import org.lealone.db.table.Table;
 import org.lealone.sql.Parser;
-import org.lealone.sql.SQLParser;
 import org.lealone.sql.StatementBase;
-import org.lealone.sql.expression.Expression;
 
-public class BatsSQLParser implements SQLParser {
+public class BatsSQLParser extends Parser {
 
-    private final Parser parser;
-
-    @Override
-    public void setRightsChecked(boolean rightsChecked) {
-        parser.setRightsChecked(rightsChecked);
-    }
-
-    @Override
-    public Expression parseExpression(String sql) {
-        return parser.parseExpression(sql);
-    }
-
-    public Table parseTableName(String sql) {
-        return parser.parseTableName(sql);
+    public BatsSQLParser(ServerSession session) {
+        super(session);
     }
 
     @Override
     public StatementBase parse(String sql) {
-        return parser.parse(sql);
-    }
-
-    @Override
-    public Column parseColumnForTable(String columnSql) {
-        return parser.parseColumnForTable(columnSql);
-    }
-
-    public BatsSQLParser(ServerSession session) {
-        parser = new Parser(session);
+        try {
+            return super.parse(sql);
+        } catch (UnsupportedSchemaException e) {
+            return new BatsQuery((ServerSession) e.getSession(), sql);
+        }
     }
 }

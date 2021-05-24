@@ -312,6 +312,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.lealone</groupId>
+            <artifactId>lealone-main</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.lealone.bats</groupId>
             <artifactId>bats-vector</artifactId>
             <version>${project.version}</version>

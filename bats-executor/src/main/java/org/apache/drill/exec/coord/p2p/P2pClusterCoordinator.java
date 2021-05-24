@@ -17,69 +17,71 @@
  */
 package org.apache.drill.exec.coord.p2p;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.drill.exec.coord.ClusterCoordinator;
+import org.apache.drill.common.util.DrillVersionInfo;
 import org.apache.drill.exec.coord.DistributedSemaphore;
+import org.apache.drill.exec.coord.local.LocalClusterCoordinator;
 import org.apache.drill.exec.coord.store.TransientStore;
 import org.apache.drill.exec.coord.store.TransientStoreConfig;
 import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint;
 import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint.State;
+import org.lealone.net.NetNode;
+import org.lealone.net.NetNodeManagerHolder;
 
-public class P2pClusterCoordinator extends ClusterCoordinator {
+public class P2pClusterCoordinator extends LocalClusterCoordinator {
 
     @Override
     public void close() throws Exception {
-        // TODO Auto-generated method stub
-        
+        super.close();
     }
 
     @Override
     public void start(long millisToWait) throws Exception {
-        // TODO Auto-generated method stub
-        
+        super.start(millisToWait);
     }
 
     @Override
     public RegistrationHandle register(DrillbitEndpoint data) {
-        // TODO Auto-generated method stub
-        return null;
+        return super.register(data);
     }
 
     @Override
     public void unregister(RegistrationHandle handle) {
-        // TODO Auto-generated method stub
-        
+        super.unregister(handle);
     }
 
     @Override
     public Collection<DrillbitEndpoint> getAvailableEndpoints() {
-        // TODO Auto-generated method stub
-        return null;
+        return getOnlineEndPoints();
     }
 
     @Override
     public Collection<DrillbitEndpoint> getOnlineEndPoints() {
-        // TODO Auto-generated method stub
-        return null;
+        ArrayList<DrillbitEndpoint> list = new ArrayList<>();
+        for (NetNode node : NetNodeManagerHolder.get().getLiveNodes()) {
+            DrillbitEndpoint partialEndpoint = DrillbitEndpoint.newBuilder().setAddress(node.getHost())
+                    .setVersion(DrillVersionInfo.getVersion()).setState(State.ONLINE).setControlPort(31011)
+                    .setDataPort(31012).build();
+            list.add(partialEndpoint);
+        }
+        return list;
     }
 
     @Override
     public RegistrationHandle update(RegistrationHandle handle, State state) {
-        // TODO Auto-generated method stub
-        return null;
+        return super.update(handle, state);
     }
 
     @Override
     public DistributedSemaphore getSemaphore(String name, int maximumLeases) {
-        // TODO Auto-generated method stub
-        return null;
+        return super.getSemaphore(name, maximumLeases);
     }
 
     @Override
     public <V> TransientStore<V> getOrCreateTransientStore(TransientStoreConfig<V> config) {
-        // TODO Auto-generated method stub
-        return null;
+        return super.getOrCreateTransientStore(config);
     }
 
 }

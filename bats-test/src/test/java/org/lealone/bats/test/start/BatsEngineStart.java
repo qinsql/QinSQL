@@ -24,6 +24,7 @@ import org.lealone.common.exceptions.ConfigException;
 import org.lealone.db.Constants;
 import org.lealone.p2p.config.Config;
 import org.lealone.p2p.config.Config.PluggableEngineDef;
+import org.lealone.p2p.server.P2pServerEngine;
 
 //加上-Xbootclasspath/p:../bats-function/target/generated-sources;../bats-function/src/main/java
 public class BatsEngineStart extends NodeBase {
@@ -36,6 +37,11 @@ public class BatsEngineStart extends NodeBase {
     @Override
     public void applyConfig(Config config) throws ConfigException {
         // enableBatsServer(config);
+        for (PluggableEngineDef e : config.protocol_server_engines) {
+            if (P2pServerEngine.NAME.equalsIgnoreCase(e.name)) {
+                e.enabled = false;
+            }
+        }
         super.applyConfig(config);
     }
 

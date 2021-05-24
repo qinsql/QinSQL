@@ -66,10 +66,10 @@ public abstract class BasicServer<T extends EnumLite, SC extends ServerConnectio
         .channel(TransportCheck.getServerSocketChannel())
         .option(ChannelOption.SO_BACKLOG, 1000)
         .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 30*1000)
-        .option(ChannelOption.TCP_NODELAY, true)
+        //.option(ChannelOption.TCP_NODELAY, true)
         .option(ChannelOption.SO_REUSEADDR, true)
         .option(ChannelOption.SO_RCVBUF, 1 << 17)
-        .option(ChannelOption.SO_SNDBUF, 1 << 17)
+        //.option(ChannelOption.SO_SNDBUF, 1 << 17)
         .group(eventLoopGroup) //
         .childOption(ChannelOption.ALLOCATOR, alloc)
 
@@ -189,11 +189,11 @@ public abstract class BasicServer<T extends EnumLite, SC extends ServerConnectio
     return null;
   }
 
-  public int bind(final int initialPort, boolean allowPortHunting) {
+  public int bind(String hostName, final int initialPort, boolean allowPortHunting) {
     int port = initialPort - 1;
     while (true) {
       try {
-        b.bind(++port).sync();
+        b.bind(hostName, ++port).sync();
         break;
       } catch (Exception e) {
         // TODO(DRILL-3026):  Revisit:  Exception is not (always) BindException.

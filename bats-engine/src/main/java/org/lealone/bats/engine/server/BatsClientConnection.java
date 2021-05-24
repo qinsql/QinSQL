@@ -219,11 +219,6 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
             public ChannelFuture awaitUninterruptibly() {
                 return null;
             }
-
-            @Override
-            public boolean isVoid() {
-                return false;
-            }
         };
     }
 }

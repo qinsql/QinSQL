@@ -57,7 +57,7 @@ protocol_server_engines:
         session_timeout: -1
     }
   - name: P2P
-    enabled: false
+    enabled: true
     parameters: {
         port: 9211,
         ssl: false

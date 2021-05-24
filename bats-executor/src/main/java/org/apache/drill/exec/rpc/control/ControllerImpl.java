@@ -57,7 +57,7 @@ public class ControllerImpl implements Controller {
   public DrillbitEndpoint start(DrillbitEndpoint partialEndpoint, final boolean allowPortHunting) {
     server = new ControlServer(config, connectionRegistry);
     int port = config.getBootstrapContext().getConfig().getInt(ExecConstants.INITIAL_BIT_PORT);
-    port = server.bind(port, allowPortHunting);
+    port = server.bind(partialEndpoint.getAddress(), port, allowPortHunting);
     DrillbitEndpoint completeEndpoint = partialEndpoint.toBuilder().setControlPort(port).build();
     connectionRegistry.setLocalEndpoint(completeEndpoint);
     handlerRegistry.setEndpoint(completeEndpoint);

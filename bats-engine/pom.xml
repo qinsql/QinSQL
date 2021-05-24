@@ -35,11 +35,6 @@
             <artifactId>bats-function</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.lealone</groupId>
-            <artifactId>lealone-main</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.yaml</groupId>

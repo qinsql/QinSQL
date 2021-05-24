@@ -98,6 +98,16 @@ public class Drillbit implements AutoCloseable {
   
   private final DrillConfig config;
   
+  private  String hostName;
+  
+  public String getHostName() {
+    return hostName;
+  }
+
+  public void setHostName(String hostName) {
+    this.hostName = hostName;
+  }
+
   public DrillConfig getConfig() {
       return config;
   }
@@ -203,7 +213,7 @@ public class Drillbit implements AutoCloseable {
     if (profileStoreProvider != storeProvider) {
       profileStoreProvider.start();
     }
-    DrillbitEndpoint md = engine.start();
+    DrillbitEndpoint md = engine.start(hostName);
     manager.start(md, engine.getController(), engine.getDataConnectionCreator(), coord, storeProvider, profileStoreProvider);
     final DrillbitContext drillbitContext = manager.getContext();
     storageRegistry = drillbitContext.getStorage();

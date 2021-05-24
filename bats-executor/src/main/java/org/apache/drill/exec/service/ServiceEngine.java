@@ -46,19 +46,16 @@ public class ServiceEngine implements AutoCloseable {
   private final Controller controller;
   private final DataConnectionCreator dataPool;
 
-  private final String hostName;
+  //private final String hostName;
   private final boolean allowPortHunting;
   private final boolean isDistributedMode;
-
-  private final BufferAllocator userAllocator;
+ 
   private final BufferAllocator controlAllocator;
   private final BufferAllocator dataAllocator;
 
   public ServiceEngine(final WorkManager manager, final BootStrapContext context,
                        final boolean allowPortHunting, final boolean isDistributedMode)
-      throws DrillbitStartupException {
-    userAllocator = newAllocator(context, "rpc:user", "drill.exec.rpc.user.server.memory.reservation",
-        "drill.exec.rpc.user.server.memory.maximum");
+      throws DrillbitStartupException { 
     controlAllocator = newAllocator(context, "rpc:bit-control",
         "drill.exec.rpc.bit.server.memory.control.reservation", "drill.exec.rpc.bit.server.memory.control.maximum");
     dataAllocator = newAllocator(context, "rpc:bit-data",
@@ -67,7 +64,7 @@ public class ServiceEngine implements AutoCloseable {
     controller = new ControllerImpl(context, controlAllocator, manager.getControlMessageHandler());
     dataPool = new DataConnectionCreator(context, dataAllocator, manager.getWorkBus(), manager.getBee());
 
-    hostName = context.getHostName();
+    //hostName = context.getHostName();
     this.allowPortHunting = allowPortHunting;
     this.isDistributedMode = isDistributedMode;
   }
@@ -78,7 +75,7 @@ public class ServiceEngine implements AutoCloseable {
         name, context.getConfig().getLong(initReservation), context.getConfig().getLong(maxAllocation));
   }
 
-  public DrillbitEndpoint start() throws DrillbitStartupException, UnknownHostException {
+  public DrillbitEndpoint start(String hostName) throws DrillbitStartupException, UnknownHostException {
     // loopback address check
     if (isDistributedMode && InetAddress.getByName(hostName).isLoopbackAddress()) {
       throw new DrillbitStartupException("Drillbit is disallowed to bind to loopback address in distributed mode.");
@@ -133,7 +130,7 @@ public class ServiceEngine implements AutoCloseable {
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
     }
-    AutoCloseables.close(userAllocator, controlAllocator, dataAllocator);
+    AutoCloseables.close(controlAllocator, dataAllocator);
 
   }
 }

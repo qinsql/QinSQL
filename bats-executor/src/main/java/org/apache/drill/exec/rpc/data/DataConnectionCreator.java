@@ -55,7 +55,7 @@ public class DataConnectionCreator implements AutoCloseable {
     if (config.getBootstrapContext().getConfig().hasPath(ExecConstants.INITIAL_DATA_PORT)) {
       port = config.getBootstrapContext().getConfig().getInt(ExecConstants.INITIAL_DATA_PORT);
     }
-    port = server.bind(port, allowPortHunting);
+    port = server.bind(partialEndpoint.getAddress(), port, allowPortHunting);
     return partialEndpoint.toBuilder().setDataPort(port).build();
   }
 

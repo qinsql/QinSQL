@@ -35,9 +35,46 @@
           "extractHeader": true
         }
       },
-      "enabled" : false
+      "enabled" : true
     },
 
+    "hdfs": {
+      "type": "file",
+      "connection": "hdfs://localhost:9000/",
+      "workspaces": {
+        "root" : {
+          "location": "/",
+          "writable": false,
+          "allowAccessOutsideWorkspace": false
+        },
+        "tmp" : {
+          "location": "/tmp",
+          "writable": true,
+          "allowAccessOutsideWorkspace": false
+        }
+      },
+      "formats": {
+        "csv" : {
+          "type": "text",
+          "extensions": [ "csv" ],
+          "delimiter": ","
+        },
+        "parquet" : {
+          "type": "parquet"
+        },
+        "json" : {
+          "type": "json",
+          "extensions": [ "json" ]
+        },
+        "csvh" : {
+          "type": "text",
+          "extensions": [ "csvh" ],
+          "delimiter": ",",
+          "extractHeader": true
+        }
+      },
+      "enabled" : true
+    },
     "cp": {
       "type": "file",
       "connection": "classpath:///",

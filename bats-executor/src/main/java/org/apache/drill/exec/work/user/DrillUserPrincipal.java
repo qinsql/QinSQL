@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.drill.exec.server.rest.auth;
+package org.apache.drill.exec.work.user;
 
 import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableList;
 import org.eclipse.jetty.security.MappedLoginService.RolePrincipal;

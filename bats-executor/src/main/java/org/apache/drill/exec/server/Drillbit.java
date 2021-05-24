@@ -38,7 +38,6 @@ import org.apache.drill.exec.server.options.OptionDefinition;
 import org.apache.drill.exec.server.options.OptionValue;
 import org.apache.drill.exec.server.options.OptionValue.OptionScope;
 import org.apache.drill.exec.server.options.SystemOptionManager;
-import org.apache.drill.exec.server.rest.WebServer;
 import org.apache.drill.exec.service.ServiceEngine;
 import org.apache.drill.exec.store.StoragePluginRegistry;
 import org.apache.drill.exec.store.sys.PersistentStoreProvider;
@@ -93,7 +92,6 @@ public class Drillbit implements AutoCloseable {
   private final PersistentStoreProvider storeProvider;
   private final WorkManager manager;
   private final BootStrapContext context;
-  private final WebServer webServer;
   private final int gracePeriod;
   private DrillbitStateManager stateManager;
   private boolean quiescentMode;
@@ -175,7 +173,6 @@ public class Drillbit implements AutoCloseable {
     context = new BootStrapContext(config, definitions, classpathScan);
     manager = new WorkManager(context);
 
-    webServer = new WebServer(context, manager, this);
     boolean isDistributedMode = (serviceSet == null) && !bindToLoopbackAddress;
     if (serviceSet != null) {
       coord = serviceSet.getCoordinator();
@@ -203,10 +200,6 @@ public class Drillbit implements AutoCloseable {
     logger.info("Construction completed ({} ms).", w.elapsed(TimeUnit.MILLISECONDS));
   }
 
-  public int getWebServerPort() {
-    return webServer.getPort();
-  }
-
   public void run() throws Exception {
     final Stopwatch w = Stopwatch.createStarted();
     logger.debug("Startup begun.");
@@ -224,13 +217,7 @@ public class Drillbit implements AutoCloseable {
     storageRegistry.init();
     drillbitContext.getOptionManager().init();
     javaPropertiesToSystemOptions();
-    manager.getContext().getRemoteFunctionRegistry().init(context.getConfig(), storeProvider, coord);
-    webServer.start();
-    //Discovering HTTP port (in case of port hunting)
-    if (webServer.isRunning()) {
-      int httpPort = getWebServerPort();
-      md = md.toBuilder().setHttpPort(httpPort).build();
-    }
+    manager.getContext().getRemoteFunctionRegistry().init(context.getConfig(), storeProvider, coord); 
     registrationHandle = coord.register(md);
     // Must start the RM after the above since it needs to read system options.
     drillbitContext.startRM();
@@ -310,7 +297,6 @@ public class Drillbit implements AutoCloseable {
 
     try {
       AutoCloseables.close(
-          webServer,
           engine,
           storeProvider,
           coord,

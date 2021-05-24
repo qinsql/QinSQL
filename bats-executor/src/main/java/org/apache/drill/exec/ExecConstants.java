@@ -508,14 +508,7 @@ public final class ExecConstants {
   public static final String KAFKA_POLL_TIMEOUT = "store.kafka.poll.timeout";
   public static final PositiveLongValidator KAFKA_POLL_TIMEOUT_VALIDATOR = new PositiveLongValidator(KAFKA_POLL_TIMEOUT, Long.MAX_VALUE,
       new OptionDescription("Amount of time in milliseconds allotted to the Kafka client to fetch messages from the Kafka cluster; default value is 200."));
-
-  // TODO: We need to add a feature that enables storage plugins to add their own options. Currently we have to declare
-  // in core which is not right. Move this option and above two mongo plugin related options once we have the feature.
-  @Deprecated // TODO: DRILL-6527
-  public static final String HIVE_OPTIMIZE_SCAN_WITH_NATIVE_READERS = "store.hive.optimize_scan_with_native_readers";
-  @Deprecated // TODO: DRILL-6527
-  public static final OptionValidator HIVE_OPTIMIZE_SCAN_WITH_NATIVE_READERS_VALIDATOR = new BooleanValidator(HIVE_OPTIMIZE_SCAN_WITH_NATIVE_READERS,
-      new OptionDescription("Deprecated as of Drill 1.14. Use the store.hive.parquet.optimize_scan_with_native_reader option instead. Enables Drill to use the Drill native reader (instead of the Hive Serde interface) to optimize reads of Parquet-backed tables from Hive. Default is false."));
+ 
   public static final String HIVE_OPTIMIZE_PARQUET_SCAN_WITH_NATIVE_READER = "store.hive.parquet.optimize_scan_with_native_reader";
   public static final OptionValidator HIVE_OPTIMIZE_PARQUET_SCAN_WITH_NATIVE_READER_VALIDATOR =
       new BooleanValidator(HIVE_OPTIMIZE_PARQUET_SCAN_WITH_NATIVE_READER,
@@ -740,39 +733,6 @@ public final class ExecConstants {
   public static final String CTAS_PARTITIONING_HASH_DISTRIBUTE = "store.partition.hash_distribute";
   public static final BooleanValidator CTAS_PARTITIONING_HASH_DISTRIBUTE_VALIDATOR = new BooleanValidator(CTAS_PARTITIONING_HASH_DISTRIBUTE,
       new OptionDescription("Uses a hash algorithm to distribute data on partition keys in a CTAS partitioning operation. An alpha option--for experimental use at this stage. Do not use in production systems."));
-
-
-  /**
-   * @deprecated option. It will not take any effect.
-   * The option added as part of DRILL-4577, was used to mark that hive tables should be loaded
-   * for all table names at once. Then as part of DRILL-4826 was added option to regulate bulk size,
-   * because big amount of views was causing performance degradation. After last improvements for
-   * DRILL-7115 both options ({@link ExecConstants#ENABLE_BULK_LOAD_TABLE_LIST_KEY}
-   * and {@link ExecConstants#BULK_LOAD_TABLE_LIST_BULK_SIZE_KEY}) became obsolete and may be removed
-   * in future releases.
-   */
-  @Deprecated
-  public static final String ENABLE_BULK_LOAD_TABLE_LIST_KEY = "exec.enable_bulk_load_table_list";
-
-  /**
-   * @see ExecConstants#ENABLE_BULK_LOAD_TABLE_LIST_KEY
-   */
-  @Deprecated
-  public static final BooleanValidator ENABLE_BULK_LOAD_TABLE_LIST = new BooleanValidator(ENABLE_BULK_LOAD_TABLE_LIST_KEY,
-      new OptionDescription("Deprecated after DRILL-7115 improvement."));
-
-  /**
-   * @see ExecConstants#ENABLE_BULK_LOAD_TABLE_LIST_KEY
-   */
-  @Deprecated
-  public static final String BULK_LOAD_TABLE_LIST_BULK_SIZE_KEY = "exec.bulk_load_table_list.bulk_size";
-
-  /**
-   * @see ExecConstants#ENABLE_BULK_LOAD_TABLE_LIST_KEY
-   */
-  @Deprecated
-  public static final PositiveLongValidator BULK_LOAD_TABLE_LIST_BULK_SIZE = new PositiveLongValidator(BULK_LOAD_TABLE_LIST_BULK_SIZE_KEY, Integer.MAX_VALUE,
-      new OptionDescription("Deprecated after DRILL-7115 improvement."));
 
   /**
    * Option whose value is a comma separated list of admin usernames. Admin users are users who have special privileges

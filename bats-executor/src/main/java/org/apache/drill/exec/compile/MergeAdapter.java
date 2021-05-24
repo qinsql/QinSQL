@@ -44,7 +44,6 @@ import org.apache.drill.shaded.guava.com.google.common.collect.Sets;
  * Serves two purposes. Renames all inner classes references to the outer class to the new name. Also adds all the
  * methods and fields of the class to merge to the class that is being visited.
  */
-@SuppressWarnings("unused")
 class MergeAdapter extends ClassVisitor {
   private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(MergeAdapter.class);
   private final ClassNode classToMerge;

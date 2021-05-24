@@ -25,6 +25,7 @@ import org.apache.drill.shaded.guava.com.google.common.collect.Lists;
 import org.apache.drill.shaded.guava.com.google.common.collect.Maps;
 import org.apache.drill.common.AutoCloseables;
 
+@SuppressWarnings("rawtypes")
 public class CachingTransientStoreFactory implements TransientStoreFactory {
   private final TransientStoreFactory delegate;
   private final Map<TransientStoreConfig, TransientStore> cache = Maps.newHashMap();
@@ -33,6 +34,7 @@ public class CachingTransientStoreFactory implements TransientStoreFactory {
     this.delegate = Preconditions.checkNotNull(delegate, "delegate factory is required");
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <V> TransientStore<V> getOrCreateStore(final TransientStoreConfig<V> config) {
     final TransientStore<V> store = cache.get(Preconditions.checkNotNull(config, "config is required"));

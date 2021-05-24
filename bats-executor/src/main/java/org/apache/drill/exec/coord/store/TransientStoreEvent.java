@@ -51,6 +51,7 @@ public class TransientStoreEvent<V> {
     return value;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof TransientStoreEvent && obj.getClass().equals(getClass())) {

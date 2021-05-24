@@ -65,6 +65,7 @@ public abstract class BaseTransientStore<V> implements TransientStore<V> {
     });
   }
 
+  @SuppressWarnings("rawtypes")
   protected void fireListeners(final TransientStoreEvent event) {
     for (final TransientStoreListener listener:listeners) {
       listener.onChange(event);

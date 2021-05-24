@@ -17,7 +17,6 @@
  */
 package org.apache.drill.exec.server;
 
-import org.apache.curator.framework.api.ACLProvider;
 import org.apache.drill.common.AutoCloseables;
 import org.apache.drill.common.StackTrace;
 import org.apache.drill.common.concurrent.ExtendedLatch;
@@ -28,8 +27,7 @@ import org.apache.drill.common.scanner.persistence.ScanResult;
 import org.apache.drill.exec.ExecConstants;
 import org.apache.drill.exec.coord.ClusterCoordinator;
 import org.apache.drill.exec.coord.ClusterCoordinator.RegistrationHandle;
-import org.apache.drill.exec.coord.zk.ZKACLProviderFactory;
-import org.apache.drill.exec.coord.zk.ZKClusterCoordinator;
+import org.apache.drill.exec.coord.p2p.P2pClusterCoordinator;
 import org.apache.drill.exec.exception.DrillbitStartupException;
 import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint;
 import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint.State;
@@ -84,8 +82,6 @@ public class Drillbit implements AutoCloseable {
   }
 
   public final static String SYSTEM_OPTIONS_NAME = "org.apache.drill.exec.server.Drillbit.system_options";
-
-  //private boolean isClosed = false;
 
   private final ClusterCoordinator coord;
   private final ServiceEngine engine;
@@ -178,11 +174,8 @@ public class Drillbit implements AutoCloseable {
       coord = serviceSet.getCoordinator();
       storeProvider = new CachingPersistentStoreProvider(new LocalPersistentStoreProvider(config));
     } else {
-      String clusterId = config.getString(ExecConstants.SERVICE_NAME);
-      String zkRoot = config.getString(ExecConstants.ZK_ROOT);
-      String drillClusterPath = "/" + zkRoot + "/" +  clusterId;
-      ACLProvider aclProvider = ZKACLProviderFactory.getACLProvider(config, drillClusterPath, context);
-      coord = new ZKClusterCoordinator(config, aclProvider);
+      //String clusterId = config.getString(ExecConstants.SERVICE_NAME); 
+      coord = new P2pClusterCoordinator();
       storeProvider = new PersistentStoreRegistry<ClusterCoordinator>(this.coord, config).newPStoreProvider();
     }
 
@@ -285,16 +278,6 @@ public class Drillbit implements AutoCloseable {
     if (coord != null && registrationHandle != null) {
       coord.unregister(registrationHandle);
     }
-    try {
-      Thread.sleep(context.getConfig().getInt(ExecConstants.ZK_REFRESH) * 2);
-    } catch (final InterruptedException e) {
-      logger.warn("Interrupted while sleeping during coordination deregistration.");
-
-      // Preserve evidence that the interruption occurred so that code higher up on the call stack can learn of the
-      // interruption and respond to it if it wants to.
-      Thread.currentThread().interrupt();
-    }
-
     try {
       AutoCloseables.close(
           engine,

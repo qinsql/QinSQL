@@ -292,6 +292,7 @@ public class ThrottledResourceManager extends AbstractResourceManager {
       this.queryCost = cost;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public QueryParallelizer getParallelizer(boolean planHasMemory) {
       // currently memory planning is disabled. Enable it once the RM functionality is fully implemented.

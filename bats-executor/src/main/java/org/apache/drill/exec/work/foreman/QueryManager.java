@@ -461,12 +461,12 @@ public class QueryManager implements AutoCloseable {
    * there is a node failure, we can then correctly track how many outstanding messages will never arrive.
    */
   private class NodeTracker {
-    private final DrillbitEndpoint endpoint;
+    //private final DrillbitEndpoint endpoint;
     private final AtomicInteger totalFragments = new AtomicInteger(0);
     private final AtomicInteger completedFragments = new AtomicInteger(0);
 
     public NodeTracker(final DrillbitEndpoint endpoint) {
-      this.endpoint = endpoint;
+      //this.endpoint = endpoint;
     }
 
     /**

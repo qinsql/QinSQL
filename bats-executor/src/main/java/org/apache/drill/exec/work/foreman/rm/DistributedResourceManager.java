@@ -31,16 +31,13 @@ public class DistributedResourceManager implements ResourceManager {
   private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DistributedResourceManager.class);
 
   private final ResourcePoolTree rmPoolTree;
-
-  private final DrillbitContext context;
-
+ 
   private final DrillConfig rmConfig;
 
   private final ResourceManager delegatedRM;
 
   public DistributedResourceManager(DrillbitContext context) throws DrillRuntimeException {
-    try {
-      this.context = context;
+    try { 
       this.rmConfig = DrillConfig.createForRM();
       rmPoolTree = new ResourcePoolTreeImpl(rmConfig, DrillConfig.getMaxDirectMemory(),
         Runtime.getRuntime().availableProcessors(), 1);

@@ -30,8 +30,6 @@ import org.apache.drill.exec.planner.fragment.Wrapper;
 import org.apache.drill.exec.proto.CoordinationProtos;
 import org.apache.drill.exec.server.DrillbitContext;
 import org.apache.drill.exec.work.QueryWorkUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,8 +57,6 @@ public class RuntimeFilterRouter {
   private SendingAccountor sendingAccountor = new SendingAccountor();
 
   private RuntimeFilterSink runtimeFilterSink;
-
-  private static final Logger logger = LoggerFactory.getLogger(RuntimeFilterRouter.class);
 
   /**
    * This class maintains context for the runtime join push down's filter management. It
@@ -173,7 +169,7 @@ public class RuntimeFilterRouter {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes", "deprecation" })
   private Wrapper findTargetWrapper(Wrapper wrapper, TargetPhysicalOperatorVisitor targetOpVisitor) {
     targetOpVisitor.setCurrentFragment(wrapper.getNode());
     try {
@@ -322,6 +318,7 @@ public class RuntimeFilterRouter {
       return joinOpId;
     }
 
+    @SuppressWarnings("unused")
     public void setJoinOpId(int joinOpId) {
       this.joinOpId = joinOpId;
     }

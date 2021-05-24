@@ -47,7 +47,7 @@ public class IncomingBuffers implements AutoCloseable {
   private final AtomicInteger streamsRemaining = new AtomicInteger(0);
   private final AtomicInteger remainingRequired;
   private final Map<Integer, DataCollector> collectorMap;
-  private final FragmentContext context;
+  //private final FragmentContext context;
 
   /**
    * Lock used to manage close and data acceptance. We should only create a local reference to incoming data in the case
@@ -60,7 +60,7 @@ public class IncomingBuffers implements AutoCloseable {
   private final AutoCloseableLock exclusiveCloseLock = new AutoCloseableLock(lock.writeLock());
 
   public IncomingBuffers(PlanFragment fragment, FragmentContext context) {
-    this.context = context;
+    //this.context = context;
     Map<Integer, DataCollector> collectors = Maps.newHashMap();
     remainingRequired = new AtomicInteger(fragment.getCollectorCount());
     for(int i =0; i < fragment.getCollectorCount(); i++){

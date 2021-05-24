@@ -19,7 +19,6 @@ package org.apache.drill.exec;
 
 import org.apache.drill.common.config.DrillConfig;
 import org.apache.drill.exec.physical.impl.common.HashTable;
-import org.apache.drill.exec.rpc.user.InboundImpersonationManager;
 import org.apache.drill.exec.server.options.OptionValidator;
 import org.apache.drill.exec.server.options.OptionValidator.OptionDescription;
 import org.apache.drill.exec.server.options.TypeValidators.AdminUserGroupsValidator;
@@ -59,8 +58,6 @@ public final class ExecConstants {
   public static final String INITIAL_BIT_PORT = "drill.exec.rpc.bit.server.port";
   public static final String INITIAL_DATA_PORT = "drill.exec.rpc.bit.server.dataport";
   public static final String BIT_RPC_TIMEOUT = "drill.exec.rpc.bit.timeout";
-  public static final String INITIAL_USER_PORT = "drill.exec.rpc.user.server.port";
-  public static final String USER_RPC_TIMEOUT = "drill.exec.rpc.user.timeout";
   public static final String METRICS_CONTEXT_NAME = "drill.exec.metrics.context";
   public static final String USE_IP_ADDRESS = "drill.exec.rpc.use.ip";
   public static final String CLIENT_RPC_THREADS = "drill.exec.rpc.user.client.threads";
@@ -804,9 +801,6 @@ public final class ExecConstants {
    * ]
    */
   public static final String IMPERSONATION_POLICIES_KEY = "exec.impersonation.inbound_policies";
-  public static final StringValidator IMPERSONATION_POLICY_VALIDATOR =
-      new InboundImpersonationManager.InboundImpersonationPolicyValidator(IMPERSONATION_POLICIES_KEY);
-
 
   /**
    * Web settings

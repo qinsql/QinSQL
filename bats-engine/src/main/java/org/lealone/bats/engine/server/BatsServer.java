@@ -27,15 +27,11 @@ import org.lealone.common.logging.Logger;
 import org.lealone.common.logging.LoggerFactory;
 import org.lealone.db.LealoneDatabase;
 import org.lealone.net.AsyncConnectionManager;
-import org.lealone.net.NetFactory;
-import org.lealone.net.NetFactoryManager;
-import org.lealone.net.NetServer;
 import org.lealone.server.TcpServer;
 
 public class BatsServer extends TcpServer implements AsyncConnectionManager {
 
     private static final Logger logger = LoggerFactory.getLogger(BatsServer.class);
-    public static final int DEFAULT_TCP_PORT = 9216;
 
     private Drillbit drillbit;
 
@@ -51,20 +47,6 @@ public class BatsServer extends TcpServer implements AsyncConnectionManager {
     @Override
     public String getType() {
         return BatsServerEngine.NAME;
-    }
-
-    @Override
-    public void init(Map<String, String> config) {
-        if (!config.containsKey("port"))
-            config.put("port", String.valueOf(DEFAULT_TCP_PORT));
-
-        NetFactory factory = NetFactoryManager.getFactory(config);
-        NetServer netServer = factory.createNetServer();
-        netServer.setConnectionManager(this);
-        setProtocolServer(netServer);
-        netServer.init(config);
-
-        // NetEndpoint.setLocalTcpEndpoint(getHost(), getPort());
     }
 
     @Override

@@ -89,13 +89,6 @@ public enum SystemTable {
     }
   },
 
-  CONNECTIONS("connections", true, BitToUserConnectionIterator.ConnectionInfo.class) {
-    @Override
-    public Iterator<Object> getIterator(final ExecutorFragmentContext context, final int maxRecords) {
-      return new BitToUserConnectionIterator(context);
-    }
-  },
-
   PROFILES("profiles", false, ProfileInfoIterator.ProfileInfo.class) {
     @Override
     public Iterator<Object> getIterator(final ExecutorFragmentContext context, final int maxRecords) {

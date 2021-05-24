@@ -181,19 +181,6 @@ public class UserSession implements AutoCloseable {
     return credentials;
   }
 
-  /**
-   * Replace current user credentials with the given user's credentials. Meant to be called only by a
-   * {@link InboundImpersonationManager impersonation manager}.
-   *
-   * @param impersonationManager impersonation manager making this call
-   * @param newCredentials user credentials to change to
-   */
-  public void replaceUserCredentials(final InboundImpersonationManager impersonationManager,
-                                     final UserCredentials newCredentials) {
-    Preconditions.checkNotNull(impersonationManager, "User credentials can only be replaced by an" +
-        " impersonation manager.");
-    credentials = newCredentials;
-  }
 
   public String getTargetUserName() {
     return properties.getProperty(DrillProperties.IMPERSONATION_TARGET);

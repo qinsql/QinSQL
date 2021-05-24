@@ -19,9 +19,9 @@ package org.lealone.bats.test.start;
 
 import java.util.ArrayList;
 
-import org.lealone.bats.engine.server.BatsServer;
 import org.lealone.bats.engine.server.BatsServerEngine;
 import org.lealone.common.exceptions.ConfigException;
+import org.lealone.db.Constants;
 import org.lealone.p2p.config.Config;
 import org.lealone.p2p.config.Config.PluggableEngineDef;
 
@@ -35,7 +35,7 @@ public class BatsEngineStart extends NodeBase {
 
     @Override
     public void applyConfig(Config config) throws ConfigException {
-        enableBatsServer(config);
+        // enableBatsServer(config);
         super.applyConfig(config);
     }
 
@@ -44,7 +44,7 @@ public class BatsEngineStart extends NodeBase {
     }
 
     public static void enableBatsServer(Config config) {
-        enableProtocolServer(config, BatsServerEngine.NAME, BatsServer.DEFAULT_TCP_PORT);
+        enableProtocolServer(config, BatsServerEngine.NAME, Constants.DEFAULT_TCP_PORT);
     }
 
     private static void enableProtocolServer(Config config, String protocolServerName, int port) {

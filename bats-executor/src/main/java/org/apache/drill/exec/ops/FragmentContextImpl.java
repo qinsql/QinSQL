@@ -21,7 +21,6 @@ import io.netty.buffer.DrillBuf;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -57,7 +56,6 @@ import org.apache.drill.exec.rpc.RpcOutcomeListener;
 import org.apache.drill.exec.rpc.UserClientConnection;
 import org.apache.drill.exec.rpc.control.Controller;
 import org.apache.drill.exec.rpc.control.WorkEventBus;
-import org.apache.drill.exec.rpc.user.UserServer;
 import org.apache.drill.exec.server.DrillbitContext;
 import org.apache.drill.exec.server.QueryProfileStoreContext;
 import org.apache.drill.exec.server.options.FragmentOptionManager;
@@ -258,11 +256,6 @@ public class FragmentContextImpl extends BaseFragmentContext implements Executor
   @Override
   public QueryProfileStoreContext getProfileStoreContext() {
     return context.getProfileStoreContext();
-  }
-
-  @Override
-  public Set<Map.Entry<UserServer.BitToUserConnection, UserServer.BitToUserConnectionConfig>> getUserConnections() {
-    return context.getUserConnections();
   }
 
   @Override

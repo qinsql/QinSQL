@@ -22,13 +22,13 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import org.lealone.bats.engine.server.BatsServer;
+import org.lealone.db.Constants;
 
 public class JdbcTest {
 
     public static void main(String[] args) throws Exception {
         Connection conn = DriverManager
-                .getConnection("jdbc:lealone:tcp://localhost:" + BatsServer.DEFAULT_TCP_PORT + "/lealone", "root", "");
+                .getConnection("jdbc:lealone:tcp://localhost:" + Constants.DEFAULT_TCP_PORT + "/lealone", "root", "");
         Statement stmt = conn.createStatement();
         init(stmt);
 

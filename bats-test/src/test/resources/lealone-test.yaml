@@ -43,7 +43,7 @@ sql_engines:
     }
 
 protocol_server_engines:
-  - name: TCP
+  - name: BATS
     enabled: true
     parameters: {
         port: 9210,
@@ -57,7 +57,7 @@ protocol_server_engines:
         session_timeout: -1
     }
   - name: P2P
-    enabled: true
+    enabled: false
     parameters: {
         port: 9211,
         ssl: false

@@ -23,13 +23,10 @@ import org.apache.drill.exec.physical.impl.OperatorCreatorRegistry;
 import org.apache.drill.exec.planner.PhysicalPlanReader;
 import org.apache.drill.exec.proto.CoordinationProtos;
 import org.apache.drill.exec.rpc.control.WorkEventBus;
-import org.apache.drill.exec.rpc.user.UserServer;
 import org.apache.drill.exec.server.QueryProfileStoreContext;
 import org.apache.drill.exec.work.batch.IncomingBuffers;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This interface represents the context that is used by a Drillbit in classes like the
@@ -59,8 +56,6 @@ public interface ExecutorFragmentContext extends RootFragmentContext {
   QueryProfileStoreContext getProfileStoreContext();
 
   WorkEventBus getWorkEventbus();
-
-  Set<Map.Entry<UserServer.BitToUserConnection, UserServer.BitToUserConnectionConfig>> getUserConnections();
-
+ 
   boolean isUserAuthenticationEnabled();
 }

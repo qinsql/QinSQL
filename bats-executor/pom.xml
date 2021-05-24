@@ -33,7 +33,6 @@
         <dep.junit.version>4.13.1</dep.junit.version>
         <shaded.guava.version>23.0</shaded.guava.version>
         <parquet.version>1.10.0</parquet.version>
-        <sqlline.version>1.7.0</sqlline.version>
         <jackson.databind.version>2.9.10.7</jackson.databind.version>
         <zookeeper.version>3.4.14</zookeeper.version>
         <ojai.version>3.0-mapr-1808</ojai.version>
@@ -353,11 +352,6 @@
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-runtime</artifactId>
                 <version>${antlr.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>sqlline</groupId>
-                <artifactId>sqlline</artifactId>
-                <version>${sqlline.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-net</groupId>
@@ -825,10 +819,6 @@
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>sqlline</groupId>
-            <artifactId>sqlline</artifactId>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>

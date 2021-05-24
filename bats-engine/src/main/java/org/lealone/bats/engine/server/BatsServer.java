@@ -67,6 +67,7 @@ public class BatsServer extends TcpServer implements AsyncConnectionManager {
         if (isStopped())
             return;
         super.stop();
+        drillbit.shutdown();
     }
 
     private void startDrillbit() throws Exception {

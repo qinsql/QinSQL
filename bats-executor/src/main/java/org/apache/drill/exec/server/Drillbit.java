@@ -484,53 +484,7 @@ public class Drillbit implements AutoCloseable {
   public GracefulShutdownThread getGracefulShutdownThread() {
     return gracefulShutdownThread;
   }
-
-  public static void main(final String[] cli) throws DrillbitStartupException {
-    final StartupOptions options = StartupOptions.parse(cli);
-    start(options);
-  }
-
-  public static Drillbit start(final StartupOptions options) throws DrillbitStartupException {
-    return start(DrillConfig.create(options.getConfigLocation()), SystemOptionManager.createDefaultOptionDefinitions(), null);
-  }
-
-  public static Drillbit start(final DrillConfig config) throws DrillbitStartupException {
-    return start(config, SystemOptionManager.createDefaultOptionDefinitions(), null);
-  }
-
-  public static Drillbit start(final DrillConfig config, final RemoteServiceSet remoteServiceSet) throws DrillbitStartupException {
-    return start(config, SystemOptionManager.createDefaultOptionDefinitions(), remoteServiceSet);
-  }
-
-  @VisibleForTesting
-  public static Drillbit start(final DrillConfig config, final CaseInsensitiveMap<OptionDefinition> validators,
-                               final RemoteServiceSet remoteServiceSet)
-      throws DrillbitStartupException {
-    logger.debug("Starting new Drillbit.");
-    // TODO: allow passing as a parameter
-    ScanResult classpathScan = ClassPathScanner.fromPrescan(config);
-    Drillbit bit;
-    try {
-      bit = new Drillbit(config, validators, remoteServiceSet, classpathScan);
-    } catch (final Exception ex) {
-      if (ex instanceof DrillbitStartupException) {
-        throw (DrillbitStartupException) ex;
-      } else {
-        throw new DrillbitStartupException("Failure while initializing values in Drillbit.", ex);
-      }
-    }
-
-    try {
-      bit.run();
-    } catch (final Exception e) {
-      logger.error("Failure during initial startup of Drillbit.", e);
-      bit.close();
-      throw new DrillbitStartupException("Failure during initial startup of Drillbit.", e);
-    }
-    logger.debug("Started new Drillbit.");
-    return bit;
-  }
-
+ 
   private static void throwInvalidSystemOption(final String systemProp, final String errorMessage) {
     throw new IllegalStateException("Property \"" + SYSTEM_OPTIONS_NAME + "\" part \"" + systemProp
         + "\" " + errorMessage + ".");

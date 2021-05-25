@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("rawtypes")
 public class DbScanToIndexScanPrule extends Prule {
   static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DbScanToIndexScanPrule.class);
   final public MatchFunction match;
@@ -269,7 +270,7 @@ public class DbScanToIndexScanPrule extends Prule {
       condition = indexContext.filter.getCondition();
     } else {
       // get the filter as if it were below the projection.
-      condition = RelOptUtil.pushFilterPastProject(indexContext.filter.getCondition(), indexContext.lowerProject);
+      condition = RelOptUtil.pushPastProject(indexContext.filter.getCondition(), indexContext.lowerProject);
     }
 
     //save this pushed down condition, in case it is needed later to build filter when joining back primary table

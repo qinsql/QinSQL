@@ -224,7 +224,7 @@ public class IndexableExprMarker extends RexVisitorImpl<Boolean> {
         }
 
         for (RexNode operand : call.getOperands()) {
-            boolean bret = operand.accept(this);
+            operand.accept(this);
         }
         return false;
     }

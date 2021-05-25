@@ -63,6 +63,7 @@ import java.util.Map;
  * IndexScanIntersectGenerator is to generate index plan against multiple index tables,
  * the input indexes are assumed to be ranked by selectivity(low to high) already.
  */
+@SuppressWarnings("deprecation")
 public class IndexIntersectPlanGenerator extends AbstractIndexPlanGenerator {
 
   static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(IndexIntersectPlanGenerator.class);

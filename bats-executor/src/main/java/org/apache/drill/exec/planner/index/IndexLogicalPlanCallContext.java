@@ -174,5 +174,6 @@ public class IndexLogicalPlanCallContext implements IndexCallContext {
 
   public RelNode getExchange() { return null; }
 
+  @SuppressWarnings("unchecked")
   public List<DistributionField> getDistributionFields() { return Collections.EMPTY_LIST; }
 }

@@ -49,6 +49,7 @@ import org.apache.drill.shaded.guava.com.google.common.collect.Lists;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("rawtypes")
 public class DbScanSortRemovalRule extends Prule {
   static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(DbScanSortRemovalRule.class);
 

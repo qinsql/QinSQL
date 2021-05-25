@@ -390,12 +390,12 @@ public class IndexSelector  {
 
     private RelOptPlanner planner;
     private IndexConditionInfo.Builder builder;
-    private PlannerSettings settings;
+    //private PlannerSettings settings;
 
     public IndexComparator(RelOptPlanner planner, IndexConditionInfo.Builder builder) {
       this.planner = planner;
       this.builder = builder;
-      this.settings = PrelUtil.getPlannerSettings(planner);
+      //this.settings = PrelUtil.getPlannerSettings(planner);
     }
 
     @Override
@@ -733,7 +733,7 @@ public class IndexSelector  {
       if (remFilters != null) {
         totCpuCost += totLeadRowCount * DrillCostBase.COMPARE_CPU_COST;
       }
-      double networkCost = 0.0; // TODO: add network cost once full table scan also considers network cost
+      //double networkCost = 0.0; // TODO: add network cost once full table scan also considers network cost
       return costFactory.makeCost(totLeadRowCount, totCpuCost, totDiskCost, totNetworkCost, totMemoryCost);
     }
 

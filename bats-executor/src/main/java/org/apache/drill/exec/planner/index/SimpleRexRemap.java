@@ -84,7 +84,7 @@ public class SimpleRexRemap {
         Map<RexNode, RexNode> srcToReplace = Maps.newIdentityHashMap();
         for (Map.Entry<RexNode, LogicalExpression> entry : equalOnCastCharExprs.entrySet()) {
             RexNode equalOp = entry.getKey();
-            LogicalExpression opInput = entry.getValue();
+            //LogicalExpression opInput = entry.getValue();
 
             final List<RexNode> operands = ((RexCall) equalOp).getOperands();
             RexLiteral newLiteral = null;

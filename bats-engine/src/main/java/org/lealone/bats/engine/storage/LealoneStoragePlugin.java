@@ -25,21 +25,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.calcite.plan.RelOptRule;
 import org.apache.calcite.schema.CalciteSchema;
 import org.apache.calcite.schema.SchemaPlus;
 import org.apache.drill.common.JSONOptions;
+import org.apache.drill.exec.ops.OptimizerRulesContext;
+import org.apache.drill.exec.planner.PlannerPhase;
 import org.apache.drill.exec.server.DrillbitContext;
 import org.apache.drill.exec.store.AbstractSchema;
 import org.apache.drill.exec.store.AbstractStoragePlugin;
 import org.apache.drill.exec.store.SchemaConfig;
 import org.apache.drill.exec.store.SystemPlugin;
 import org.apache.drill.shaded.guava.com.google.common.base.Joiner;
+import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableSet;
 import org.lealone.db.Constants;
 import org.lealone.db.Database;
 import org.lealone.db.LealoneDatabase;
 import org.lealone.db.schema.Schema;
 import org.lealone.db.table.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -76,6 +81,32 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
         LealoneScanSpec scanSpec = selection.getListWith(new ObjectMapper(), new TypeReference<LealoneScanSpec>() {
         });
         return new LealoneGroupScan(this, scanSpec, null);
+    }
+
+    @Override
+    @JsonIgnore
+    public Set<? extends RelOptRule> getOptimizerRules(OptimizerRulesContext optimizerContext, PlannerPhase phase) {
+        switch (phase) {
+        case LOGICAL_PRUNE_AND_JOIN:
+        case LOGICAL_PRUNE:
+        case PARTITION_PRUNING:
+            return ImmutableSet.of();
+        // case PHYSICAL:
+        // final ImmutableSet<RelOptRule> indexRules = ImmutableSet.<RelOptRule> builder()
+        // .add(DbScanToIndexScanPrule.REL_FILTER_SCAN, DbScanToIndexScanPrule.SORT_FILTER_PROJECT_SCAN,
+        // DbScanToIndexScanPrule.SORT_PROJECT_FILTER_PROJECT_SCAN,
+        // DbScanToIndexScanPrule.PROJECT_FILTER_PROJECT_SCAN,
+        // DbScanToIndexScanPrule.SORT_PROJECT_FILTER_SCAN, DbScanToIndexScanPrule.FILTER_PROJECT_SCAN,
+        // DbScanToIndexScanPrule.FILTER_SCAN, DbScanSortRemovalRule.INDEX_SORT_EXCHANGE_PROJ_SCAN,
+        // DbScanSortRemovalRule.INDEX_SORT_EXCHANGE_SCAN, DbScanSortRemovalRule.INDEX_SORT_SCAN,
+        // DbScanSortRemovalRule.INDEX_SORT_PROJ_SCAN)
+        // .build();
+        // return indexRules;
+        case LOGICAL:
+        case JOIN_PLANNING:
+        default:
+            return ImmutableSet.of();
+        }
     }
 
     @Override

@@ -105,6 +105,7 @@ public class IndexPhysicalPlanCallContext implements IndexCallContext {
   }
 
 
+  @SuppressWarnings("deprecation")
   public List<RelCollation> getCollationList() {
     if (sort != null) {
       return sort.getCollationList();
@@ -183,6 +184,7 @@ public class IndexPhysicalPlanCallContext implements IndexCallContext {
     sortExprs = Lists.newArrayList();
   }
 
+  @SuppressWarnings("unchecked")
   public List<DistributionField> getDistributionFields() {
     if (exch != null) {
       return ((HashToRandomExchangePrel) exch).getFields();

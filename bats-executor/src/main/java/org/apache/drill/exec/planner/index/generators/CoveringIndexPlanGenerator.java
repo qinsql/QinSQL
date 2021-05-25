@@ -176,6 +176,7 @@ public class CoveringIndexPlanGenerator extends AbstractIndexPlanGenerator {
         return finalRel;
     }
 
+    @SuppressWarnings("unused")
     private RexNode rewriteConditionForProject(RexNode condition, List<RexNode> projects) {
         Map<RexNode, RexNode> mapping = new HashMap<>();
         rewriteConditionForProjectInternal(condition, projects, mapping);

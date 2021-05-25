@@ -82,6 +82,7 @@ import org.apache.drill.shaded.guava.com.google.common.collect.Lists;
  * This plan will be further optimized by the filter pushdown rule of the Index plugin which should
  * push the index column filters into the index scan.
  */
+@SuppressWarnings("deprecation")
 public class NonCoveringIndexPlanGenerator extends AbstractIndexPlanGenerator {
 
   static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(NonCoveringIndexPlanGenerator.class);

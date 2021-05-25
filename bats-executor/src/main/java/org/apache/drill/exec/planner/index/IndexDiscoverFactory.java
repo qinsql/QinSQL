@@ -28,6 +28,7 @@ import java.lang.reflect.Constructor;
 /**
  * With this factory, we allow user to load a different indexDiscover class to obtain index information
  */
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class IndexDiscoverFactory {
   static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(IndexDiscoverFactory.class);
   static final String INDEX_DISCOVER_CLASS_KEY = "index.discoverClass";

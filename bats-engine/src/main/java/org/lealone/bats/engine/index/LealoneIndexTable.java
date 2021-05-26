@@ -42,13 +42,20 @@ public class LealoneIndexTable extends DynamicDrillTable {
     LealoneScanSpec scanSpec;
     List<LogicalExpression> indexCols;
 
+    private final String indexName;
+
     public LealoneIndexTable(org.lealone.db.table.Table table, String storageEngineName, StoragePlugin plugin,
-            Schema schema, LealoneScanSpec scanSpec, List<LogicalExpression> indexCols) {
+            Schema schema, LealoneScanSpec scanSpec, List<LogicalExpression> indexCols, String indexName) {
         super(plugin, storageEngineName, scanSpec);
         // this.schema = schema;
         this.table = table;
         this.scanSpec = scanSpec;
         this.indexCols = indexCols;
+        this.indexName = indexName;
+    }
+
+    public String getIndexName() {
+        return indexName;
     }
 
     @Override
@@ -78,6 +85,6 @@ public class LealoneIndexTable extends DynamicDrillTable {
         for (LogicalExpression e : this.indexCols) {
             indexCols.add(SchemaPath.getSimplePath(e.toString()));
         }
-        return new LealoneIndexGroupScan((LealoneStoragePlugin) getPlugin(), scanSpec, indexCols);
+        return new LealoneIndexGroupScan((LealoneStoragePlugin) getPlugin(), scanSpec, indexCols, this);
     }
 }

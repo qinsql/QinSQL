@@ -76,6 +76,8 @@ public class LealoneGroupScan extends AbstractDbGroupScan {
     private ListMultimap<Integer, LealoneWork> assignments;
     private List<EndpointAffinity> affinities;
 
+    private double rowCountApproximation;
+
     @JsonCreator
     public LealoneGroupScan(@JsonProperty("scanSpec") LealoneScanSpec scanSpec,
             @JsonProperty("lealoneStoragePluginConfig") LealoneStoragePluginConfig lealoneStoragePluginConfig,
@@ -91,6 +93,7 @@ public class LealoneGroupScan extends AbstractDbGroupScan {
         this.scanSpec = scanSpec;
         this.columns = columns == null || columns.size() == 0 ? ALL_COLUMNS : columns;
         init();
+        rowCountApproximation = getRowCountApproximation();
     }
 
     private void init() {
@@ -167,6 +170,7 @@ public class LealoneGroupScan extends AbstractDbGroupScan {
         this.filterPushedDown = that.filterPushedDown;
         this.lealoneWorkList = that.lealoneWorkList;
         this.assignments = that.assignments;
+        this.rowCountApproximation = that.rowCountApproximation;
     }
 
     @Override
@@ -209,14 +213,15 @@ public class LealoneGroupScan extends AbstractDbGroupScan {
                     work.getPartitionKeyEnd()));
         }
         scanSpecList.add(new LealoneSubScanSpec(scanSpec, getTableName(), null, null));
-        return new LealoneSubScan(lealoneStoragePlugin, scanSpecList, this.columns);
+        return new LealoneSubScan(lealoneStoragePlugin, scanSpecList, this.columns, null);
     }
 
     // LealoneStoragePlugin plugin, LealoneStoragePluginConfig config,
     // List<LealoneSubScanSpec> tabletInfoList, List<SchemaPath> columns
     @Override
     public ScanStats getScanStats() {
-        long recordCount = 100000 * lealoneWorkList.size();
+        // long recordCount = 100000 * 1;// lealoneWorkList.size();
+        double recordCount = rowCountApproximation * 100000;
         return new ScanStats(GroupScanProperty.NO_EXACT_ROW_COUNT, recordCount, 1, recordCount);
     }
 
@@ -324,6 +329,10 @@ public class LealoneGroupScan extends AbstractDbGroupScan {
 
     @Override
     public double getRowCount(RexNode condition, RelNode scanRel) {
+        return getRowCountApproximation();
+    }
+
+    private double getRowCountApproximation() {
         Database db = LealoneDatabase.getInstance().getDatabase(scanSpec.getDbName());
         Schema schema = db.getSchema(null, scanSpec.getSchemaName());
         Table table = schema.getTableOrView(null, scanSpec.getTableName());

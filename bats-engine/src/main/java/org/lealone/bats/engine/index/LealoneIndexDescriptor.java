@@ -64,7 +64,7 @@ public class LealoneIndexDescriptor extends DrillIndexDescriptor {
                 nullsDirection);
         this.gs = gs;
         this.table = new LealoneIndexTable(table, gs.getStoragePlugin().getName(), gs.getStoragePlugin(),
-                table.getSchema(), gs.getLealoneScanSpec(), indexCols);
+                table.getSchema(), gs.getLealoneScanSpec(), indexCols, indexName);
     }
 
     public LealoneIndexDescriptor(DrillIndexDefinition def) {

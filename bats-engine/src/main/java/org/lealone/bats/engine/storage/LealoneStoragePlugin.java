@@ -38,6 +38,7 @@ import org.apache.drill.exec.store.SchemaConfig;
 import org.apache.drill.exec.store.SystemPlugin;
 import org.apache.drill.shaded.guava.com.google.common.base.Joiner;
 import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableSet;
+import org.lealone.bats.engine.index.LealonePushFilterIntoScan;
 import org.lealone.db.Constants;
 import org.lealone.db.Database;
 import org.lealone.db.LealoneDatabase;
@@ -50,10 +51,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SystemPlugin
 public class LealoneStoragePlugin extends AbstractStoragePlugin {
-    static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LealoneStoragePlugin.class);
 
-    private final LealoneStoragePluginConfig engineConfig;
-    // private final LealoneSchemaFactory schemaFactory;
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(LealoneStoragePlugin.class);
+
+    private final LealoneStoragePluginConfig config;
 
     public LealoneStoragePlugin(DrillbitContext context) throws IOException {
         this(new LealoneStoragePluginConfig(), context, LealoneStoragePluginConfig.NAME);
@@ -62,18 +63,22 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
     public LealoneStoragePlugin(LealoneStoragePluginConfig configuration, DrillbitContext context, String name)
             throws IOException {
         super(context, name);
-        this.engineConfig = configuration;
-        // this.schemaFactory = new LealoneSchemaFactory(name);
-    }
-
-    @Override
-    public void start() throws IOException {
-
+        this.config = configuration;
     }
 
     @Override
     public boolean supportsRead() {
         return true;
+    }
+
+    @Override
+    public boolean supportsWrite() {
+        return true;
+    }
+
+    @Override
+    public LealoneStoragePluginConfig getConfig() {
+        return config;
     }
 
     @Override
@@ -91,32 +96,15 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
         case LOGICAL_PRUNE:
         case PARTITION_PRUNING:
             return ImmutableSet.of();
-        // case PHYSICAL:
-        // final ImmutableSet<RelOptRule> indexRules = ImmutableSet.<RelOptRule> builder()
-        // .add(DbScanToIndexScanPrule.REL_FILTER_SCAN, DbScanToIndexScanPrule.SORT_FILTER_PROJECT_SCAN,
-        // DbScanToIndexScanPrule.SORT_PROJECT_FILTER_PROJECT_SCAN,
-        // DbScanToIndexScanPrule.PROJECT_FILTER_PROJECT_SCAN,
-        // DbScanToIndexScanPrule.SORT_PROJECT_FILTER_SCAN, DbScanToIndexScanPrule.FILTER_PROJECT_SCAN,
-        // DbScanToIndexScanPrule.FILTER_SCAN, DbScanSortRemovalRule.INDEX_SORT_EXCHANGE_PROJ_SCAN,
-        // DbScanSortRemovalRule.INDEX_SORT_EXCHANGE_SCAN, DbScanSortRemovalRule.INDEX_SORT_SCAN,
-        // DbScanSortRemovalRule.INDEX_SORT_PROJ_SCAN)
-        // .build();
-        // return indexRules;
+        case PHYSICAL:
+            final ImmutableSet<RelOptRule> indexRules = ImmutableSet.<RelOptRule> builder()
+                    .add(LealonePushFilterIntoScan.FILTER_ON_SCAN).build();
+            return indexRules;
         case LOGICAL:
         case JOIN_PLANNING:
         default:
             return ImmutableSet.of();
         }
-    }
-
-    @Override
-    public boolean supportsWrite() {
-        return true;
-    }
-
-    @Override
-    public LealoneStoragePluginConfig getConfig() {
-        return engineConfig;
     }
 
     private class CapitalizingJdbcSchema extends AbstractSchema {
@@ -194,9 +182,8 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
 
             // no table was found.
             if (table != null) {
-                return new LealoneTable(table, LealoneStoragePlugin.this.getName(), LealoneStoragePlugin.this, inner,
-                        new LealoneScanSpec(table.getDatabase().getName(), table.getSchema().getName(),
-                                table.getName()));
+                return new LealoneTable(table, LealoneStoragePlugin.this, new LealoneScanSpec(
+                        table.getDatabase().getName(), table.getSchema().getName(), table.getName()));
             } else {
                 return null;
             }
@@ -314,7 +301,7 @@ public class LealoneStoragePlugin extends AbstractStoragePlugin {
                 subSchema = CalciteSchema.createRootSchema(false, true, schemaName).plus();
             }
             for (Table table : schema.getAllTablesAndViews()) {
-                LealoneTable t = new LealoneTable(table, getName(), this, schema,
+                LealoneTable t = new LealoneTable(table, this,
                         new LealoneScanSpec(dbName, schemaName, table.getName()));
                 subSchema.add(table.getName().toUpperCase(), t);
                 subSchema.add(table.getName().toLowerCase(), t);

@@ -53,6 +53,7 @@ import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableMap;
 import org.lealone.db.Database;
 import org.lealone.db.LealoneDatabase;
 import org.lealone.db.index.Cursor;
+import org.lealone.db.index.Index;
 import org.lealone.db.result.Row;
 import org.lealone.db.table.Column;
 import org.lealone.db.table.Table;
@@ -125,11 +126,13 @@ public class LealoneRecordReader extends AbstractRecordReader {
     private ImmutableList<Copier<?>> copiers;
     private final Table table;
     private Cursor cursor;
+    private final LealoneSubScan subScanConfig;
 
-    public LealoneRecordReader(LealoneScanSpec scanSpec, String storagePluginName) {
+    public LealoneRecordReader(LealoneScanSpec scanSpec, LealoneSubScan subScanConfig, String storagePluginName) {
         this.storagePluginName = storagePluginName;
         Database db = LealoneDatabase.getInstance().getDatabase(scanSpec.getDbName());
         table = db.getSchema(null, scanSpec.getSchemaName()).findTableOrView(null, scanSpec.getTableName());
+        this.subScanConfig = subScanConfig;
     }
 
     static {
@@ -222,8 +225,13 @@ public class LealoneRecordReader extends AbstractRecordReader {
     @Override
     public void setup(OperatorContext operatorContext, OutputMutator output) throws ExecutionSetupException {
         try {
+            Index index;
+            if (subScanConfig.getIndexName() == null)
+                index = table.getScanIndex(null);
+            else
+                index = table.getSchema().getIndex(null, subScanConfig.getIndexName());
             // TODO 如何传递session到这里，通过OperatorContext？
-            cursor = table.getScanIndex(null).find(table.getDatabase().getSystemSession(), null, null);
+            cursor = index.find(table.getDatabase().getSystemSession(), null, null);
 
             // final int columns = meta.getColumnCount();
             Column[] columns = table.getColumns();

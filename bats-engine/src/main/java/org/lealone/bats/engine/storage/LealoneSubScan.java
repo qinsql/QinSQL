@@ -46,24 +46,28 @@ public class LealoneSubScan extends AbstractBase implements SubScan {
     private final LealoneStoragePlugin lealoneStoragePlugin;
     private final List<LealoneSubScanSpec> tabletScanSpecList;
     private final List<SchemaPath> columns;
+    private final String indexName;
 
     @JsonCreator
     public LealoneSubScan(@JacksonInject StoragePluginRegistry registry,
             @JsonProperty("lealoneStoragePluginConfig") LealoneStoragePluginConfig lealoneStoragePluginConfig,
             @JsonProperty("tabletScanSpecList") LinkedList<LealoneSubScanSpec> tabletScanSpecList,
-            @JsonProperty("columns") List<SchemaPath> columns) throws ExecutionSetupException {
+            @JsonProperty("columns") List<SchemaPath> columns, @JsonProperty("indexName") String indexName)
+            throws ExecutionSetupException {
         super((String) null);
         lealoneStoragePlugin = (LealoneStoragePlugin) registry.getPlugin(lealoneStoragePluginConfig);
         this.tabletScanSpecList = tabletScanSpecList;
         this.columns = columns;
+        this.indexName = indexName;
     }
 
     public LealoneSubScan(LealoneStoragePlugin plugin, List<LealoneSubScanSpec> tabletInfoList,
-            List<SchemaPath> columns) {
+            List<SchemaPath> columns, String indexName) {
         super((String) null);
         this.lealoneStoragePlugin = plugin;
         this.tabletScanSpecList = tabletInfoList;
         this.columns = columns;
+        this.indexName = indexName;
     }
 
     public LealoneStoragePluginConfig getLealoneStoragePluginConfig() {
@@ -76,6 +80,10 @@ public class LealoneSubScan extends AbstractBase implements SubScan {
 
     public List<SchemaPath> getColumns() {
         return columns;
+    }
+
+    public String getIndexName() {
+        return indexName;
     }
 
     @Override
@@ -96,7 +104,7 @@ public class LealoneSubScan extends AbstractBase implements SubScan {
     @Override
     public PhysicalOperator getNewWithChildren(List<PhysicalOperator> children) {
         Preconditions.checkArgument(children.isEmpty());
-        return new LealoneSubScan(lealoneStoragePlugin, tabletScanSpecList, columns);
+        return new LealoneSubScan(lealoneStoragePlugin, tabletScanSpecList, columns, indexName);
     }
 
     @Override

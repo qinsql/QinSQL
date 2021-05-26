@@ -27,6 +27,6 @@ public class LealoneIndexSubScan extends LealoneSubScan {
 
     public LealoneIndexSubScan(LealoneStoragePlugin plugin, List<LealoneSubScanSpec> tabletInfoList,
             List<SchemaPath> columns) {
-        super(plugin, tabletInfoList, columns);
+        super(plugin, tabletInfoList, columns, null);
     }
 }

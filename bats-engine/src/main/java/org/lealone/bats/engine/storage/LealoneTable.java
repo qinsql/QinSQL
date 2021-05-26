@@ -24,18 +24,16 @@ import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.drill.exec.planner.logical.DynamicDrillTable;
 import org.apache.drill.shaded.guava.com.google.common.collect.Lists;
-import org.lealone.db.schema.Schema;
 import org.lealone.db.table.Column;
+import org.lealone.db.table.Table;
 import org.lealone.db.value.DataType;
 
 public class LealoneTable extends DynamicDrillTable {
-    // private final Schema schema;
-    org.lealone.db.table.Table table;
 
-    public LealoneTable(org.lealone.db.table.Table table, String storageEngineName, LealoneStoragePlugin plugin,
-            Schema schema, LealoneScanSpec scanSpec) {
-        super(plugin, storageEngineName, scanSpec);
-        // this.schema = schema;
+    private final Table table;
+
+    public LealoneTable(Table table, LealoneStoragePlugin plugin, LealoneScanSpec scanSpec) {
+        super(plugin, plugin.getName(), scanSpec);
         this.table = table;
     }
 
@@ -57,6 +55,5 @@ public class LealoneTable extends DynamicDrillTable {
         int sqlType = DataType.convertTypeToSQLType(type);
         SqlTypeName typeName = SqlTypeName.getNameForJdbcType(sqlType);
         return typeFactory.createSqlType(typeName);
-        // throw new UnsupportedOperationException("Unsupported type.");
     }
 }

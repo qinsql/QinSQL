@@ -20,43 +20,40 @@ if "%OS%" == "Windows_NT" setlocal
 if NOT DEFINED JAVA_HOME goto :err
 
 pushd %~dp0..
-if NOT DEFINED BATS_HOME set BATS_HOME=%CD%
+if NOT DEFINED LEALONE_HOME set LEALONE_HOME=%CD%
 popd
 
-if NOT DEFINED BATS_MAIN set BATS_MAIN=sqlline.SqlLine -ac org.lealone.bats.engine.BatsSqlLineApplication
+if NOT DEFINED LEALONE_MAIN set LEALONE_MAIN=org.lealone.main.Shell
 
 set JAVA_OPTS=-Xms10M^
- -Dlogback.configurationFile=logback.xml^
- -Dbats.logdir="%BATS_HOME%\logs"
+ -Dlealone.logdir="%LEALONE_HOME%\logs"
 
 REM ***** CLASSPATH library setting *****
 
 REM Ensure that any user defined CLASSPATH variables are not used on startup
-set CLASSPATH="%BATS_HOME%\conf;%BATS_HOME%\lib\*"
-goto okClasspath
+set CLASSPATH="%LEALONE_HOME%\conf;%LEALONE_HOME%\lib\*"
 
-:okClasspath
-set BATS_PARAMS=%1 %2 %3 %4
-goto runShell
+REM set LEALONE_PARAMS=%1 %2
+REM goto runShell
 
-set BATS_PARAMS=
+set LEALONE_PARAMS=
 
 :param
 set str=%1
 if "%str%"=="" (
     goto end
 )
-set BATS_PARAMS=%BATS_PARAMS% %str%
+set LEALONE_PARAMS=%LEALONE_PARAMS% %str%
 shift /0
 goto param
 
 :end
-if "%BATS_PARAMS%"=="" (
+if "%LEALONE_PARAMS%"=="" (
     goto runShell
 )
 
 :runShell
-"%JAVA_HOME%\bin\java" %JAVA_OPTS% -cp %CLASSPATH% %BATS_MAIN% %BATS_PARAMS%
+"%JAVA_HOME%\bin\java" %JAVA_OPTS% -cp %CLASSPATH% "%LEALONE_MAIN%" %LEALONE_PARAMS%
 goto finally
 
 :err

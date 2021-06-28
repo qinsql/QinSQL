@@ -43,7 +43,7 @@ import org.lealone.server.ProtocolServerEngineManager;
 import org.lealone.sql.SQLStatement;
 import org.lealone.sql.StatementBase;
 import org.lealone.sql.executor.YieldableBase;
-import org.lealone.sql.executor.YieldableQueryBase;
+import org.lealone.sql.query.YieldableQueryBase;
 
 public class BatsQuery extends StatementBase {
 

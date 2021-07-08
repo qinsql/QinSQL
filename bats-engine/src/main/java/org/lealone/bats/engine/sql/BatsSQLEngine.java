@@ -27,7 +27,6 @@ import org.lealone.db.value.Value;
 import org.lealone.sql.IExpression;
 import org.lealone.sql.Parser;
 import org.lealone.sql.SQLEngine;
-import org.lealone.sql.SQLEngineManager;
 import org.lealone.sql.SQLParser;
 import org.lealone.sql.expression.Parameter;
 import org.lealone.sql.expression.SequenceValue;
@@ -39,7 +38,6 @@ public class BatsSQLEngine implements SQLEngine {
     public static final String NAME = "BATS";
 
     public BatsSQLEngine() {
-        SQLEngineManager.getInstance().registerEngine(this);
     }
 
     @Override

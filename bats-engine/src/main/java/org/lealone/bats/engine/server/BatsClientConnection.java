@@ -34,6 +34,7 @@ import org.apache.drill.exec.work.user.UserWorker;
 import org.lealone.db.async.AsyncHandler;
 import org.lealone.db.async.AsyncResult;
 import org.lealone.db.result.Result;
+import org.lealone.db.session.ServerSession;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -45,14 +46,16 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
     // private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(BatsClientConnection.class);
 
     private final BatsBatchResult batchResult = new BatsBatchResult();
+    private final ServerSession serverSession;
     private final UserSession session;
     private final SocketAddress remoteAddress;
     private final AsyncHandler<AsyncResult<Result>> asyncHandler;
 
-    public BatsClientConnection(SchemaPlus schema, String userName, UserWorker userWorker, SocketAddress remoteAddress,
-            AsyncHandler<AsyncResult<Result>> asyncHandler) {
+    public BatsClientConnection(SchemaPlus schema, ServerSession serverSession, UserWorker userWorker,
+            SocketAddress remoteAddress, AsyncHandler<AsyncResult<Result>> asyncHandler) {
+        this.serverSession = serverSession;
         session = UserSession.Builder.newBuilder()
-                .withCredentials(UserCredentials.newBuilder().setUserName(userName).build())
+                .withCredentials(UserCredentials.newBuilder().setUserName(serverSession.getUser().getName()).build())
                 .withOptionManager(userWorker.getSystemOptions())
                 // .withUserProperties(inbound.getProperties())
                 // .setSupportComplexTypes(inbound.getSupportComplexTypes())
@@ -60,6 +63,10 @@ public class BatsClientConnection implements org.apache.drill.exec.rpc.UserClien
         session.setDefaultSchema(schema);
         this.remoteAddress = remoteAddress;
         this.asyncHandler = asyncHandler;
+    }
+
+    public ServerSession getServerSession() {
+        return serverSession;
     }
 
     @Override

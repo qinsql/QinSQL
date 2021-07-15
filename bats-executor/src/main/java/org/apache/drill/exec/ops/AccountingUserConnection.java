@@ -58,4 +58,8 @@ public class AccountingUserConnection {
             sendingAccountor.decrement();
         }
     }
+
+    public UserClientConnection getConnection() {
+        return connection;
+    }
 }

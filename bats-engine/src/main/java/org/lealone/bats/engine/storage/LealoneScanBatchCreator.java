@@ -45,7 +45,7 @@ public class LealoneScanBatchCreator implements BatchCreator<LealoneSubScan> {
                 // columns = GroupScan.ALL_COLUMNS;
                 // }
 
-                RecordReader reader = new LealoneRecordReader(scanSpec.getScanSpec(), config, null);
+                RecordReader reader = new LealoneRecordReader(context, scanSpec.getScanSpec(), config, null);
                 readers.add(reader);
             } catch (Exception e1) {
                 throw new ExecutionSetupException(e1);

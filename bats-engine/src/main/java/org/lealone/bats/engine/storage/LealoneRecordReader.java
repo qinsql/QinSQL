@@ -31,6 +31,8 @@ import org.apache.drill.common.types.TypeProtos.MajorType;
 import org.apache.drill.common.types.TypeProtos.MinorType;
 import org.apache.drill.exec.exception.SchemaChangeException;
 import org.apache.drill.exec.expr.TypeHelper;
+import org.apache.drill.exec.ops.ExchangeFragmentContext;
+import org.apache.drill.exec.ops.ExecutorFragmentContext;
 import org.apache.drill.exec.ops.OperatorContext;
 import org.apache.drill.exec.physical.impl.OutputMutator;
 import org.apache.drill.exec.record.MaterializedField;
@@ -50,11 +52,13 @@ import org.apache.drill.exec.vector.ValueVector;
 import org.apache.drill.shaded.guava.com.google.common.base.Charsets;
 import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableList;
 import org.apache.drill.shaded.guava.com.google.common.collect.ImmutableMap;
+import org.lealone.bats.engine.server.BatsClientConnection;
 import org.lealone.db.Database;
 import org.lealone.db.LealoneDatabase;
 import org.lealone.db.index.Cursor;
 import org.lealone.db.index.Index;
 import org.lealone.db.result.Row;
+import org.lealone.db.session.ServerSession;
 import org.lealone.db.table.Column;
 import org.lealone.db.table.Table;
 import org.lealone.db.value.DataType;
@@ -128,10 +132,13 @@ public class LealoneRecordReader extends AbstractRecordReader {
     private Cursor cursor;
     private final LealoneSubScan subScanConfig;
 
-    public LealoneRecordReader(LealoneScanSpec scanSpec, LealoneSubScan subScanConfig, String storagePluginName) {
+    public LealoneRecordReader(ExecutorFragmentContext context, LealoneScanSpec scanSpec, LealoneSubScan subScanConfig,
+            String storagePluginName) {
         this.storagePluginName = storagePluginName;
+        BatsClientConnection conn = (BatsClientConnection) context.getUserDataTunnel().getConnection();
         Database db = LealoneDatabase.getInstance().getDatabase(scanSpec.getDbName());
-        table = db.getSchema(null, scanSpec.getSchemaName()).findTableOrView(null, scanSpec.getTableName());
+        table = db.getSchema(conn.getServerSession(), scanSpec.getSchemaName()).findTableOrView(conn.getServerSession(),
+                scanSpec.getTableName());
         this.subScanConfig = subScanConfig;
     }
 
@@ -225,13 +232,21 @@ public class LealoneRecordReader extends AbstractRecordReader {
     @Override
     public void setup(OperatorContext operatorContext, OutputMutator output) throws ExecutionSetupException {
         try {
+            ServerSession session = null;
+            if (operatorContext.getFragmentContext() instanceof ExchangeFragmentContext) {
+                BatsClientConnection conn = (BatsClientConnection) ((ExchangeFragmentContext) operatorContext
+                        .getFragmentContext()).getUserDataTunnel().getConnection();
+                session = conn.getServerSession();
+            }
             Index index;
             if (subScanConfig.getIndexName() == null)
-                index = table.getScanIndex(null);
+                index = table.getScanIndex(session);
             else
-                index = table.getSchema().getIndex(null, subScanConfig.getIndexName());
-            // TODO 如何传递session到这里，通过OperatorContext？
-            cursor = index.find(table.getDatabase().getSystemSession(), null, null);
+                index = table.getSchema().getIndex(session, subScanConfig.getIndexName());
+
+            if (session == null)
+                session = table.getDatabase().getSystemSession();
+            cursor = index.find(session, null, null);
 
             // final int columns = meta.getColumnCount();
             Column[] columns = table.getColumns();

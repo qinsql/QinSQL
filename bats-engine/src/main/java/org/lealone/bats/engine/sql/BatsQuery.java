@@ -130,8 +130,8 @@ public class BatsQuery extends StatementBase {
                 lsp.registerSchema(schema, dbName, defaultSchema);
                 rootSchema.add(LealoneStoragePluginConfig.NAME, defaultSchema);
             }
-            BatsClientConnection clientConnection = new BatsClientConnection(rootSchema, session.getUser().getName(),
-                    userWorker, NetNode.getLocalTcpNode().getInetSocketAddress(), res -> {
+            BatsClientConnection clientConnection = new BatsClientConnection(rootSchema, session, userWorker,
+                    NetNode.getLocalTcpNode().getInetSocketAddress(), res -> {
                         if (res.isSucceeded()) {
                             result = res.getResult();
                             setResult(result, result.getRowCount());

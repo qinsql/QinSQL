@@ -1,9 +1,10 @@
 # Bats
 
-面向 OLAP 场景的 SQL 引擎
+面向单机与分布式 OLTP/OLAP 场景的可暂停的渐进式 SQL 引擎
 
 改编自 [Apache Calcite](https://calcite.apache.org/) 和 [Apache Drill](http://drill.apache.org/)
 
+兼容 MySQL 或 PostgreSQL 的协议和 SQL 语法
 
 
 ## 开发环境

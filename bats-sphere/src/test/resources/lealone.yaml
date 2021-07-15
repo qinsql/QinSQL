@@ -1,0 +1,101 @@
+# Copyright Lealone Database Group.
+# Licensed under the Server Side Public License, v 1.
+# Initial Developer: zhh
+
+base_dir: ./target/data
+
+listen_address: 127.0.0.1
+
+storage_engines:
+  - name: AOSE
+    enabled: true
+    parameters: {
+        # key1: v1,
+        # key2: v2,
+    }
+
+transaction_engines:
+  - name: AOTE
+    enabled: true
+    parameters: {
+        redo_log_dir: redo_log
+    }
+
+sql_engines:
+  - name: Lealone
+    enabled: false
+    parameters: {
+        # key1: v1,
+        # key2: v2,
+    }
+  - name: MySQL
+    enabled: true
+    parameters: {
+        # key1: v1,
+        # key2: v2,
+    }
+protocol_server_engines:
+  - name: TCP
+    enabled: true
+    parameters: {
+        port: 9210,
+        trace: false,
+        allow_others: true,
+        daemon: false,
+        ssl: false
+    }
+  - name: MySQL
+    enabled: true
+    parameters: {
+        port: 9310,
+        trace: false,
+        allow_others: true,
+        daemon: false,
+        ssl: false
+    }
+  - name: PostgreSQL
+    enabled: true
+    parameters: {
+        port: 9510,
+        trace: false,
+        allow_others: true,
+        daemon: false,
+        ssl: false
+    }
+  - name: P2P
+    enabled: false
+    parameters: {
+        port: 9211,
+        ssl: false
+    }
+
+server_encryption_options:
+    keystore: conf/.keystore
+    keystore_password: lealone
+    truststore: conf/.truststore
+    truststore_password: lealone
+
+cluster_config:
+    cluster_name: Test Cluster
+    node_snitch: SimpleSnitch
+    dynamic_snitch: true
+    request_timeout_in_ms: 10000
+
+    seed_provider:
+        name: SimpleSeedProvider
+        parameters: {
+            seeds: "127.0.0.1"
+        }
+
+    replication_strategy:
+        name: SimpleStrategy
+        parameters: {
+            replication_factor: 3
+        }
+
+    # replication_strategy:
+    #     name: NetworkTopologyStrategy
+    #     parameters: {
+    #         dc1: 1,
+    #         dc2: 2
+    #     }

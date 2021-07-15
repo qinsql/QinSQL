@@ -1,0 +1,2 @@
+org.lealone.bats.sphere.mysql.jdbc.LealoneMySQLJDBCDriverURLRecognizer
+org.lealone.bats.sphere.postgresql.jdbc.LealonePostgreSQLJDBCDriverURLRecognizer

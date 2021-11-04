@@ -1,2 +1,0 @@
-org.lealone.bats.sphere.mysql.jdbc.LealoneMySQLXADataSourceDefinition
-org.lealone.bats.sphere.postgresql.jdbc.LealonePostgreSQLXADataSourceDefinition

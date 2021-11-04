@@ -1,2 +1,0 @@
-org.lealone.bats.sphere.mysql.jdbc.LealoneMySQLStatementMemoryStrictlyFetchSizeSetter
-org.lealone.bats.sphere.postgresql.jdbc.LealonePostgreSQLStatementMemoryStrictlyFetchSizeSetter

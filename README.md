@@ -4,8 +4,6 @@
 
 改编自 [Apache Calcite](https://calcite.apache.org/) 和 [Apache Drill](http://drill.apache.org/)
 
-兼容 MySQL 或 PostgreSQL 的协议和 SQL 语法
-
 
 ## 开发环境
 

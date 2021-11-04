@@ -34,9 +34,6 @@
         <module>bats-function</module>
         <module>bats-vector</module>
         <module>bats-engine</module>
-        <module>bats-mysql</module>
-        <module>bats-postgresql</module>
-        <module>bats-sphere</module>
         <module>bats-test</module>
         <module>bats-dist</module>
     </modules>

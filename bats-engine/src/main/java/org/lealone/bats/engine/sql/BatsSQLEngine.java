@@ -25,7 +25,7 @@ import org.lealone.db.session.ServerSession;
 import org.lealone.db.session.Session;
 import org.lealone.db.value.Value;
 import org.lealone.sql.IExpression;
-import org.lealone.sql.Parser;
+import org.lealone.sql.LealoneSQLParser;
 import org.lealone.sql.SQLEngine;
 import org.lealone.sql.SQLParser;
 import org.lealone.sql.expression.Parameter;
@@ -56,7 +56,7 @@ public class BatsSQLEngine implements SQLEngine {
 
     @Override
     public String quoteIdentifier(String identifier) {
-        return Parser.quoteIdentifier(identifier);
+        return LealoneSQLParser.quoteIdentifier(identifier);
     }
 
     @Override
@@ -77,7 +77,8 @@ public class BatsSQLEngine implements SQLEngine {
     @Override
     public IExpression createConditionAndOr(boolean and, IExpression left, IExpression right) {
         return new ConditionAndOr(and ? ConditionAndOr.AND : ConditionAndOr.OR,
-                (org.lealone.sql.expression.Expression) left, (org.lealone.sql.expression.Expression) right);
+                (org.lealone.sql.expression.Expression) left,
+                (org.lealone.sql.expression.Expression) right);
     }
 
     @Override

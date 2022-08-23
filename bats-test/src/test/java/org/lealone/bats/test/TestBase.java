@@ -27,18 +27,15 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.lealone.common.exceptions.DbException;
-import org.lealone.common.logging.ConsoleLogDelegateFactory;
 import org.lealone.common.logging.LoggerFactory;
+import org.lealone.common.logging.impl.ConsoleLoggerFactory;
 import org.lealone.common.trace.TraceSystem;
 import org.lealone.db.ConnectionSetting;
 import org.lealone.db.Constants;
+import org.lealone.db.DbSetting;
 import org.lealone.db.SysProperties;
 import org.lealone.p2p.config.Config;
 import org.lealone.storage.fs.FileUtils;
-import org.lealone.storage.memory.MemoryStorageEngine;
-import org.lealone.transaction.TransactionEngine;
-import org.lealone.transaction.TransactionEngineManager;
-import org.lealone.transaction.aote.log.LogSyncService;
 
 public class TestBase extends Assert {
 
@@ -56,7 +53,8 @@ public class TestBase extends Assert {
 
     public static String url;
     public static final String DEFAULT_STORAGE_ENGINE_NAME = getDefaultStorageEngineName();
-    public static final String TEST_BASE_DIR = "." + File.separatorChar + "target" + File.separatorChar + "test-data";
+    public static final String TEST_BASE_DIR = "." + File.separatorChar + "target" + File.separatorChar
+            + "test-data";
     public static final String TEST_DIR = TEST_BASE_DIR + File.separatorChar + "test";
     public static final String TEST = "test";
     public static final String LEALONE = "lealone";
@@ -64,8 +62,6 @@ public class TestBase extends Assert {
     public static final String DEFAULT_USER = "root";
     public static final String DEFAULT_PASSWORD = "";
     public static final int NETWORK_TIMEOUT_MILLISECONDS = -1; // 小于0表示没有时间限制，方便在eclipse中调试代码
-
-    public static TransactionEngine te;
 
     static {
         System.setProperty("java.io.tmpdir", TEST_DIR + File.separatorChar + "tmp");
@@ -83,32 +79,14 @@ public class TestBase extends Assert {
     public TestBase() {
     }
 
-    // 测试阶段使用ConsoleLog能加快启动速度，比logback快
+    // 测试阶段使用ConsoleLogger能加快启动速度
     public static void setConsoleLoggerFactory() {
-        System.setProperty(LoggerFactory.LOGGER_DELEGATE_FACTORY_CLASS_NAME, ConsoleLogDelegateFactory.class.getName());
+        System.setProperty(LoggerFactory.LOGGER_FACTORY_CLASS_NAME,
+                ConsoleLoggerFactory.class.getName());
     }
 
     public static String getDefaultStorageEngineName() {
         return "AOSE";
-    }
-
-    public static synchronized void initTransactionEngine() {
-        if (te == null) {
-            te = TransactionEngineManager.getInstance().getEngine(Constants.DEFAULT_TRANSACTION_ENGINE_NAME);
-
-            Map<String, String> config = new HashMap<>();
-            config.put("base_dir", TEST_DIR);
-            config.put("redo_log_dir", "redo_log");
-            config.put("log_sync_type", LogSyncService.LOG_SYNC_TYPE_PERIODIC);
-            // config.put("log_sync_type", LogSyncService.LOG_SYNC_TYPE_NO_SYNC);
-            te.init(config);
-        }
-    }
-
-    public static synchronized void closeTransactionEngine() {
-        if (te != null) {
-            te.close();
-        }
     }
 
     protected String dbName = DEFAULT_DB_NAME;
@@ -132,6 +110,11 @@ public class TestBase extends Assert {
         for (String dir : dirs)
             s.append(File.separatorChar).append(dir);
         return s.toString();
+    }
+
+    public synchronized TestBase addConnectionParameter(DbSetting key, String value) {
+        connectionParameters.put(key.name(), value);
+        return this;
     }
 
     public synchronized TestBase addConnectionParameter(String key, String value) {
@@ -232,13 +215,14 @@ public class TestBase extends Assert {
             addConnectionParameter("user", DEFAULT_USER);
             addConnectionParameter("password", DEFAULT_PASSWORD);
         }
-        addConnectionParameter(ConnectionSetting.NETWORK_TIMEOUT.name(), String.valueOf(NETWORK_TIMEOUT_MILLISECONDS));
+        addConnectionParameter(ConnectionSetting.NETWORK_TIMEOUT.name(),
+                String.valueOf(NETWORK_TIMEOUT_MILLISECONDS));
 
         StringBuilder url = new StringBuilder(100);
 
         url.append(Constants.URL_PREFIX);
-        if (inMemory || MemoryStorageEngine.NAME.equalsIgnoreCase(storageEngineName)) {
-            addConnectionParameter("PERSISTENT", "false");
+        if (inMemory) {
+            addConnectionParameter(DbSetting.PERSISTENT, "false");
         }
 
         if (embedded) {
@@ -260,8 +244,10 @@ public class TestBase extends Assert {
             separatorChar = '&';
         }
 
-        url.append(dbName).append(firstSeparatorChar).append("default_storage_engine=").append(storageEngineName);
-        url.append(firstSeparatorChar).append(Constants.NET_FACTORY_NAME_KEY).append("=").append(netFactoryName);
+        url.append(dbName).append(firstSeparatorChar).append("default_storage_engine=")
+                .append(storageEngineName);
+        url.append(firstSeparatorChar).append(Constants.NET_FACTORY_NAME_KEY).append("=")
+                .append(netFactoryName);
 
         for (Map.Entry<String, String> e : connectionParameters.entrySet())
             url.append(separatorChar).append(e.getKey()).append('=').append(e.getValue());
@@ -298,7 +284,8 @@ public class TestBase extends Assert {
     public static void deleteFileRecursive(String path) {
         // 避免误删除
         if (!path.startsWith(TEST_BASE_DIR)) {
-            throw new RuntimeException("invalid path: " + path + ", must be start with: " + TEST_BASE_DIR);
+            throw new RuntimeException(
+                    "invalid path: " + path + ", must be start with: " + TEST_BASE_DIR);
         }
         FileUtils.deleteRecursive(path, false);
     }

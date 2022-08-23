@@ -19,10 +19,10 @@ package org.lealone.bats.engine.sql;
 
 import org.lealone.common.exceptions.UnsupportedSchemaException;
 import org.lealone.db.session.ServerSession;
-import org.lealone.sql.Parser;
+import org.lealone.sql.LealoneSQLParser;
 import org.lealone.sql.StatementBase;
 
-public class BatsSQLParser extends Parser {
+public class BatsSQLParser extends LealoneSQLParser {
 
     public BatsSQLParser(ServerSession session) {
         super(session);

@@ -32,6 +32,7 @@ import org.lealone.bats.engine.storage.LealoneStoragePlugin;
 import org.lealone.bats.engine.storage.LealoneStoragePluginConfig;
 import org.lealone.common.exceptions.DbException;
 import org.lealone.db.Constants;
+import org.lealone.db.PluginManager;
 import org.lealone.db.async.AsyncHandler;
 import org.lealone.db.async.AsyncResult;
 import org.lealone.db.result.Result;
@@ -39,7 +40,7 @@ import org.lealone.db.result.ResultTarget;
 import org.lealone.db.session.ServerSession;
 import org.lealone.db.session.SessionStatus;
 import org.lealone.net.NetNode;
-import org.lealone.server.ProtocolServerEngineManager;
+import org.lealone.server.ProtocolServerEngine;
 import org.lealone.sql.SQLStatement;
 import org.lealone.sql.StatementBase;
 import org.lealone.sql.executor.YieldableBase;
@@ -108,12 +109,14 @@ public class BatsQuery extends StatementBase {
         }
 
         private void executeQueryAsync(ServerSession session, String sql, boolean useDefaultSchema) {
-            Drillbit drillbit = ((BatsServer) ProtocolServerEngineManager.getInstance().getEngine(BatsSQLEngine.NAME)
-                    .getProtocolServer()).getDrillbit();
+            Drillbit drillbit = ((BatsServer) PluginManager
+                    .getPlugin(ProtocolServerEngine.class, BatsSQLEngine.NAME).getProtocolServer())
+                            .getDrillbit();
             UserProtos.RunQuery runQuery = UserProtos.RunQuery.newBuilder().setPlan(sql)
                     .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
             UserWorker userWorker = drillbit.getWorkManager().getUserWorker();
-            SchemaTreeProvider schemaTreeProvider = new SchemaTreeProvider(drillbit.getWorkManager().getContext());
+            SchemaTreeProvider schemaTreeProvider = new SchemaTreeProvider(
+                    drillbit.getWorkManager().getContext());
             SchemaPlus rootSchema = schemaTreeProvider.createRootSchema(userWorker.getSystemOptions());
             if (useDefaultSchema && sql.contains(LealoneStoragePluginConfig.NAME)) {
                 LealoneStoragePlugin lsp;
@@ -124,14 +127,16 @@ public class BatsQuery extends StatementBase {
                     throw DbException.throwInternalError();
                 }
 
-                SchemaPlus defaultSchema = CalciteSchema.createRootSchema(false, true, Constants.SCHEMA_MAIN).plus();
+                SchemaPlus defaultSchema = CalciteSchema
+                        .createRootSchema(false, true, Constants.SCHEMA_MAIN).plus();
                 String dbName = session.getDatabase().getShortName();
-                SchemaPlus schema = CalciteSchema.createRootSchema(defaultSchema, false, true, dbName).plus();
+                SchemaPlus schema = CalciteSchema.createRootSchema(defaultSchema, false, true, dbName)
+                        .plus();
                 lsp.registerSchema(schema, dbName, defaultSchema);
                 rootSchema.add(LealoneStoragePluginConfig.NAME, defaultSchema);
             }
-            BatsClientConnection clientConnection = new BatsClientConnection(rootSchema, session, userWorker,
-                    NetNode.getLocalTcpNode().getInetSocketAddress(), res -> {
+            BatsClientConnection clientConnection = new BatsClientConnection(rootSchema, session,
+                    userWorker, NetNode.getLocalTcpNode().getInetSocketAddress(), res -> {
                         if (res.isSucceeded()) {
                             result = res.getResult();
                             setResult(result, result.getRowCount());

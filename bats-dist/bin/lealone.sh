@@ -23,7 +23,7 @@ if [ "x$JAVA_HOME" = "x" ]; then
     exit 1;
 fi
 
-LEALONE_MAIN=org.lealone.main.Lealone
+LEALONE_MAIN=org.lealone.bats.engine.Bats
 
 # JAVA_OPTS=-ea
 # JAVA_OPTS="$JAVA_OPTS -Xms10M"

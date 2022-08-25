@@ -36,6 +36,7 @@ transaction_engines:
 sql_engines:
   - name: BATS
     enabled: true
+    is_default: true
     parameters: {
         # key1: v1,
         # key2: v2,
@@ -57,6 +58,8 @@ protocol_server_engines:
         port: 9211,
         ssl: false
     }
+  - name: TCP
+    enabled: false
 
 server_encryption_options:
     keystore: conf/.keystore

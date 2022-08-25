@@ -23,7 +23,7 @@ pushd %~dp0..
 if NOT DEFINED LEALONE_HOME set LEALONE_HOME=%CD%
 popd
 
-if NOT DEFINED LEALONE_MAIN set LEALONE_MAIN=org.lealone.main.Lealone
+if NOT DEFINED LEALONE_MAIN set LEALONE_MAIN=org.lealone.bats.engine.Bats
 
 
 REM ***** JAVA options *****

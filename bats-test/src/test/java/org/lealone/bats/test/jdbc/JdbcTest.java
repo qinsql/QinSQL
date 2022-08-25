@@ -27,8 +27,8 @@ import org.lealone.db.Constants;
 public class JdbcTest {
 
     public static void main(String[] args) throws Exception {
-        Connection conn = DriverManager
-                .getConnection("jdbc:lealone:tcp://localhost:" + Constants.DEFAULT_TCP_PORT + "/lealone", "root", "");
+        Connection conn = DriverManager.getConnection(
+                "jdbc:lealone:tcp://localhost:" + Constants.DEFAULT_TCP_PORT + "/lealone", "root", "");
         Statement stmt = conn.createStatement();
         init(stmt);
 
@@ -36,7 +36,7 @@ public class JdbcTest {
         query(stmt, sql);
 
         sql = "SELECT name FROM olap.my_table"; // 用OLAP的SQL引擎
-        query(stmt, sql);
+        // query(stmt, sql);
 
         sql = "SELECT count(*) FROM cp.`test.csvh`"; // 用OLAP的SQL引擎
         query(stmt, sql);

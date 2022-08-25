@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.drill.exec.coord.p2p;
+package org.lealone.p2p.server;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,7 +28,7 @@ import org.apache.drill.exec.coord.store.TransientStoreConfig;
 import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint;
 import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint.State;
 import org.lealone.net.NetNode;
-import org.lealone.net.NetNodeManagerHolder;
+import org.lealone.p2p.gossip.Gossiper;
 
 public class P2pClusterCoordinator extends LocalClusterCoordinator {
 
@@ -60,10 +60,10 @@ public class P2pClusterCoordinator extends LocalClusterCoordinator {
     @Override
     public Collection<DrillbitEndpoint> getOnlineEndPoints() {
         ArrayList<DrillbitEndpoint> list = new ArrayList<>();
-        for (NetNode node : NetNodeManagerHolder.get().getLiveNodes()) {
+        for (NetNode node : Gossiper.instance.getLiveMembers()) {
             DrillbitEndpoint partialEndpoint = DrillbitEndpoint.newBuilder().setAddress(node.getHost())
-                    .setVersion(DrillVersionInfo.getVersion()).setState(State.ONLINE).setControlPort(31011)
-                    .setDataPort(31012).build();
+                    .setVersion(DrillVersionInfo.getVersion()).setState(State.ONLINE)
+                    .setControlPort(31011).setDataPort(31012).build();
             list.add(partialEndpoint);
         }
         return list;

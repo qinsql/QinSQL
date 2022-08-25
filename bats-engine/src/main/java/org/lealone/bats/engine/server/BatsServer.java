@@ -20,7 +20,6 @@ package org.lealone.bats.engine.server;
 import java.util.Map;
 
 import org.apache.drill.common.config.DrillConfig;
-import org.apache.drill.exec.coord.p2p.P2pClusterCoordinator;
 import org.apache.drill.exec.server.Drillbit;
 import org.apache.drill.exec.server.RemoteServiceSet;
 import org.apache.drill.exec.store.StoragePlugin;
@@ -29,6 +28,7 @@ import org.lealone.common.logging.LoggerFactory;
 import org.lealone.db.LealoneDatabase;
 import org.lealone.net.AsyncConnectionManager;
 import org.lealone.p2p.config.ConfigDescriptor;
+import org.lealone.p2p.server.P2pClusterCoordinator;
 import org.lealone.server.TcpServer;
 
 public class BatsServer extends TcpServer implements AsyncConnectionManager {
@@ -72,6 +72,7 @@ public class BatsServer extends TcpServer implements AsyncConnectionManager {
         drillbit.shutdown();
     }
 
+    @SuppressWarnings("resource")
     private void startDrillbit() throws Exception {
         // 能查看org.apache.calcite.rel.metadata.JaninoRelMetadataProvider生成的代码
         // System.setProperty("calcite.debug", "true");

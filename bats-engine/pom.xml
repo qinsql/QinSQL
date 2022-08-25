@@ -32,7 +32,7 @@
     <dependencies>
         <dependency>
             <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-function</artifactId>
+            <artifactId>bats-p2p</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

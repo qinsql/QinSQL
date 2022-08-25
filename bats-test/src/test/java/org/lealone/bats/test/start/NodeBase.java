@@ -17,8 +17,8 @@
  */
 package org.lealone.bats.test.start;
 
+import org.lealone.bats.engine.Bats;
 import org.lealone.common.exceptions.ConfigException;
-import org.lealone.main.Lealone;
 import org.lealone.p2p.config.Config;
 import org.lealone.p2p.config.YamlConfigLoader;
 
@@ -26,7 +26,7 @@ public class NodeBase extends YamlConfigLoader {
 
     public static void run(Class<?> loader, String[] args) {
         init(loader);
-        Lealone.main(args);
+        Bats.main(args);
     }
 
     private static void init(Class<?> loader) {

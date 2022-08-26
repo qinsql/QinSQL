@@ -35,6 +35,8 @@ import org.lealone.db.Constants;
 import org.lealone.db.PluginManager;
 import org.lealone.db.async.AsyncHandler;
 import org.lealone.db.async.AsyncResult;
+import org.lealone.db.index.Cursor;
+import org.lealone.db.result.LocalResult;
 import org.lealone.db.result.Result;
 import org.lealone.db.result.ResultTarget;
 import org.lealone.db.session.ServerSession;
@@ -49,11 +51,38 @@ import org.lealone.sql.query.YieldableQueryBase;
 public class BatsQuery extends StatementBase {
 
     private final String sql;
+    private LocalResult localResult;
+    private Cursor cursor;
+    private boolean stopped;
 
     public BatsQuery(ServerSession session, String sql) {
         super(session);
         this.sql = sql;
         parameters = new ArrayList<>();
+    }
+
+    public LocalResult getLocalResult() {
+        return localResult;
+    }
+
+    public void setLocalResult(LocalResult localResult) {
+        this.localResult = localResult;
+    }
+
+    public Cursor getCursor() {
+        return cursor;
+    }
+
+    public void setCursor(Cursor cursor) {
+        this.cursor = cursor;
+    }
+
+    public boolean isStopped() {
+        return stopped;
+    }
+
+    public void stop() {
+        stopped = true;
     }
 
     @Override
@@ -136,7 +165,8 @@ public class BatsQuery extends StatementBase {
                 rootSchema.add(LealoneStoragePluginConfig.NAME, defaultSchema);
             }
             BatsClientConnection clientConnection = new BatsClientConnection(rootSchema, session,
-                    userWorker, NetNode.getLocalTcpNode().getInetSocketAddress(), res -> {
+                    userWorker, NetNode.getLocalTcpNode().getInetSocketAddress(),
+                    select.getLocalResult(), select, res -> {
                         if (res.isSucceeded()) {
                             result = res.getResult();
                             setResult(result, result.getRowCount());
@@ -146,6 +176,7 @@ public class BatsQuery extends StatementBase {
                         session.setStatus(SessionStatus.STATEMENT_COMPLETED);
                         session.getTransactionListener().wakeUp();
                     });
+            clientConnection.setCursor(select.getCursor());
             userWorker.submitWork(clientConnection, runQuery);
         }
     }

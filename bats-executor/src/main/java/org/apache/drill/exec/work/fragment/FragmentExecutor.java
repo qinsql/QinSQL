@@ -42,6 +42,7 @@ import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint;
 import org.apache.drill.exec.proto.ExecProtos.FragmentHandle;
 import org.apache.drill.exec.proto.UserBitShared.FragmentState;
 import org.apache.drill.exec.proto.helper.QueryIdHelper;
+import org.apache.drill.exec.rpc.UserClientConnection;
 import org.apache.drill.exec.server.FailureUtils;
 import org.apache.drill.exec.testing.ControlsInjector;
 import org.apache.drill.exec.testing.ControlsInjectorFactory;
@@ -122,6 +123,7 @@ public class FragmentExecutor implements Runnable {
 
   // Thread that is currently executing the Fragment. Value is null if the fragment hasn't started running or finished
   private final AtomicReference<Thread> myThreadRef = new AtomicReference<>(null);
+  private final UserClientConnection clientConnection;
 
   /**
    * Create a FragmentExecutor where we need to parse and materialize the root operator.
@@ -150,7 +152,7 @@ public class FragmentExecutor implements Runnable {
     this.fragment = fragment;
     this.rootOperator = rootOperator;
     this.fragmentName = QueryIdHelper.getQueryIdentifier(context.getHandle());
-
+    clientConnection =  context.getUserDataTunnel().getConnection();
     context.setExecutorState(new ExecutorStateImpl());
   }
 
@@ -298,7 +300,8 @@ public class FragmentExecutor implements Runnable {
               break;
             }
           }
-
+          //if (clientConnection != null)
+          //  clientConnection.sendResult(null, null);
           return null;
         }
       });

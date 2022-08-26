@@ -132,13 +132,13 @@ public class LealoneRecordReader extends AbstractRecordReader {
     private Cursor cursor;
     private final LealoneSubScan subScanConfig;
 
-    public LealoneRecordReader(ExecutorFragmentContext context, LealoneScanSpec scanSpec, LealoneSubScan subScanConfig,
-            String storagePluginName) {
+    public LealoneRecordReader(ExecutorFragmentContext context, LealoneScanSpec scanSpec,
+            LealoneSubScan subScanConfig, String storagePluginName) {
         this.storagePluginName = storagePluginName;
         BatsClientConnection conn = (BatsClientConnection) context.getUserDataTunnel().getConnection();
         Database db = LealoneDatabase.getInstance().getDatabase(scanSpec.getDbName());
-        table = db.getSchema(conn.getServerSession(), scanSpec.getSchemaName()).findTableOrView(conn.getServerSession(),
-                scanSpec.getTableName());
+        table = db.getSchema(conn.getServerSession(), scanSpec.getSchemaName())
+                .findTableOrView(conn.getServerSession(), scanSpec.getTableName());
         this.subScanConfig = subScanConfig;
     }
 
@@ -148,16 +148,21 @@ public class LealoneRecordReader extends AbstractRecordReader {
                 .put(java.sql.Types.TINYINT, MinorType.INT).put(java.sql.Types.SMALLINT, MinorType.INT)
                 .put(java.sql.Types.INTEGER, MinorType.INT).put(java.sql.Types.BIGINT, MinorType.BIGINT)
 
-                .put(java.sql.Types.CHAR, MinorType.VARCHAR).put(java.sql.Types.VARCHAR, MinorType.VARCHAR)
-                .put(java.sql.Types.LONGVARCHAR, MinorType.VARCHAR).put(java.sql.Types.CLOB, MinorType.VARCHAR)
+                .put(java.sql.Types.CHAR, MinorType.VARCHAR)
+                .put(java.sql.Types.VARCHAR, MinorType.VARCHAR)
+                .put(java.sql.Types.LONGVARCHAR, MinorType.VARCHAR)
+                .put(java.sql.Types.CLOB, MinorType.VARCHAR)
 
-                .put(java.sql.Types.NCHAR, MinorType.VARCHAR).put(java.sql.Types.NVARCHAR, MinorType.VARCHAR)
+                .put(java.sql.Types.NCHAR, MinorType.VARCHAR)
+                .put(java.sql.Types.NVARCHAR, MinorType.VARCHAR)
                 .put(java.sql.Types.LONGNVARCHAR, MinorType.VARCHAR)
 
                 .put(java.sql.Types.VARBINARY, MinorType.VARBINARY)
-                .put(java.sql.Types.LONGVARBINARY, MinorType.VARBINARY).put(java.sql.Types.BLOB, MinorType.VARBINARY)
+                .put(java.sql.Types.LONGVARBINARY, MinorType.VARBINARY)
+                .put(java.sql.Types.BLOB, MinorType.VARBINARY)
 
-                .put(java.sql.Types.NUMERIC, MinorType.FLOAT8).put(java.sql.Types.DECIMAL, MinorType.VARDECIMAL)
+                .put(java.sql.Types.NUMERIC, MinorType.FLOAT8)
+                .put(java.sql.Types.DECIMAL, MinorType.VARDECIMAL)
                 .put(java.sql.Types.REAL, MinorType.FLOAT8)
 
                 .put(java.sql.Types.DATE, MinorType.DATE).put(java.sql.Types.TIME, MinorType.TIME)
@@ -230,23 +235,29 @@ public class LealoneRecordReader extends AbstractRecordReader {
     }
 
     @Override
-    public void setup(OperatorContext operatorContext, OutputMutator output) throws ExecutionSetupException {
+    public void setup(OperatorContext operatorContext, OutputMutator output)
+            throws ExecutionSetupException {
         try {
             ServerSession session = null;
+            Cursor cursor = null;
             if (operatorContext.getFragmentContext() instanceof ExchangeFragmentContext) {
                 BatsClientConnection conn = (BatsClientConnection) ((ExchangeFragmentContext) operatorContext
                         .getFragmentContext()).getUserDataTunnel().getConnection();
                 session = conn.getServerSession();
+                cursor = conn.getCursor();
             }
-            Index index;
-            if (subScanConfig.getIndexName() == null)
-                index = table.getScanIndex(session);
-            else
-                index = table.getSchema().getIndex(session, subScanConfig.getIndexName());
+            if (cursor == null) {
+                Index index;
+                if (subScanConfig.getIndexName() == null)
+                    index = table.getScanIndex(session);
+                else
+                    index = table.getSchema().getIndex(session, subScanConfig.getIndexName());
 
-            if (session == null)
-                session = table.getDatabase().getSystemSession();
-            cursor = index.find(session, null, null);
+                if (session == null)
+                    session = table.getDatabase().getSystemSession();
+                cursor = index.find(session, null, null);
+            }
+            this.cursor = cursor;
 
             // final int columns = meta.getColumnCount();
             Column[] columns = table.getColumns();
@@ -263,11 +274,12 @@ public class LealoneRecordReader extends AbstractRecordReader {
                 MinorType minorType = JDBC_TYPE_MAPPINGS.get(jdbcType);
                 if (minorType == null) {
 
-                    logger.warn("Ignoring column that is unsupported.", UserException.unsupportedError().message(
-                            "A column you queried has a data type that is not currently supported by the JDBC storage plugin. "
-                                    + "The column's name was %s and its JDBC data type was %s. ",
-                            name, nameFromType(jdbcType)).addContext("column Name", name)
-                            .addContext("plugin", storagePluginName).build(logger));
+                    logger.warn("Ignoring column that is unsupported.",
+                            UserException.unsupportedError().message(
+                                    "A column you queried has a data type that is not currently supported by the JDBC storage plugin. "
+                                            + "The column's name was %s and its JDBC data type was %s. ",
+                                    name, nameFromType(jdbcType)).addContext("column Name", name)
+                                    .addContext("plugin", storagePluginName).build(logger));
 
                     continue;
                 }
@@ -275,7 +287,8 @@ public class LealoneRecordReader extends AbstractRecordReader {
                 final MajorType type = MajorType.newBuilder().setMode(TypeProtos.DataMode.OPTIONAL)
                         .setMinorType(minorType).setScale(scale).setPrecision(width).build();
                 final MaterializedField field = MaterializedField.create(name, type);
-                final Class<? extends ValueVector> clazz = TypeHelper.getValueVectorClass(minorType, type.getMode());
+                final Class<? extends ValueVector> clazz = TypeHelper.getValueVectorClass(minorType,
+                        type.getMode());
                 ValueVector vector = output.addField(field, clazz);
                 vectorBuilder.add(vector);
                 copierBuilder.add(getCopier(jdbcType, i, resultSet, vector));
@@ -311,7 +324,8 @@ public class LealoneRecordReader extends AbstractRecordReader {
                 counter++;
             }
         } catch (SQLException e) {
-            throw UserException.dataReadError(e).message("Failure while attempting to read from database.")
+            throw UserException.dataReadError(e)
+                    .message("Failure while attempting to read from database.")
                     .addContext("plugin", storagePluginName).build(logger);
         }
 
@@ -410,7 +424,8 @@ public class LealoneRecordReader extends AbstractRecordReader {
 
     private class DecimalCopier extends Copier<NullableVarDecimalVector.Mutator> {
 
-        public DecimalCopier(int columnIndex, ResultSet result, NullableVarDecimalVector.Mutator mutator) {
+        public DecimalCopier(int columnIndex, ResultSet result,
+                NullableVarDecimalVector.Mutator mutator) {
             super(columnIndex, result, mutator);
         }
 
@@ -443,7 +458,8 @@ public class LealoneRecordReader extends AbstractRecordReader {
 
     private class VarBinaryCopier extends Copier<NullableVarBinaryVector.Mutator> {
 
-        public VarBinaryCopier(int columnIndex, ResultSet result, NullableVarBinaryVector.Mutator mutator) {
+        public VarBinaryCopier(int columnIndex, ResultSet result,
+                NullableVarBinaryVector.Mutator mutator) {
             super(columnIndex, result, mutator);
         }
 
@@ -498,7 +514,8 @@ public class LealoneRecordReader extends AbstractRecordReader {
 
         // private final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
-        public TimeStampCopier(int columnIndex, ResultSet result, NullableTimeStampVector.Mutator mutator) {
+        public TimeStampCopier(int columnIndex, ResultSet result,
+                NullableTimeStampVector.Mutator mutator) {
             super(columnIndex, result, mutator);
         }
 

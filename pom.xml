@@ -19,24 +19,24 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>bats sql engine project</name>
-    <groupId>org.lealone.bats</groupId>
-    <artifactId>bats</artifactId>
+    <name>qin sql engine project</name>
+    <groupId>org.lealone.qinsql</groupId>
+    <artifactId>qinsql</artifactId>
     <packaging>pom</packaging>
     <version>5.0.0-SNAPSHOT</version>
 
     <modules>
-        <module>bats-common</module>
-        <module>bats-rpc</module>
-        <module>bats-optimizer</module>
-        <module>bats-logical</module>
-        <module>bats-executor</module>
-        <module>bats-function</module>
-        <module>bats-vector</module>
-        <module>bats-engine</module>
-        <module>bats-p2p</module>
-        <module>bats-test</module>
-        <module>bats-dist</module>
+        <module>qinsql-common</module>
+        <module>qinsql-rpc</module>
+        <module>qinsql-optimizer</module>
+        <module>qinsql-logical</module>
+        <module>qinsql-executor</module>
+        <module>qinsql-function</module>
+        <module>qinsql-vector</module>
+        <module>qinsql-engine</module>
+        <module>qinsql-p2p</module>
+        <module>qinsql-test</module>
+        <module>qinsql-dist</module>
     </modules>
 
     <properties>
@@ -105,9 +105,9 @@
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.2-beta-5</version>
                     <configuration>
-                        <finalName>bats-${project.version}</finalName>
+                        <finalName>qinsql-${project.version}</finalName>
                         <descriptors>
-                            <descriptor>bats-dist/assembly.xml</descriptor>
+                            <descriptor>qinsql-dist/assembly.xml</descriptor>
                         </descriptors>
                     </configuration>
                 </plugin>

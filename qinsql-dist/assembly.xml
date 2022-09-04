@@ -26,11 +26,11 @@
     <baseDirectory>/</baseDirectory>
     <fileSets>
         <fileSet>
-            <directory>bats-dist/bin</directory>
+            <directory>qinsql-dist/bin</directory>
             <outputDirectory>bin</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>bats-dist/conf</directory>
+            <directory>qinsql-dist/conf</directory>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
     </fileSets>
@@ -38,7 +38,7 @@
     <moduleSets>
         <moduleSet>
             <includes>
-                <include>org.lealone.bats:bats-engine</include>
+                <include>org.lealone.qinsql:qinsql-engine</include>
             </includes> 
             <binaries>
                 <unpack>false</unpack>

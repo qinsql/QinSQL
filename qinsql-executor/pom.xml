@@ -19,13 +19,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.lealone.bats</groupId>
-        <artifactId>bats</artifactId>
+        <groupId>org.lealone.qinsql</groupId>
+        <artifactId>qinsql</artifactId>
         <version>5.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>bats-executor</artifactId>
+    <artifactId>qinsql-executor</artifactId>
     <packaging>jar</packaging>
     <version>5.0.0-SNAPSHOT</version>
 
@@ -322,18 +322,18 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-vector</artifactId>
+            <groupId>org.lealone.qinsql</groupId>
+            <artifactId>qinsql-vector</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-rpc</artifactId>
+            <groupId>org.lealone.qinsql</groupId>
+            <artifactId>qinsql-rpc</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-logical</artifactId>
+            <groupId>org.lealone.qinsql</groupId>
+            <artifactId>qinsql-logical</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -873,7 +873,7 @@
                             <outputDirectory>${project.build.directory}/codegen/templates</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>${project.basedir}/../bats-optimizer/src/main/codegen/templates</directory>
+                                    <directory>${project.basedir}/../qinsql-optimizer/src/main/codegen/templates</directory>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>

@@ -19,25 +19,25 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.lealone.bats</groupId>
-        <artifactId>bats</artifactId>
+        <groupId>org.lealone.qinsql</groupId>
+        <artifactId>qinsql</artifactId>
         <version>5.0.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>bats-logical</artifactId>
+    <artifactId>qinsql-logical</artifactId>
     <packaging>jar</packaging>
     <version>5.0.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
-            <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-optimizer</artifactId>
+            <groupId>org.lealone.qinsql</groupId>
+            <artifactId>qinsql-optimizer</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.lealone.bats</groupId>
-            <artifactId>bats-common</artifactId>
+            <groupId>org.lealone.qinsql</groupId>
+            <artifactId>qinsql-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 

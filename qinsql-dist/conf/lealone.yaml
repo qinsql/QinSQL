@@ -34,7 +34,7 @@ transaction_engines:
     }
 
 sql_engines:
-  - name: BATS
+  - name: QinSQL
     enabled: true
     is_default: true
     parameters: {
@@ -43,7 +43,7 @@ sql_engines:
     }
 
 protocol_server_engines:
-  - name: BATS
+  - name: QinSQL
     enabled: true
     parameters: {
         port: 9210,

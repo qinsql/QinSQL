@@ -1,8 +1,8 @@
-# Bats
+# QinSQL
 
 微服务 数据湖仓 OLTP 数据库 一体化平台
 
-Bats = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [Apache Drill](http://drill.apache.org/)
+QinSQL = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [Apache Drill](http://drill.apache.org/)
 
 
 ## 开发环境
@@ -17,9 +17,9 @@ Bats = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [Ap
 
 ## 在 IDE 中运行
 
-代码导入 IDE 后，直接运行 [BatsEngineStart](https://github.com/lealone/Bats/blob/master/bats-test/src/test/java/org/lealone/bats/test/start/BatsEngineStart.java) 
+代码导入 IDE 后，直接运行 [QinEngineStart](https://github.com/lealone/QinSQL/blob/master/qinsql-test/src/test/java/org/lealone/qinsql/test/start/QinEngineStart.java) 
 
-然后执行 [JdbcTest](https://github.com/lealone/Bats/blob/master/bats-test/src/test/java/org/lealone/bats/test/jdbc/JdbcTest.java) 通过标准 JDBC API 访问数据库。
+然后执行 [JdbcTest](https://github.com/lealone/QinSQL/blob/master/qinsql-test/src/test/java/org/lealone/qinsql/test/jdbc/JdbcTest.java) 通过标准 JDBC API 访问数据库。
 
 
 
@@ -31,12 +31,12 @@ Bats = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [Ap
 
 `mvn package assembly:assembly -Dmaven.test.skip=true`
 
-生成的文件放在 `target\bats-5.0.0-SNAPSHOT` 目录
+生成的文件放在 `target\qinsql-5.0.0-SNAPSHOT` 目录
 
 
 ### 运行
 
-打开两个命令行窗口，都切换到 `target\bats-5.0.0-SNAPSHOT\bin` 目录
+打开两个命令行窗口，都切换到 `target\qinsql-5.0.0-SNAPSHOT\bin` 目录
 
 在第一个窗口中输入 `lealone` 启动数据库
 
@@ -47,7 +47,7 @@ Bats = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [Ap
 
 ```sql
 --创建服务，关联到指定的 java 类
-create service hello_service (hello(name varchar) varchar) implement by 'org.lealone.bats.test.service.HelloService';
+create service hello_service (hello(name varchar) varchar) implement by 'org.lealone.qinsql.test.service.HelloService';
 
 --调用服务
 execute service hello_service hello('zhh');
@@ -69,7 +69,7 @@ SELECT count(*) FROM my_table WHERE name>='a';
 
 ```sql
 --直接查询本地文件
-SELECT count(*) FROM dfs.`E:\lealone\bats\bats-test\src\test\resources\test.csvh`;
+SELECT count(*) FROM dfs.`E:\lealone\qinsql\qinsql-test\src\test\resources\test.csvh`;
 
 --使用 OLAP 引擎执行查询语句
 SELECT count(*) FROM olap.my_table WHERE name>='a';

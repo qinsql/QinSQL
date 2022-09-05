@@ -85,9 +85,9 @@
           "delimiter": ","
         },
         "tsv" : {
-                  "type": "text",
-                  "extensions": [ "tsv" ],
-                  "delimiter": "\t"
+          "type": "text",
+          "extensions": [ "tsv" ],
+          "delimiter": "\t"
         },
         "json" : {
           "type": "json",

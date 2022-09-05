@@ -39,7 +39,7 @@ if "%str%"=="" (
 
 :exec
 set CLASSPATH="%LEALONE_HOME%\conf;%LEALONE_HOME%\lib\*"
-"%JAVA_HOME%\bin\java" %JAVA_OPTS% -cp %CLASSPATH% org.lealone.qinsql.engine.Qin %*
+"%JAVA_HOME%\bin\java" %JAVA_OPTS% -cp %CLASSPATH% org.lealone.qinsql.engine.QinEngine %*
 goto finally
 
 :err

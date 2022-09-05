@@ -19,10 +19,18 @@ package org.lealone.qinsql.engine.sql;
 
 import java.util.ArrayList;
 
+import org.apache.calcite.schema.CalciteSchema;
 import org.apache.calcite.schema.SchemaPlus;
+import org.apache.drill.common.exceptions.ExecutionSetupException;
 import org.apache.drill.exec.proto.UserProtos;
 import org.apache.drill.exec.server.Drillbit;
+import org.apache.drill.exec.store.SchemaTreeProvider;
+import org.apache.drill.exec.store.StoragePluginRegistry;
 import org.apache.drill.exec.work.user.UserWorker;
+import org.lealone.common.exceptions.DbException;
+import org.lealone.db.Constants;
+import org.lealone.db.Database;
+import org.lealone.db.LealoneDatabase;
 import org.lealone.db.PluginManager;
 import org.lealone.db.async.AsyncHandler;
 import org.lealone.db.async.AsyncResult;
@@ -30,12 +38,17 @@ import org.lealone.db.index.Cursor;
 import org.lealone.db.result.LocalResult;
 import org.lealone.db.result.Result;
 import org.lealone.db.result.ResultTarget;
+import org.lealone.db.schema.Schema;
 import org.lealone.db.session.ServerSession;
 import org.lealone.db.session.SessionStatus;
+import org.lealone.db.table.Table;
 import org.lealone.net.NetNode;
-import org.lealone.qinsql.engine.QinEngine;
 import org.lealone.qinsql.engine.server.QinClientConnection;
 import org.lealone.qinsql.engine.server.QinServer;
+import org.lealone.qinsql.engine.storage.LealoneScanSpec;
+import org.lealone.qinsql.engine.storage.LealoneStoragePlugin;
+import org.lealone.qinsql.engine.storage.LealoneStoragePluginConfig;
+import org.lealone.qinsql.engine.storage.LealoneTable;
 import org.lealone.server.ProtocolServerEngine;
 import org.lealone.sql.SQLStatement;
 import org.lealone.sql.StatementBase;
@@ -133,7 +146,7 @@ public class QinQuery extends StatementBase {
 
         private void executeQueryAsync(ServerSession session, String sql, boolean useDefaultSchema) {
 
-            SchemaPlus rootSchema = QinEngine.getRootSchema(session, sql, useDefaultSchema,
+            SchemaPlus rootSchema = getRootSchema(session, sql, useDefaultSchema,
                     select.localResult != null);
 
             Drillbit drillbit = ((QinServer) PluginManager
@@ -158,5 +171,66 @@ public class QinQuery extends StatementBase {
             clientConnection.setCursor(select.getCursor());
             userWorker.submitWork(clientConnection, runQuery);
         }
+    }
+
+    public static SchemaPlus getRootSchema(ServerSession session, String sql, boolean useDefaultSchema,
+            boolean isOlap) {
+        Drillbit drillbit = ((QinServer) PluginManager
+                .getPlugin(ProtocolServerEngine.class, QinSQLEngine.NAME).getProtocolServer())
+                        .getDrillbit();
+        StoragePluginRegistry storageRegistry = drillbit.getContext().getStorage();
+        if (isOlap) {
+            LealoneStoragePlugin lsp;
+            try {
+                lsp = (LealoneStoragePlugin) storageRegistry.getPlugin(LealoneStoragePluginConfig.NAME);
+            } catch (ExecutionSetupException e) {
+                throw DbException.throwInternalError();
+            }
+            SchemaPlus parent = CalciteSchema.createRootSchema(false, true, "").plus();
+            SchemaPlus defaultSchema = CalciteSchema.createRootSchema(false, true, Constants.SCHEMA_MAIN)
+                    .plus();
+            String dbName = session.getDatabase().getShortName();
+            Database db = LealoneDatabase.getInstance().getDatabase(dbName);
+            for (Schema schema : db.getAllSchemas()) {
+                final String schemaName = schema.getName();
+                final SchemaPlus subSchema;
+                if (schemaName.equalsIgnoreCase(Constants.SCHEMA_MAIN)) {
+                    subSchema = defaultSchema;
+                } else {
+                    subSchema = CalciteSchema.createRootSchema(false, true, schemaName).plus();
+                }
+                for (Table table : schema.getAllTablesAndViews()) {
+                    LealoneTable t = new LealoneTable(table, lsp,
+                            new LealoneScanSpec(dbName, schemaName, table.getName()));
+                    subSchema.add(table.getName().toUpperCase(), t);
+                    subSchema.add(table.getName().toLowerCase(), t);
+                }
+                parent.add(schemaName, subSchema);
+            }
+            if (session.getCurrentSchemaName().equalsIgnoreCase(Constants.SCHEMA_MAIN))
+                return defaultSchema;
+            return parent;
+        }
+        SchemaTreeProvider schemaTreeProvider = new SchemaTreeProvider(drillbit.getContext());
+        SchemaPlus rootSchema = schemaTreeProvider
+                .createRootSchema(drillbit.getContext().getOptionManager());
+        if (useDefaultSchema && (isOlap || sql.contains(LealoneStoragePluginConfig.NAME))) {
+            LealoneStoragePlugin lsp;
+            try {
+                lsp = (LealoneStoragePlugin) storageRegistry.getPlugin(LealoneStoragePluginConfig.NAME);
+            } catch (ExecutionSetupException e) {
+                throw DbException.throwInternalError();
+            }
+
+            SchemaPlus defaultSchema = CalciteSchema.createRootSchema(false, true, Constants.SCHEMA_MAIN)
+                    .plus();
+            String dbName = session.getDatabase().getShortName();
+            SchemaPlus schema = CalciteSchema.createRootSchema(defaultSchema, false, true, dbName)
+                    .plus();
+            lsp.registerSchema(schema, dbName, defaultSchema);
+            rootSchema.add(LealoneStoragePluginConfig.NAME, defaultSchema);
+            rootSchema.add("", defaultSchema);
+        }
+        return rootSchema;
     }
 }

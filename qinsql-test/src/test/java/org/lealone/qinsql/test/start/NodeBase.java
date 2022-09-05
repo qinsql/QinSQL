@@ -20,13 +20,13 @@ package org.lealone.qinsql.test.start;
 import org.lealone.common.exceptions.ConfigException;
 import org.lealone.p2p.config.Config;
 import org.lealone.p2p.config.YamlConfigLoader;
-import org.lealone.qinsql.engine.Qin;
+import org.lealone.qinsql.engine.QinEngine;
 
 public class NodeBase extends YamlConfigLoader {
 
     public static void run(Class<?> loader, String[] args) {
         init(loader);
-        Qin.main(args);
+        QinEngine.main(args);
     }
 
     private static void init(Class<?> loader) {

@@ -40,7 +40,7 @@ QinSQL = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [
 
 在第一个窗口中输入 `qinsql` 启动数据库
 
-在第二个窗口中输入 `sqlshell -url jdbc:lealone:tcp://localhost:9210/lealone -user root` 打开一个 SQL Shell 窗口
+在第二个窗口中输入 `sqlshell` 打开一个 SQL Shell 窗口
 
 
 #### 微服务

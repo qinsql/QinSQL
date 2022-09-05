@@ -52,7 +52,6 @@ public final class ExecConstants {
   public static final String BIT_RPC_TIMEOUT = "drill.exec.rpc.bit.timeout";
   public static final String METRICS_CONTEXT_NAME = "drill.exec.metrics.context";
   public static final String USE_IP_ADDRESS = "drill.exec.rpc.use.ip";
-  public static final String CLIENT_RPC_THREADS = "drill.exec.rpc.user.client.threads";
   public static final String BIT_SERVER_RPC_THREADS = "drill.exec.rpc.bit.server.threads";
   public static final String USER_SERVER_RPC_THREADS = "drill.exec.rpc.user.server.threads";
   public static final String FRAG_RUNNER_RPC_TIMEOUT = "drill.exec.rpc.fragrunner.timeout";
@@ -259,8 +258,6 @@ public final class ExecConstants {
    * setting allows the user to see the query status as failure. Useful for developers/testers.
    */
   public static final String RETURN_ERROR_FOR_FAILURE_IN_CANCELLED_FRAGMENTS = "drill.exec.debug.return_error_for_failure_in_cancelled_fragments";
-
-  public static final String CLIENT_SUPPORT_COMPLEX_TYPES = "drill.client.supports-complex-types";
 
   /**
    * Configuration properties connected with dynamic UDFs support

@@ -40,6 +40,7 @@ import org.apache.drill.common.scanner.persistence.ScanResult;
 import org.apache.drill.exec.ExecConstants;
 import org.apache.drill.exec.coord.ClusterCoordinator;
 import org.apache.drill.exec.coord.ClusterCoordinator.RegistrationHandle;
+import org.apache.drill.exec.coord.local.LocalClusterCoordinator;
 import org.apache.drill.exec.exception.DrillbitStartupException;
 import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint;
 import org.apache.drill.exec.proto.CoordinationProtos.DrillbitEndpoint.State;
@@ -51,6 +52,7 @@ import org.apache.drill.exec.server.options.SystemOptionManager;
 import org.apache.drill.exec.service.ServiceEngine;
 import org.apache.drill.exec.store.StoragePluginRegistry;
 import org.apache.drill.exec.store.sys.PersistentStoreProvider;
+import org.apache.drill.exec.store.sys.PersistentStoreRegistry;
 import org.apache.drill.exec.store.sys.store.provider.CachingPersistentStoreProvider;
 import org.apache.drill.exec.store.sys.store.provider.InMemoryStoreProvider;
 import org.apache.drill.exec.store.sys.store.provider.LocalPersistentStoreProvider;
@@ -159,7 +161,8 @@ public class Drillbit implements AutoCloseable {
         // Must start up with access to JDK Compiler
         if (ToolProvider.getSystemJavaCompiler() == null) {
             throw new DrillbitStartupException(
-                    "JDK Java compiler not available. Ensure Drill is running with the java executable from a JDK and not a JRE");
+                    "JDK Java compiler not available."
+                    + " Ensure Drill is running with the java executable from a JDK and not a JRE");
         }
 
         gracePeriod = config.getInt(ExecConstants.GRACE_PERIOD);
@@ -176,12 +179,9 @@ public class Drillbit implements AutoCloseable {
             coord = serviceSet.getCoordinator();
             storeProvider = new CachingPersistentStoreProvider(new LocalPersistentStoreProvider(config));
         } else {
-            // String clusterId = config.getString(ExecConstants.SERVICE_NAME);
-            // coord = new P2pClusterCoordinator();
-            // storeProvider = new PersistentStoreRegistry<ClusterCoordinator>(this.coord, config)
-            // .newPStoreProvider();
-            coord = null;
-            storeProvider = null;
+            coord = new LocalClusterCoordinator();
+            storeProvider = new PersistentStoreRegistry<ClusterCoordinator>(this.coord, config)
+                    .newPStoreProvider();
         }
 
         // Check if InMemory Profile Store, else use Default Store Provider
@@ -372,8 +372,9 @@ public class Drillbit implements AutoCloseable {
         }
 
         /*
-         * Poll for the graceful file, if the file is found cloase the drillbit. In case if the DRILL_HOME path is not
-         * set, graceful shutdown will not be supported from the command line.
+         * Poll for the graceful file, if the file is found cloase the drillbit.
+         * In case if the DRILL_HOME path is not set,
+         * graceful shutdown will not be supported from the command line.
          */
         private void pollShutdown(Drillbit drillbit) throws IOException, InterruptedException {
             final String drillHome = System.getenv("DRILL_HOME");
@@ -381,14 +382,16 @@ public class Drillbit implements AutoCloseable {
             final Path drillHomePath;
             if (drillHome == null || gracefulFile == null) {
                 logger.warn(
-                        "Cannot access graceful file. Graceful shutdown from command line will not be supported.");
+                        "Cannot access graceful file. "
+                        + "Graceful shutdown from command line will not be supported.");
                 return;
             }
             try {
                 drillHomePath = Paths.get(drillHome);
             } catch (InvalidPathException e) {
                 logger.warn(
-                        "Cannot access graceful file. Graceful shutdown from command line will not be supported.");
+                        "Cannot access graceful file."
+                        + " Graceful shutdown from command line will not be supported.");
                 return;
             }
             boolean triggered_shutdown = false;

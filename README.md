@@ -17,7 +17,7 @@ QinSQL = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [
 
 ## 在 IDE 中运行
 
-代码导入 IDE 后，直接运行 [QinEngineStart](https://github.com/lealone/QinSQL/blob/master/qinsql-test/src/test/java/org/qinsql/test/start/QinEngineStart.java) 
+代码导入 IDE 后，直接运行 [QinEngineStart](https://github.com/lealone/QinSQL/blob/master/qinsql-test/src/test/java/org/qinsql/test/QinEngineStart.java) 
 
 然后执行 [JdbcTest](https://github.com/lealone/QinSQL/blob/master/qinsql-test/src/test/java/org/qinsql/test/jdbc/JdbcTest.java) 通过标准 JDBC API 访问数据库。
 
@@ -31,12 +31,12 @@ QinSQL = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [
 
 `mvn package assembly:assembly -Dmaven.test.skip=true`
 
-生成的文件放在 `target\qinsql-5.0.0-SNAPSHOT` 目录
+生成的文件放在 `target\qinsql-5.1.2` 目录
 
 
 ### 运行
 
-打开两个命令行窗口，都切换到 `target\qinsql-5.0.0-SNAPSHOT\bin` 目录
+打开两个命令行窗口，都切换到 `target\qinsql-5.1.2\bin` 目录
 
 在第一个窗口中输入 `qinsql` 启动数据库
 

@@ -34,7 +34,6 @@
         <module>qinsql-function</module>
         <module>qinsql-vector</module>
         <module>qinsql-engine</module>
-        <module>qinsql-p2p</module>
         <module>qinsql-test</module>
         <module>qinsql-dist</module>
     </modules>

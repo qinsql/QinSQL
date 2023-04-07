@@ -27,8 +27,6 @@ import org.lealone.common.logging.Logger;
 import org.lealone.common.logging.LoggerFactory;
 import org.lealone.db.LealoneDatabase;
 import org.lealone.net.AsyncConnectionManager;
-import org.lealone.p2p.config.ConfigDescriptor;
-import org.lealone.p2p.server.P2pClusterCoordinator;
 import org.lealone.server.TcpServer;
 
 public class QinServer extends TcpServer implements AsyncConnectionManager {
@@ -78,12 +76,7 @@ public class QinServer extends TcpServer implements AsyncConnectionManager {
         // System.setProperty("calcite.debug", "true");
 
         DrillConfig drillConfig = DrillConfig.create();
-        RemoteServiceSet serviceSet;
-        if (ConfigDescriptor.getLocalNode() != null) {
-            serviceSet = new RemoteServiceSet(new P2pClusterCoordinator());
-        } else {
-            serviceSet = RemoteServiceSet.getLocalServiceSet();
-        }
+        RemoteServiceSet serviceSet = RemoteServiceSet.getLocalServiceSet();
         drillbit = new Drillbit(drillConfig, serviceSet);
         drillbit.setHostName(getHost());
         drillbit.run();

@@ -319,7 +319,7 @@
         <dependency>
             <groupId>org.lealone</groupId>
             <artifactId>lealone-main</artifactId>
-            <version>${project.version}</version>
+            <version>5.1.2</version>
         </dependency>
         <dependency>
             <groupId>org.qinsql</groupId>

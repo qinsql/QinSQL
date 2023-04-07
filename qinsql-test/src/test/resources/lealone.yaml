@@ -57,46 +57,6 @@ protocol_server_engines:
         ssl: false,
         session_timeout: -1
     }
-  - name: P2P
-    enabled: true
-    parameters: {
-        port: 9211,
-        ssl: false
-    }
   - name: TCP
     enabled: false
-    
-server_encryption_options:
-    keystore: conf/.keystore
-    keystore_password: lealone
-    truststore: conf/.truststore
-    truststore_password: lealone
-
-cluster_config:
-    cluster_name: Test Cluster
-    node_snitch: SimpleSnitch
-    dynamic_snitch: true
-    #方便在eclipse中debug，不会产生超时
-    request_timeout_in_ms: 100000000
-    #request_timeout_in_ms: 2000
-
-    seed_provider:
-        name: SimpleSeedProvider
-        parameters: {
-            seeds: "127.0.0.1"
-        }
-
-    replication_strategy:
-        name: SimpleStrategy
-        parameters: {
-            replication_factor: 3
-        }
-
-    # replication_strategy:
-    #     name: NetworkTopologyStrategy
-    #     parameters: {
-    #         dc1: 1,
-    #         dc2: 2
-    #     }
-
 

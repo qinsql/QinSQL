@@ -32,7 +32,7 @@
     <dependencies>
         <dependency>
             <groupId>org.qinsql</groupId>
-            <artifactId>qinsql-p2p</artifactId>
+            <artifactId>qinsql-function</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

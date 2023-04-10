@@ -17,6 +17,7 @@
  */
 package org.qinsql.engine.sql;
 
+import org.lealone.common.exceptions.DbException;
 import org.lealone.common.exceptions.UnsupportedSchemaException;
 import org.lealone.db.session.ServerSession;
 import org.lealone.sql.LealoneSQLParser;
@@ -24,8 +25,11 @@ import org.lealone.sql.StatementBase;
 
 public class QinSQLParser extends LealoneSQLParser {
 
+    private final ServerSession session;
+
     public QinSQLParser(ServerSession session) {
         super(session);
+        this.session = session;
     }
 
     @Override
@@ -33,7 +37,9 @@ public class QinSQLParser extends LealoneSQLParser {
         try {
             return super.parse(sql);
         } catch (UnsupportedSchemaException e) {
-            return new QinQuery((ServerSession) e.getSession(), sql);
+            return new QinQuery((ServerSession) e.getSession(), sql, false);
+        } catch (DbException e) {
+            return new QinQuery(session, sql, true);
         }
     }
 }

@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.calcite.schema.SchemaPlus;
+import org.apache.calcite.tools.ValidationException;
 import org.apache.drill.exec.physical.impl.materialize.QueryWritableBatch;
 import org.apache.drill.exec.proto.GeneralRPCProtos.Ack;
 import org.apache.drill.exec.proto.UserBitShared.QueryResult;
@@ -31,6 +32,7 @@ import org.apache.drill.exec.record.RecordBatch;
 import org.apache.drill.exec.rpc.RpcOutcomeListener;
 import org.apache.drill.exec.rpc.user.UserSession;
 import org.apache.drill.exec.work.user.UserWorker;
+import org.lealone.common.exceptions.DbException;
 import org.lealone.db.async.AsyncHandler;
 import org.lealone.db.async.AsyncResult;
 import org.lealone.db.index.Cursor;
@@ -56,8 +58,8 @@ public class QinClientConnection implements org.apache.drill.exec.rpc.UserClient
     private Cursor cursor;
     private QinQuery query;
 
-    public QinClientConnection(SchemaPlus schema, ServerSession serverSession, UserWorker userWorker,
-            SocketAddress remoteAddress, LocalResult localResult, QinQuery query,
+    public QinClientConnection(SchemaPlus schema, boolean useDefaultSchema, ServerSession serverSession,
+            UserWorker userWorker, SocketAddress remoteAddress, LocalResult localResult, QinQuery query,
             AsyncHandler<AsyncResult<Result>> asyncHandler) {
         this.serverSession = serverSession;
         session = UserSession.Builder.newBuilder()
@@ -67,7 +69,16 @@ public class QinClientConnection implements org.apache.drill.exec.rpc.UserClient
                 // .withUserProperties(inbound.getProperties())
                 // .setSupportComplexTypes(inbound.getSupportComplexTypes())
                 .build();
-        session.setDefaultSchema(schema);
+        if (useDefaultSchema) {
+            try {
+                session.setDefaultSchemaPath(serverSession.getCurrentSchemaName(), schema);
+            } catch (ValidationException e) {
+                throw DbException.convert(e);
+            }
+        } else {
+            session.setDefaultSchema(schema);
+        }
+
         this.remoteAddress = remoteAddress;
         this.asyncHandler = asyncHandler;
         this.localResult = localResult;

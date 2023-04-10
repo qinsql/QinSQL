@@ -61,10 +61,12 @@ public class QinQuery extends StatementBase {
     private LocalResult localResult;
     private Cursor cursor;
     private boolean stopped;
+    private boolean useDefaultSchema;
 
-    public QinQuery(ServerSession session, String sql) {
+    public QinQuery(ServerSession session, String sql, boolean useDefaultSchema) {
         super(session);
         this.sql = sql;
+        this.useDefaultSchema = useDefaultSchema;
         parameters = new ArrayList<>();
     }
 
@@ -156,9 +158,10 @@ public class QinQuery extends StatementBase {
                     .setType(org.apache.drill.exec.proto.UserBitShared.QueryType.SQL).build();
             UserWorker userWorker = drillbit.getWorkManager().getUserWorker();
 
-            QinClientConnection clientConnection = new QinClientConnection(rootSchema, session,
-                    userWorker, NetNode.getLocalTcpNode().getInetSocketAddress(),
-                    select.getLocalResult(), select, res -> {
+            QinClientConnection clientConnection = new QinClientConnection(rootSchema,
+                    select.useDefaultSchema, session, userWorker,
+                    NetNode.getLocalTcpNode().getInetSocketAddress(), select.getLocalResult(), select,
+                    res -> {
                         if (res.isSucceeded()) {
                             result = res.getResult();
                             setResult(result, result.getRowCount());

@@ -38,7 +38,7 @@ public class OlapOperator implements Operator {
     public void start() {
         ServerSession session = select.getSession();
         String sql = select.getSQL();
-        query = new QinQuery(session, sql);
+        query = new QinQuery(session, sql, false);
         query.setLocalResult(localResult);
         query.setCursor(select.getTableFilter().getCursor());
         query.createYieldableQuery(-1, false, null).run();

@@ -25,7 +25,10 @@ import org.apache.drill.exec.server.RemoteServiceSet;
 import org.apache.drill.exec.store.StoragePlugin;
 import org.lealone.common.logging.Logger;
 import org.lealone.common.logging.LoggerFactory;
+import org.lealone.db.Database;
 import org.lealone.db.LealoneDatabase;
+import org.lealone.db.auth.User;
+import org.lealone.db.schema.Schema;
 import org.lealone.net.AsyncConnectionManager;
 import org.lealone.server.TcpServer;
 
@@ -81,8 +84,15 @@ public class QinServer extends TcpServer implements AsyncConnectionManager {
         drillbit.setHostName(getHost());
         drillbit.run();
 
+        Database db = LealoneDatabase.getInstance();
+        User systemUser = db.getSystemSession().getUser();
         for (Map.Entry<String, StoragePlugin> e : drillbit.getStoragePluginRegistry()) {
-            LealoneDatabase.addUnsupportedSchema(e.getKey());
+            String name = e.getKey();
+            if (db.findSchema(null, name) == null) {
+                LealoneDatabase.addUnsupportedSchema(e.getKey());
+                Schema schema = new Schema(db, 0, name, systemUser, true);
+                db.addDatabaseObject(null, schema, null);
+            }
         }
     }
 }

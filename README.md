@@ -69,7 +69,10 @@ SELECT count(*) FROM my_table WHERE name>='a';
 
 ```sql
 --直接查询本地文件
-SELECT count(*) FROM dfs.`E:\lealone\qinsql\qinsql-test\src\test\resources\test.csvh`;
+SELECT count(*) FROM dfs.`E:/qinsql/qinsql-test/src/test/resources/test.csvh`;
+
+--查询 HDFS 的文件
+SELECT count(*) FROM hdfs.`/test.csvh`;
 
 --使用 OLAP 引擎执行查询语句
 SELECT count(*) FROM olap.my_table WHERE name>='a';

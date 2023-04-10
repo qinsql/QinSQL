@@ -23,7 +23,7 @@
     <groupId>org.qinsql</groupId>
     <artifactId>qinsql</artifactId>
     <packaging>pom</packaging>
-    <version>5.1.2</version>
+    <version>5.1.3-SNAPSHOT</version>
 
     <modules>
         <module>qinsql-common</module>

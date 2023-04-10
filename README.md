@@ -76,11 +76,11 @@ SELECT count(*) FROM hdfs.`/test.csvh`;
 
 --使用 OLAP 引擎执行查询语句
 SELECT count(*) FROM olap.my_table WHERE name>='a';
-```
 
 --查询 JSON 数据
-SELECT id, type, name, ppu FROM dfs.`E:/qinsql/qinsql-test/src/test/resources/test.json`;
-
+USE dfs; --后续语句不用指定 dfs 前缀
+SELECT id, type, name, ppu FROM `E:/qinsql/qinsql-test/src/test/resources/test.json`;
+```
 
 
 ## 模块依赖关系

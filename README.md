@@ -78,6 +78,9 @@ SELECT count(*) FROM hdfs.`/test.csvh`;
 SELECT count(*) FROM olap.my_table WHERE name>='a';
 ```
 
+--查询 JSON 数据
+SELECT id, type, name, ppu FROM dfs.`E:/qinsql/qinsql-test/src/test/resources/test.json`;
+
 
 
 ## 模块依赖关系

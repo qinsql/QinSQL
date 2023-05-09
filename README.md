@@ -32,12 +32,12 @@ QinSQL = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [
 
 `mvn package assembly:assembly -Dmaven.test.skip=true`
 
-生成的文件放在 `target\qinsql-5.1.2` 目录
+生成的文件放在 `target\qinsql-5.2.0` 目录
 
 
 ### 运行
 
-打开两个命令行窗口，都切换到 `target\qinsql-5.1.2\bin` 目录
+打开两个命令行窗口，都切换到 `target\qinsql-5.2.0\bin` 目录
 
 在第一个窗口中输入 `qinsql` 启动数据库
 

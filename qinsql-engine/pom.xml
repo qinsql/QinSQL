@@ -38,7 +38,7 @@
         <dependency>
             <groupId>org.lealone.plugins</groupId>
             <artifactId>lealone-service</artifactId>
-            <version>5.1.2</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

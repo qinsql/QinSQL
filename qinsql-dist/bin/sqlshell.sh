@@ -4,4 +4,4 @@
 # Licensed under the Server Side Public License, v 1.
 # Initial Developer: zhh
 
-./qinsql.sh -client $@
+qinsql.sh -client $@

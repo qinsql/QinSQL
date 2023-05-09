@@ -4,4 +4,4 @@
 @REM  Initial Developer: zhh
 
 @echo off
-.\qinsql.bat -client %*
+qinsql.bat -client %*

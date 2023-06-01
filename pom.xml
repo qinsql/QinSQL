@@ -7,13 +7,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <name>qin sql engine project</name>
+    <name>qinsql engine project</name>
     <groupId>org.qinsql</groupId>
     <artifactId>qinsql</artifactId>
     <packaging>pom</packaging>
     <version>5.2.0-SNAPSHOT</version>
     <url>https://github.com/qinsql/QinSQL</url>
-    <description>qin sql engine project</description>
+    <description>qinsql engine project</description>
 
     <licenses>
         <license>

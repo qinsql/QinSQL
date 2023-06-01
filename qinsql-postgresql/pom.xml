@@ -23,12 +23,5 @@
             <artifactId>lealone-main</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <!-- 9.4.1212   42.3.8 --> 
-            <version>42.3.8</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>

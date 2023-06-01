@@ -1,0 +1,34 @@
+<!--
+ * Copyright Lealone Database Group.
+ * Licensed under the Server Side Public License, v 1.
+ * Initial Developer: zhh
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.qinsql</groupId>
+        <artifactId>qinsql</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>qinsql-mysql</artifactId>
+    <packaging>jar</packaging>
+    <version>5.2.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.lealone</groupId>
+            <artifactId>lealone-main</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <!-- 5.1.47   6.0.2   8.0.28 --> 
+            <version>8.0.28</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

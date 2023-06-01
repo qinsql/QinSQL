@@ -22,35 +22,67 @@ storage_engines:
   - name: AOSE
     enabled: true
     parameters: {
-        # key1: v1,
-        # key2: v2,
+        page_split_size: 16k,
+        # cache_size: 16m, # 每个 btree 的缓存大小
+        compress: no, # no、lzf、deflate 或 0、1、2
     }
 
 transaction_engines:
   - name: AOTE
     enabled: true
     parameters: {
-        redo_log_dir: redo_log
+        redo_log_dir: redo_log, # 会组合成这样的目录: ${base_dir} + "/"+ ${redo_log_dir},
+        log_sync_type: periodic # 取值：instant,no_sync,periodic，默认是periodic
     }
 
 sql_engines:
-  - name: QinSQL
+  - name: Lealone
     enabled: true
-    is_default: true
+    parameters: {
+        # key1: v1,
+        # key2: v2,
+    }
+  - name: MySQL
+    enabled: true
+    parameters: {
+        # key1: v1,
+        # key2: v2,
+    }
+  - name: PostgreSQL
+    enabled: true
     parameters: {
         # key1: v1,
         # key2: v2,
     }
 
 protocol_server_engines:
-  - name: QinSQL
+  - name: TCP
     enabled: true
     parameters: {
         port: 9210,
         trace: false,
         allow_others: true,
+        # white_list: "127.0.0.4,127.0.0.2",
+        daemon: false,
+        net_factory_name: nio, # 网络层默认用nio来实现
+        ssl: false,
+        session_timeout: -1
+    }
+  - name: MySQL
+    enabled: true
+    parameters: {
+        port: 9310,
+        trace: false,
+        allow_others: true,
         daemon: false,
         ssl: false
     }
-  - name: TCP
-    enabled: false
+  - name: PostgreSQL
+    enabled: true
+    parameters: {
+        port: 9510,
+        trace: false,
+        allow_others: true,
+        daemon: false,
+        ssl: false
+    }

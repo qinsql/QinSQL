@@ -1,0 +1,34 @@
+<!--
+ * Copyright Lealone Database Group.
+ * Licensed under the Server Side Public License, v 1.
+ * Initial Developer: zhh
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.qinsql</groupId>
+        <artifactId>qinsql</artifactId>
+        <version>5.2.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>qinsql-postgresql</artifactId>
+    <packaging>jar</packaging>
+    <version>5.2.0-SNAPSHOT</version>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.lealone</groupId>
+            <artifactId>lealone-main</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <!-- 9.4.1212   42.3.8 --> 
+            <version>42.3.8</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

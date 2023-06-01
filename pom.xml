@@ -1,19 +1,7 @@
 <!--
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright Lealone Database Group.
+ * Licensed under the Server Side Public License, v 1.
+ * Initial Developer: zhh
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -24,39 +12,49 @@
     <artifactId>qinsql</artifactId>
     <packaging>pom</packaging>
     <version>5.2.0-SNAPSHOT</version>
+    <url>https://github.com/qinsql/QinSQL</url>
+    <description>qin sql engine project</description>
+
+    <licenses>
+        <license>
+            <name>MPL 2.0</name>
+            <url>https://www.mozilla.org/en-US/MPL/2.0/</url>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>EPL 1.0</name>
+            <url>https://opensource.org/licenses/eclipse-1.0.php</url>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>Server Side Public License 1.0</name>
+            <url>https://github.com/qinsql/QinSQL/blob/master/LICENSE.md</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <tag>master</tag>
+        <url>https://github.com/qinsql/QinSQL</url>
+        <connection>scm:git:https://github.com/qinsql/QinSQL.git</connection>
+        <developerConnection>scm:git:https://github.com/qinsql/QinSQL.git</developerConnection>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>codefollower</id>
+            <name>codefollower</name>
+            <email>codefollower at gmail dot com</email>
+            <organization>qinsql</organization>
+        </developer>
+    </developers>
 
     <modules>
-        <module>qinsql-common</module>
-        <module>qinsql-rpc</module>
-        <module>qinsql-optimizer</module>
-        <module>qinsql-logical</module>
-        <module>qinsql-executor</module>
-        <module>qinsql-function</module>
-        <module>qinsql-vector</module>
-        <module>qinsql-engine</module>
+        <module>qinsql-mysql</module>
+        <module>qinsql-postgresql</module>
         <module>qinsql-test</module>
         <module>qinsql-dist</module>
     </modules>
-
-    <properties>
-        <janino.version>3.0.11</janino.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <jackson.version>2.9.9</jackson.version>
-        <jackson.asl.version>1.9.13</jackson.asl.version>
-        <commons.lang3.version>3.8</commons.lang3.version>
-        <guava.version>19.0</guava.version>
-        <hadoop.version>2.7.4</hadoop.version>
-        <metrics.version>4.0.2</metrics.version>
-        <antlr.version>4.7.1</antlr.version>
-        <netty.version>4.0.48.Final</netty.version>
-    </properties>
-
-    <repositories>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 
     <build>
         <plugins>
@@ -68,16 +66,21 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <version>3.8.1</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <source>17</source>
+                        <target>17</target>
+                        <release>17</release>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
@@ -93,11 +96,38 @@
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <archive>
+                            <manifestEntries>
+                                <Built-By>Lealone Database Group</Built-By>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>2.5</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.4</version>
+                    <configuration>
+                        <archive>
+                            <manifestEntries>
+                                <Built-By>Lealone Database Group</Built-By>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.12</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -115,117 +145,141 @@
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>2.1</version>
                 </plugin>
-                <!-- 需要先执行 mvn install，否则用了antlr4 插件后， 直接执行 mvn eclipse:eclipse 会抱错说找不到依赖的子模块。 -->
-                <plugin>
-                    <groupId>org.antlr</groupId>
-                    <artifactId>antlr4-maven-plugin</artifactId>
-                    <version>4.7.1</version>
-                    <configuration>
-                        <listener>false</listener>
-                        <visitor>true</visitor>
-                        <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>antlr4</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.5</version>
-                    <configuration>
-                        <encoding>UTF-8</encoding>
-                    </configuration>
-                    <executions>
-                        <execution> <!-- copy all templates in the same location to compile them at once -->
-                            <id>copy-fmpp-resources</id>
-                            <phase>initialize</phase>
-                            <goals>
-                                <goal>copy-resources</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}/codegen</outputDirectory>
-                                <resources>
-                                    <resource>
-                                        <directory>src/main/codegen</directory>
-                                        <filtering>false</filtering>
-                                    </resource>
-                                </resources>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin> <!-- generate sources from fmpp -->
-                    <groupId>org.apache.drill.tools</groupId>
-                    <artifactId>drill-fmpp-maven-plugin</artifactId>
-                    <version>1.16.0</version>
-                    <executions>
-                        <execution>
-                            <id>generate-fmpp</id>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>generate</goal>
-                            </goals>
-                            <configuration>
-                                <config>src/main/codegen/config.fmpp</config>
-                                <output>${project.build.directory}/generated-sources</output>
-                                <templates>${project.build.directory}/codegen/templates</templates>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin> <!-- generate the parser (Parser.jj is itself generated wit fmpp above) -->
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>javacc-maven-plugin</artifactId>
-                    <version>2.4</version>
-                    <executions>
-                        <execution>
-                            <id>javacc</id>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>javacc</goal>
-                            </goals>
-                            <configuration>
-                                <sourceDirectory>${project.build.directory}/generated-sources/</sourceDirectory>
-                                <includes>
-                                    <include>**/Parser.jj</include>
-                                </includes>
-                                <lookAhead>2</lookAhead>
-                                <isStatic>false</isStatic>
-                                <outputDirectory>${project.build.directory}/generated-sources/</outputDirectory>
-                                <!-- <debugParser>true</debugParser> <debugLookAhead>true</debugLookAhead> <debugTokenManager>true</debugTokenManager> -->
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.2</version>
-        </dependency>
-    </dependencies>
+
+    <profiles>
+        <!-- 只构建数据库，不包含web、orm模块以及log4j2依赖 -->
+        <profile>
+            <id>database</id>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.lealone</groupId>
+                        <artifactId>lealone-main</artifactId>
+                        <version>${project.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.apache.logging.log4j</groupId>
+                                <artifactId>log4j-api</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>org.apache.logging.log4j</groupId>
+                                <artifactId>log4j-core</artifactId>
+                            </exclusion>
+                            <exclusion>
+                                <groupId>org.yaml</groupId>
+                                <artifactId>snakeyaml</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Source -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                    </plugin>
+                    <!-- Javadoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <encoding>UTF-8</encoding>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </plugin>
+                    <!-- GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>${gpg.keyname}</keyname>
+                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--Compiler -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.1</version>
+                        <configuration>
+                            <source>17</source>
+                            <target>17</target>
+                            <release>17</release>
+                            <fork>true</fork>
+                            <verbose>true</verbose>
+                            <encoding>UTF-8</encoding>
+                            <showWarnings>false</showWarnings>
+                        </configuration>
+                    </plugin>
+                    <!--Release -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>2.5.1</version>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <version>1.6.7</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <serverId>ossrh</serverId>
+                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>
+

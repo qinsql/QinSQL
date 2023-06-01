@@ -33,4 +33,4 @@ fi
 
 CLASSPATH=$QINSQL_HOME/conf:$QINSQL_HOME/lib/*
 
-"$JAVA_HOME/bin/java" $JAVA_OPTS -cp $CLASSPATH org.lealone.main.Lealone $@
+"$JAVA_HOME/bin/java" $JAVA_OPTS -cp $CLASSPATH org.lealone.main.Lealone "$@"

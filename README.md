@@ -1,97 +1,116 @@
 # QinSQL
 
-微服务 数据湖仓 OLTP 数据库 一体化平台
+使用 MySQL 或 PostgreSQL 的协议和 SQL 语法访问 Lealone 数据库
 
-QinSQL = Lealone + 改编的 [Apache Calcite](https://calcite.apache.org/) 和 [Apache Drill](http://drill.apache.org/)
+MySQL 协议版本支持 5.x 到 8.x 系列
 
-
-## 开发环境
-
-* JDK 1.8+
-* Maven 3.3+
+PostgreSQL JDBC Driver 支持 9.x 和 42.x 两个系列版本
 
 
-需要先执行 mvn install -Dmaven.test.skip=true，
-否则项目里用到的一些 java 源文件会找不到，这些 java 源文件是通过模板生成的。
+## 编译需要
 
+* JDK 17+ (运行只需要 JDK 1.8+)
+* Maven 3.8+
+
+
+## 打包
+
+执行以下命令打包:
+
+`mvn package -Dmaven.test.skip=true`
+
+生成的文件放在 `qinsql\target` 目录
+
+
+## 运行 Lealone 数据库
+
+进入 `qinsql\target\qinsql-5.2.0\bin` 目录，运行: `qinsql`
+
+```java
+E:\qinsql\target\qinsql-5.2.0\bin>qinsql
+Lealone version: 5.2.0
+Loading config from Loading config from file:/E:/qinsql/target/qinsql-5.2.0/conf/lealone.yaml
+Base dir: E:/qinsql/target/qinsql-5.2.0/data
+Init storage engines: 4 ms
+Init transaction engines: 27 ms
+Init sql engines: 1 ms
+Init protocol server engines: 184 ms
+Init lealone database: 0 ms
+Starting TcpServer accepter
+TcpServer started, host: 127.0.0.1, port: 9210
+Starting MySQLServer accepter
+MySQLServer started, host: 127.0.0.1, port: 9310
+Starting PgServer accepter
+PgServer started, host: 127.0.0.1, port: 9510
+Total time: 293 ms (Load config: 69 ms, Init: 220 ms, Start: 4 ms)
+Exit with Ctrl+C
+```
+
+## 用 MySQL 客户端访问 Lealone 数据库
+
+执行以下命令启动 MySQL 客户端:
+
+`mysql --no-beep -h 127.0.0.1 -P 9310 -u root`
+
+```sql
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 0
+Server version: 5.1.48-lealone-5.2.0
+
+Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create table if not exists pet(name varchar(20), age int);
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> insert into pet values('pet1', 2);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> select count(*) from pet;
++----------+
+| COUNT(*) |
++----------+
+|        1 |
++----------+
+1 row in set (0.01 sec)
+
+mysql>
+```
+
+
+## 用 PostgreSQL 客户端访问 Lealone 数据库
+
+执行以下命令启动 PostgreSQL 客户端:
+
+`psql -h 127.0.0.1 -p 9510 -U postgres -W`
+
+提示口令时输入: postgres
+
+```sql
+口令:
+psql (14.0, 服务器 8.2.23)
+输入 "help" 来获取帮助信息.
+
+postgres=> create table if not exists pet(name varchar(20), age int);
+UPDATE 0
+postgres=> insert into pet values('pet1', 2);
+CommandInterfaceINSERT 0 1
+postgres=> select count(*) from pet;
+ count(*)
+----------
+        1
+(1 行记录)
+
+postgres=>
+```
 
 
 ## 在 IDE 中运行
 
-代码导入 IDE 后，直接运行 [QinEngineStart](https://github.com/lealone/QinSQL/blob/master/qinsql-test/src/test/java/org/qinsql/test/QinEngineStart.java) 
+代码导入 IDE 后，直接运行 [QinServerStart](https://github.com/qinsql/QinSQL/blob/master/qinsql-test/src/test/java/org/qinsql/test/QinServerStart.java)
 
-然后执行 [JdbcTest](https://github.com/lealone/QinSQL/blob/master/qinsql-test/src/test/java/org/qinsql/test/jdbc/JdbcTest.java) 通过标准 JDBC API 访问数据库。
-
-
-
-## 打包后运行
-
-### 打包
-
-先执行以下命令打包:
-
-`mvn package assembly:assembly -Dmaven.test.skip=true`
-
-生成的文件放在 `target\qinsql-5.2.0` 目录
-
-
-### 运行
-
-打开两个命令行窗口，都切换到 `target\qinsql-5.2.0\bin` 目录
-
-在第一个窗口中输入 `qinsql` 启动数据库
-
-在第二个窗口中输入 `sqlshell` 打开一个 SQL Shell 窗口
-
-
-#### 微服务
-
-```sql
---创建服务，关联到指定的 java 类
-create service hello_service (hello(name varchar) varchar) implement by 'org.qinsql.test.service.HelloService';
-
---调用服务
-execute service hello_service hello('zhh');
-```
-
-
-#### OLTP 数据库
-
-```sql
-CREATE TABLE IF NOT EXISTS my_table(name varchar(20) primary key, f2 int);
-
-INSERT INTO my_table(name, f2) VALUES('a', 123);
-
-SELECT count(*) FROM my_table WHERE name>='a';
-```
-
-
-#### 数据湖仓
-
-```sql
---直接查询本地文件
-SELECT count(*) FROM dfs.`E:/qinsql/qinsql-test/src/test/resources/test.csvh`;
-
---查询 HDFS 的文件
-SELECT count(*) FROM hdfs.`/test.csvh`;
-
---使用 OLAP 引擎执行查询语句
-SELECT count(*) FROM olap.my_table WHERE name>='a';
-
---查询 JSON 数据
-USE dfs; --后续语句不用指定 dfs 前缀
-SELECT id, type, name, ppu FROM `E:/qinsql/qinsql-test/src/test/resources/test.json`;
-```
-
-
-## 模块依赖关系
-
-```
-                                  rpc ----------------------|
-                                   ↑                        |
-                                   |                        ↓
-test --> engine --> function --> executor --> vector --> common
-                                   |                        ↑
-                                   |                        |
-                                   |--------------------> logical --> optimizer
-```

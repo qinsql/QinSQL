@@ -50,6 +50,7 @@
     </developers>
 
     <modules>
+        <module>qinsql-olap</module>
         <module>qinsql-mysql</module>
         <module>qinsql-postgresql</module>
         <module>qinsql-test</module>

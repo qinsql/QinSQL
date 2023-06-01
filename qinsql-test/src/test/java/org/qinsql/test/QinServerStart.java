@@ -7,6 +7,8 @@ package org.qinsql.test;
 
 import org.lealone.main.Lealone;
 
+//加以下参数才能正常运行jdk vector
+//--add-modules jdk.incubator.vector -server
 public class QinServerStart {
 
     public static void main(String[] args) {

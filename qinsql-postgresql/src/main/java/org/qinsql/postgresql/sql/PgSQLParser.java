@@ -4955,6 +4955,37 @@ public class PgSQLParser implements SQLParser {
             }
             return command;
         } else {
+            if (readIf("SESSION")) {
+                if (readIf("CHARACTERISTICS")) {
+                    read("AS");
+                    read("TRANSACTION");
+                    if (readIf("ISOLATION")) {
+                        read("LEVEL");
+                        SetSession command = new SetSession(session,
+                                SessionSetting.TRANSACTION_ISOLATION_LEVEL);
+                        if (readIf("SERIALIZABLE")) {
+                            command.setString("SERIALIZABLE");
+                        } else if (readIf("REPEATABLE")) {
+                            read("READ");
+                            command.setString("REPEATABLE_READ");
+                        } else if (readIf("READ")) {
+                            if (readIf("COMMITTED"))
+                                command.setString("READ_COMMITTED");
+                            else if (readIf("UNCOMMITTED"))
+                                command.setString("READ_UNCOMMITTED");
+                            return command;
+                        }
+                    } else if (readIf("READ")) {
+                        if (!readIf("WRITE"))
+                            read("ONLY");
+                    } else if (readIf("NOT")) {
+                        read("DEFERRABLE");
+                    } else {
+                        readIf("DEFERRABLE");
+                    }
+                    return new NoOperation(session);
+                }
+            }
             if (readIf("STATEMENT_TIMEOUT")) {
                 readIfEqualOrTo();
                 return new NoOperation(session);

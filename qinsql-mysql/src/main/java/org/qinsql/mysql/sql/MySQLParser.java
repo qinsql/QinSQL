@@ -230,6 +230,13 @@ public class MySQLParser implements SQLParser {
         this.identifiersToUpper = database.getSettings().databaseToUpper;
     }
 
+    private String identifier(String s) {
+        if (database.getMode().lowerCaseIdentifiers) {
+            s = s == null ? null : StringUtils.toLowerEnglish(s);
+        }
+        return s;
+    }
+
     @Override
     public void setRightsChecked(boolean rightsChecked) {
         this.rightsChecked = rightsChecked;
@@ -934,6 +941,7 @@ public class MySQLParser implements SQLParser {
             }
             buff.append(
                     "TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=? ORDER BY TABLE_NAME");
+            schema = identifier(schema);
             paramValues.add(ValueString.get(schema));
         } else if (readIf("GRANTS")) {
             // for MySQL compatibility

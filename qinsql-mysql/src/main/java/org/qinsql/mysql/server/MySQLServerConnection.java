@@ -220,7 +220,7 @@ public class MySQLServerConnection extends AsyncConnection {
                     if (values[j] == ValueNull.INSTANCE) {
                         row.add(new byte[0]);
                     } else {
-                        row.add(values[j].toString().getBytes());
+                        row.add(values[j].getString().getBytes());
                     }
                 }
                 row.packetId = ++packetId;

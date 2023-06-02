@@ -45,23 +45,29 @@ public class UpdateVectorizedAggregateVisitor extends VoidExpressionVisitor {
 
     @Override
     public Void visitAggregate(Aggregate e) {
-        AggregateData data = ((BuiltInAggregate) e).getAggregateData();
+        BuiltInAggregate bia = (BuiltInAggregate) e;
+        AggregateData data = bia.getAggregateData();
         if (data == null) {
             return null;
         }
         ValueVector vv = e.getOn() == null ? null : e.getOn().accept(getValueVectorVisitor);
 
-        switch (e.getType()) {
+        switch (bia.getAType()) {
         case Aggregate.COUNT:
             updateVectorizedCount(session, bvv, vv, (AggregateDataCount) data);
+            break;
         case Aggregate.COUNT_ALL:
             updateVectorizedCountAll(session, bvv, vv, (AggregateDataCountAll) data);
+            break;
         case Aggregate.GROUP_CONCAT:
             updateVectorizedAggregate(session, bvv, vv, data);
+            break;
         case Aggregate.HISTOGRAM:
             updateVectorizedAggregate(session, bvv, vv, data);
+            break;
         case Aggregate.SELECTIVITY:
             updateVectorizedAggregate(session, bvv, vv, data);
+            break;
         default:
             updateVectorizedDefault(session, bvv, vv, (AggregateDataDefault) data);
         }

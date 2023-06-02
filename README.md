@@ -12,8 +12,9 @@ PostgreSQL JDBC Driver 支持 9.x 和 42.x 两个系列版本
 ## 编译需要
 
 * Git 2.32+
-* JDK 17+ (运行只需要 JDK 1.8+)
+* JDK 17+
 * Maven 3.8+
+
 
 ## 下载项目源代码
 
@@ -42,25 +43,25 @@ PostgreSQL JDBC Driver 支持 9.x 和 42.x 两个系列版本
 或者进入 `qinsql\target` 目录，运行: `java -jar qinsql-5.2.0.jar`
 
 ```java
-INFO  09:05:04.246 Lealone version: 5.2.0-SNAPSHOT
-INFO  09:05:04.253 Loading config from file:/E:/qinsql/target/qinsql-5.2.0/conf/qinsql.yaml
-INFO  09:05:04.303 Base dir: E:/qinsql/target/qinsql-5.2.0/data
-INFO  09:05:04.308 Init storage engines: 2 ms
-INFO  09:05:04.331 Init transaction engines: 22 ms
-INFO  09:05:04.334 Init sql engines: 2 ms
-INFO  09:05:04.518 Init protocol server engines: 183 ms
-INFO  09:05:04.519 Init lealone database: 0 ms
-INFO  09:05:04.520 Starting TcpServer accepter
-INFO  09:05:04.524 TcpServer started, host: 127.0.0.1, port: 9210
-INFO  09:05:04.524 Starting MySQLServer accepter
-INFO  09:05:04.525 MySQLServer started, host: 127.0.0.1, port: 9310
-INFO  09:05:04.525 Starting PgServer accepter
-INFO  09:05:04.526 PgServer started, host: 127.0.0.1, port: 9510
-INFO  09:05:04.526 Total time: 277 ms (Load config: 54 ms, Init: 216 ms, Start: 7 ms)
-INFO  09:05:04.526 Exit with Ctrl+C
+INFO 09:12:13.384 Lealone version: 5.2.0
+INFO 09:12:13.392 Loading config from file:/E:/qinsql/target/qinsql-5.2.0/conf/qinsql.yaml
+INFO 09:12:13.444 Base dir: E:/qinsql/target/qinsql-5.2.0/data
+INFO 09:12:13.450 Init storage engines: 3 ms
+INFO 09:12:13.474 Init transaction engines: 23 ms
+INFO 09:12:13.477 Init sql engines: 2 ms
+INFO 09:12:13.650 Init protocol server engines: 171 ms
+INFO 09:12:13.651 Init lealone database: 0 ms
+INFO 09:12:13.655 Starting TcpServer accepter
+INFO 09:12:13.657 TcpServer started, host: 127.0.0.1, port: 9210
+INFO 09:12:13.657 Starting MySQLServer accepter
+INFO 09:12:13.658 MySQLServer started, host: 127.0.0.1, port: 9310
+INFO 09:12:13.659 Starting PgServer accepter
+INFO 09:12:13.659 PgServer started, host: 127.0.0.1, port: 9510
+INFO 09:12:13.659 Total time: 272 ms (Load config: 57 ms, Init: 208 ms, Start: 7 ms)
+INFO 09:12:13.660 Exit with Ctrl+C
 ```
 
-## 用 MySQL 客户端访问 Lealone 数据库
+## 用 MySQL 客户端访问 QinSQL
 
 执行以下命令启动 MySQL 客户端:
 
@@ -97,7 +98,7 @@ mysql>
 ```
 
 
-## 用 PostgreSQL 客户端访问 Lealone 数据库
+## 用 PostgreSQL 客户端访问 QinSQL
 
 执行以下命令启动 PostgreSQL 客户端:
 

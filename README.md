@@ -1,6 +1,8 @@
 # QinSQL
 
-使用 MySQL 或 PostgreSQL 的协议和 SQL 语法访问 Lealone 数据库
+QinSQL 是一个基于 [Lealone](https://github.com/lealone/Lealone) 的 OLAP 引擎
+
+可以使用 MySQL 或 PostgreSQL 的协议和 SQL 语法访问 Lealone 数据库
 
 MySQL 协议版本支持 5.x 到 8.x 系列
 
@@ -9,41 +11,53 @@ PostgreSQL JDBC Driver 支持 9.x 和 42.x 两个系列版本
 
 ## 编译需要
 
+* Git 2.32+
 * JDK 17+ (运行只需要 JDK 1.8+)
 * Maven 3.8+
 
+## 下载项目源代码
 
-## 打包
+`git clone https://github.com/qinsql/QinSQL.git qinsql`
 
-执行以下命令打包:
-
-`mvn package -Dmaven.test.skip=true`
-
-生成的文件放在 `qinsql\target` 目录
+假设源代码放在 `E:\qinsql`
 
 
-## 运行 Lealone 数据库
+## 从源代码构建
+
+进入 E:\qinsql 目录，运行: `mvn clean package assembly:assembly -Dmaven.test.skip=true`
+
+生成的文件放在 E:\qinsql\target 目录中，
+默认生成 qinsql-x.y.z.tar.gz 和 qinsql-x.y.z.zip 两个压缩文件，
+其中 x.y.z 代表实际的版本号
+
+如果运行: `mvn package -Dmaven.test.skip=true -P database`
+
+只生成 qinsql-x.y.z.jar
+
+
+## 运行 QinSQL
 
 进入 `qinsql\target\qinsql-5.2.0\bin` 目录，运行: `qinsql`
 
+或者进入 `qinsql\target` 目录，运行: `java -jar qinsql-5.2.0.jar`
+
 ```java
-E:\qinsql\target\qinsql-5.2.0\bin>qinsql
-Lealone version: 5.2.0
-Loading config from Loading config from file:/E:/qinsql/target/qinsql-5.2.0/conf/lealone.yaml
-Base dir: E:/qinsql/target/qinsql-5.2.0/data
-Init storage engines: 4 ms
-Init transaction engines: 27 ms
-Init sql engines: 1 ms
-Init protocol server engines: 184 ms
-Init lealone database: 0 ms
-Starting TcpServer accepter
-TcpServer started, host: 127.0.0.1, port: 9210
-Starting MySQLServer accepter
-MySQLServer started, host: 127.0.0.1, port: 9310
-Starting PgServer accepter
-PgServer started, host: 127.0.0.1, port: 9510
-Total time: 293 ms (Load config: 69 ms, Init: 220 ms, Start: 4 ms)
-Exit with Ctrl+C
+INFO  09:05:04.246 Lealone version: 5.2.0-SNAPSHOT
+INFO  09:05:04.253 Loading config from file:/E:/qinsql/target/qinsql-5.2.0/conf/qinsql.yaml
+INFO  09:05:04.303 Base dir: E:/qinsql/target/qinsql-5.2.0/data
+INFO  09:05:04.308 Init storage engines: 2 ms
+INFO  09:05:04.331 Init transaction engines: 22 ms
+INFO  09:05:04.334 Init sql engines: 2 ms
+INFO  09:05:04.518 Init protocol server engines: 183 ms
+INFO  09:05:04.519 Init lealone database: 0 ms
+INFO  09:05:04.520 Starting TcpServer accepter
+INFO  09:05:04.524 TcpServer started, host: 127.0.0.1, port: 9210
+INFO  09:05:04.524 Starting MySQLServer accepter
+INFO  09:05:04.525 MySQLServer started, host: 127.0.0.1, port: 9310
+INFO  09:05:04.525 Starting PgServer accepter
+INFO  09:05:04.526 PgServer started, host: 127.0.0.1, port: 9510
+INFO  09:05:04.526 Total time: 277 ms (Load config: 54 ms, Init: 216 ms, Start: 7 ms)
+INFO  09:05:04.526 Exit with Ctrl+C
 ```
 
 ## 用 MySQL 客户端访问 Lealone 数据库

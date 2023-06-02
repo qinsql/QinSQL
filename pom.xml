@@ -17,16 +17,6 @@
 
     <licenses>
         <license>
-            <name>MPL 2.0</name>
-            <url>https://www.mozilla.org/en-US/MPL/2.0/</url>
-            <distribution>repo</distribution>
-        </license>
-        <license>
-            <name>EPL 1.0</name>
-            <url>https://opensource.org/licenses/eclipse-1.0.php</url>
-            <distribution>repo</distribution>
-        </license>
-        <license>
             <name>Server Side Public License 1.0</name>
             <url>https://github.com/qinsql/QinSQL/blob/master/LICENSE.md</url>
             <distribution>repo</distribution>

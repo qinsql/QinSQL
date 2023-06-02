@@ -1,7 +1,7 @@
 /*
- * Copyright 2004-2014 H2 Group. Multiple-Licensed under the MPL 2.0,
- * and the EPL 1.0 (http://h2database.com/html/license.html).
- * Initial Developer: H2 Group
+ * Copyright Lealone Database Group.
+ * Licensed under the Server Side Public License, v 1.
+ * Initial Developer: zhh
  */
 package org.qinsql.postgresql.sql;
 
@@ -38,10 +38,11 @@ public class PgAlias {
      * @param pretty this flag is ignored
      * @return the SQL statement or the column name
      */
-    public static String getIndexColumn(Connection conn, int indexId, Integer ordinalPosition, Boolean pretty)
-            throws SQLException {
+    public static String getIndexColumn(Connection conn, int indexId, Integer ordinalPosition,
+            Boolean pretty) throws SQLException {
         if (ordinalPosition == null || ordinalPosition.intValue() == 0) {
-            PreparedStatement prep = conn.prepareStatement("select sql from information_schema.indexes where id=?");
+            PreparedStatement prep = conn
+                    .prepareStatement("select sql from information_schema.indexes where id=?");
             prep.setInt(1, indexId);
             ResultSet rs = prep.executeQuery();
             if (rs.next()) {
@@ -143,7 +144,8 @@ public class PgAlias {
      * @return the user name
      */
     public static String getUserById(Connection conn, int id) throws SQLException {
-        PreparedStatement prep = conn.prepareStatement("SELECT NAME FROM INFORMATION_SCHEMA.USERS WHERE ID=?");
+        PreparedStatement prep = conn
+                .prepareStatement("SELECT NAME FROM INFORMATION_SCHEMA.USERS WHERE ID=?");
         prep.setInt(1, id);
         ResultSet rs = prep.executeQuery();
         if (rs.next()) {

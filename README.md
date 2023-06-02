@@ -129,3 +129,9 @@ postgres=>
 
 代码导入 IDE 后，直接运行 [QinServerStart](https://github.com/qinsql/QinSQL/blob/master/qinsql-test/src/test/java/org/qinsql/test/QinServerStart.java)
 
+
+## 启用 OLAP 引擎
+
+`set olap_threshold 1000;`
+
+当执行 select 语句时，如果遍历了1000条记录还没有结束就会自动启用 OLAP 引擎

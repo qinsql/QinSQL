@@ -53,6 +53,7 @@
         <module>qinsql-olap</module>
         <module>qinsql-mysql</module>
         <module>qinsql-postgresql</module>
+        <module>qinsql-main</module>
         <module>qinsql-test</module>
         <module>qinsql-dist</module>
     </modules>
@@ -151,7 +152,7 @@
     </build>
 
     <profiles>
-        <!-- 只构建数据库，不包含web、orm模块以及log4j2依赖 -->
+        <!-- 只构建数据库，不包含第三方依赖 -->
         <profile>
             <id>database</id>
             <dependencyManagement>
@@ -168,11 +169,11 @@
                             <exclusion>
                                 <groupId>org.apache.logging.log4j</groupId>
                                 <artifactId>log4j-core</artifactId>
-                            </exclusion>
+                            </exclusion><!--
                             <exclusion>
                                 <groupId>org.yaml</groupId>
                                 <artifactId>snakeyaml</artifactId>
-                            </exclusion>
+                            </exclusion>-->
                         </exclusions>
                     </dependency>
                 </dependencies>

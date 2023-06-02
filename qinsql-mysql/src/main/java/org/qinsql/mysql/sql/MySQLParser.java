@@ -3745,6 +3745,13 @@ public class MySQLParser implements SQLParser {
         } else {
             column = parseColumnWithType(columnName);
         }
+        if (readIf("CHARACTER")) {
+            read("SET");
+            readExpression();
+        }
+        if (readIf("COLLATE")) {
+            readExpression();
+        }
         if (readIf("NOT")) {
             read("NULL");
             column.setNullable(false);
@@ -5709,11 +5716,20 @@ public class MySQLParser implements SQLParser {
         }
         if (readIf("ENGINE")) {
             readIf("=");
-            command.setStorageEngineName(readUniqueIdentifier());
+            String engineName = readUniqueIdentifier();
+            if (!engineName.equalsIgnoreCase("innodb"))
+                command.setStorageEngineName(readUniqueIdentifier());
         } else if (database.getSettings().defaultStorageEngine != null) {
             command.setStorageEngineName(database.getSettings().defaultStorageEngine);
         }
         command.setStorageEngineParams(parseParameters());
+
+        if (readIf("DEFAULT")) {
+            if (readIf("CHARSET")) {
+                readIf("=");
+                readExpression();
+            }
+        }
         if (temp) {
             if (readIf("ON")) {
                 read("COMMIT");

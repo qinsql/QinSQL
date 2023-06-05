@@ -11,7 +11,7 @@
         </Console>
         <RollingFile name="RollingFile" fileName="${env:QINSQL_HOME}/logs/qinsql.log"
             filePattern="$${env:QINSQL_HOME}/logs/qinsql.log.%i.zip">
-            <PatternLayout pattern="%-4level [%thread] [%date{ISO8601}] [%F] %msg%n" />
+            <PatternLayout pattern="%-4level [%thread] [%date{ISO8601}] %msg%n" />
             <Policies>
                 <SizeBasedTriggeringPolicy size="20MB" />
             </Policies>

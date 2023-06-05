@@ -5,9 +5,12 @@
  */
 package org.qinsql.mysql.sql.expression;
 
+import java.sql.Connection;
+
 import org.lealone.db.session.ServerSession;
 import org.lealone.db.value.Value;
 import org.lealone.db.value.ValueInt;
+import org.lealone.db.value.ValueString;
 import org.lealone.sql.expression.Variable;
 
 public class MySQLVariable extends Variable {
@@ -24,7 +27,24 @@ public class MySQLVariable extends Variable {
             return ValueInt.get(-1);
         case "auto_increment_increment":
             return ValueInt.get(1);
+        case "tx_isolation":
+            return ValueString.get(getTransactionIsolationLevel(session));
         }
         return super.getValue(session);
+    }
+
+    public String getTransactionIsolationLevel(ServerSession session) {
+        switch (session.getTransactionIsolationLevel()) {
+        case Connection.TRANSACTION_READ_COMMITTED:
+            return "READ-COMMITTED";
+        case Connection.TRANSACTION_REPEATABLE_READ:
+            return "REPEATABLE-READ";
+        case Connection.TRANSACTION_SERIALIZABLE:
+            return "ERIALIZABLE";
+        case Connection.TRANSACTION_READ_UNCOMMITTED:
+            return "READ-UNCOMMITTED";
+        default:
+            return "READ-COMMITTED";
+        }
     }
 }

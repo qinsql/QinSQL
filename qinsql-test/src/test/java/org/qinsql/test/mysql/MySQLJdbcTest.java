@@ -45,6 +45,7 @@ public class MySQLJdbcTest {
         info.put("serverTimezone", "GMT");
 
         Connection conn = DriverManager.getConnection(url, info);
+        conn.getTransactionIsolation();
         conn.setAutoCommit(autoCommit);
         return conn;
     }

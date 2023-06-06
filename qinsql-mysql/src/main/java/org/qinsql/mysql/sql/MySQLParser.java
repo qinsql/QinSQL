@@ -909,24 +909,31 @@ public class MySQLParser implements SQLParser {
     private void parseShowCharSet(StringBuilder buff) {
         buff.append("'utf8' AS Charset, 'UTF-8 Unicode' AS Description, "
                 + "'utf8_general_ci' AS `Default collation`, 3 AS Maxlen FROM DUAL");
-        if (readIf("LIKE")) {
-            buff.append(" WHERE Charset LIKE '").append(readString()).append("'");
-        } else if (readIf("WHERE")) {
-            buff.append(" WHERE ").append(readExpression().getSQL());
-        }
+        parseShowLikeOrWhere(buff, "Charset", true);
     }
 
     private void parseShowCollation(StringBuilder buff) {
         buff.append("'latin1_swedish_ci' AS Collation, 'latin1' AS Charset, 8 AS Id, "
                 + "'YES' AS Default, 'YES' AS Compiled, 1 AS Sortlen FROM DUAL");
+        parseShowLikeOrWhere(buff, "Charset", true);
+    }
+
+    private void parseShowLikeOrWhere(StringBuilder buff, String column, boolean isWhere) {
+        String w = isWhere ? " WHERE " : " AND ";
         if (readIf("LIKE")) {
-            buff.append(" WHERE Charset LIKE '").append(readString()).append("'");
+            buff.append(w).append(column).append(" LIKE ");
+            buff.append(readExpression().getSQL());
         } else if (readIf("WHERE")) {
-            buff.append(" WHERE ").append(readExpression().getSQL());
+            buff.append(w).append(readExpression().getSQL());
         }
     }
 
     private StatementBase parseShow() {
+        readIf("GLOBAL");
+        readIf("SESSION");
+        readIf("EXTENDED");
+        readIf("FULL");
+
         ArrayList<Value> paramValues = Utils.newSmallArrayList();
         StringBuilder buff = new StringBuilder("SELECT ");
         if (readIf("DATABASES")) {
@@ -949,21 +956,25 @@ public class MySQLParser implements SQLParser {
                     + "'STORAGE ENGINE' AS Type, NULL AS Library, 'GPL' AS License FROM DUAL");
         } else if (readIf("TABLES")) {
             String schema = Constants.SCHEMA_MAIN;
-            if (readIf("FROM")) {
+            if (readIf("FROM") || readIf("IN")) {
                 schema = readUniqueIdentifier();
             }
-            buff.append("TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES "
-                    + "WHERE TABLE_SCHEMA=? ORDER BY TABLE_NAME");
+            buff.append("TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=?");
+
+            parseShowLikeOrWhere(buff, "TABLE_NAME", false);
+            buff.append(" ORDER BY TABLE_NAME");
+
             schema = identifier(schema);
             paramValues.add(ValueString.get(schema));
         } else if (readIf("GRANTS")) {
             buff.append("* FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES");
-        } else if (readIf("COLUMNS")) {
-            read("FROM");
+        } else if (readIf("COLUMNS") || readIf("FIELDS")) {
+            if (!readIf("FROM"))
+                read("IN");
             String tableName = readIdentifierWithSchema();
             String schemaName = getSchema().getName();
             paramValues.add(ValueString.get(tableName));
-            if (readIf("FROM")) {
+            if (readIf("FROM") || readIf("IN")) {
                 schemaName = readUniqueIdentifier();
             }
             buff.append("C.COLUMN_NAME FIELD, "
@@ -974,19 +985,16 @@ public class MySQLParser implements SQLParser {
                     + "WHEN 'PRIMARY KEY' THEN 'PRI' "
                     + "WHEN 'UNIQUE INDEX' THEN 'UNI' ELSE '' END KEY, "
                     + "IFNULL(COLUMN_DEFAULT, 'NULL') DEFAULT " + "FROM INFORMATION_SCHEMA.COLUMNS C "
-                    + "WHERE C.TABLE_NAME=? AND C.TABLE_SCHEMA=? " + "ORDER BY C.ORDINAL_POSITION");
+                    + "WHERE C.TABLE_NAME=? AND C.TABLE_SCHEMA=?");
+
+            parseShowLikeOrWhere(buff, "C.COLUMN_NAME", false);
+            buff.append(" ORDER BY C.ORDINAL_POSITION");
             paramValues.add(ValueString.get(schemaName));
         } else if (readIf("VARIABLES") || readIf("STATUS")) {
             buff.append(
                     "NAME AS VARIABLE_NAME, VALUE AS VARIABLE_VALUE FROM INFORMATION_SCHEMA.SETTINGS");
 
-            if (readIf("LIKE")) {
-                buff.append(" WHERE VARIABLE_NAME LIKE ");
-                buff.append(readExpression().getSQL());
-            } else if (readIf("WHERE")) {
-                buff.append(" WHERE ");
-                buff.append(readExpression().getSQL());
-            }
+            parseShowLikeOrWhere(buff, "VARIABLE_NAME", true);
         }
         boolean b = session.getAllowLiterals();
         try {

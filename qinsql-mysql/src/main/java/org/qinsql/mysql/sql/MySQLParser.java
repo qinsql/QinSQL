@@ -917,6 +917,12 @@ public class MySQLParser implements SQLParser {
             buff.append("'InnoDB' AS Engine, 'DEFAULT' AS Support, "
                     + "'Supports transactions, row-level locking, and foreign keys' AS Comment, "
                     + "'YES' AS Transactions, 'YES' AS XA, 'YES' AS Savepoints FROM DUAL");
+        } else if (readIf("CHARSET")) {
+            buff.append("'utf8' AS Charset, 'UTF-8 Unicode' AS Description, "
+                    + "'utf8_general_ci' AS `Default collation`, '3' AS Maxlen FROM DUAL");
+        } else if (readIf("PLUGINS")) {
+            buff.append("'InnoDB' AS Name, 'ACTIVE' AS Status, "
+                    + "'STORAGE ENGINE' AS Type, NULL AS Library, 'GPL' AS License FROM DUAL");
         } else if (readIf("CLIENT_ENCODING")) {
             // for PostgreSQL compatibility
             buff.append("'UNICODE' AS CLIENT_ENCODING FROM DUAL");

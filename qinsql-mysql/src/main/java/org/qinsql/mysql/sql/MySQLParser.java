@@ -961,6 +961,10 @@ public class MySQLParser implements SQLParser {
                 if (readIf(","))
                     readInt();
             }
+        } else if (readIf("PROCESSLIST")) {
+            buff.append("NULL AS Id, NULL AS User, NULL AS Host FROM DUAL WHERE 1=2");
+        } else if (readIf("PRIVILEGES")) {
+            buff.append("NULL AS Privilege, NULL AS Context, NULL AS Comment FROM DUAL WHERE 1=2");
         } else if (readIf("TABLES")) {
             String schema = Constants.SCHEMA_MAIN;
             if (readIf("FROM") || readIf("IN")) {

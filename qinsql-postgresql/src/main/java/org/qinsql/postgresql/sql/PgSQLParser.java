@@ -931,8 +931,8 @@ public class PgSQLParser implements SQLParser {
             if (readIf("FROM")) {
                 schema = readUniqueIdentifier();
             }
-            buff.append(
-                    "TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=? ORDER BY TABLE_NAME");
+            buff.append("TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES "
+                    + "WHERE TABLE_SCHEMA=? ORDER BY TABLE_NAME");
             paramValues.add(ValueString.get(schema));
         } else if (readIf("COLUMNS")) {
             // for MySQL compatibility
@@ -5509,7 +5509,8 @@ public class PgSQLParser implements SQLParser {
             command.setTableName(tableName);
             if (!readIf("(")) {
                 // 指定索引名，例如:
-                // CREATE TABLE IF NOT EXISTS t (f1 int,CONSTRAINT IF NOT EXISTS my_constraint INDEX my_index(f1))
+                // CREATE TABLE IF NOT EXISTS t
+                // (f1 int,CONSTRAINT IF NOT EXISTS my_constraint INDEX my_index(f1))
                 command.setIndexName(readUniqueIdentifier());
                 read("(");
             }

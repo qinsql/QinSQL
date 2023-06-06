@@ -906,6 +906,26 @@ public class MySQLParser implements SQLParser {
         return prepare(session, buff.toString(), paramValues);
     }
 
+    private void parseShowCharSet(StringBuilder buff) {
+        buff.append("'utf8' AS Charset, 'UTF-8 Unicode' AS Description, "
+                + "'utf8_general_ci' AS `Default collation`, 3 AS Maxlen FROM DUAL");
+        if (readIf("LIKE")) {
+            buff.append(" WHERE Charset LIKE '").append(readString()).append("'");
+        } else if (readIf("WHERE")) {
+            buff.append(" WHERE ").append(readExpression().getSQL());
+        }
+    }
+
+    private void parseShowCollation(StringBuilder buff) {
+        buff.append("'latin1_swedish_ci' AS Collation, 'latin1' AS Charset, 8 AS Id, "
+                + "'YES' AS Default, 'YES' AS Compiled, 1 AS Sortlen FROM DUAL");
+        if (readIf("LIKE")) {
+            buff.append(" WHERE Charset LIKE '").append(readString()).append("'");
+        } else if (readIf("WHERE")) {
+            buff.append(" WHERE ").append(readExpression().getSQL());
+        }
+    }
+
     private StatementBase parseShow() {
         ArrayList<Value> paramValues = Utils.newSmallArrayList();
         StringBuilder buff = new StringBuilder("SELECT ");
@@ -918,46 +938,27 @@ public class MySQLParser implements SQLParser {
                     + "'Supports transactions, row-level locking, and foreign keys' AS Comment, "
                     + "'YES' AS Transactions, 'YES' AS XA, 'YES' AS Savepoints FROM DUAL");
         } else if (readIf("CHARSET")) {
-            buff.append("'utf8' AS Charset, 'UTF-8 Unicode' AS Description, "
-                    + "'utf8_general_ci' AS `Default collation`, '3' AS Maxlen FROM DUAL");
+            parseShowCharSet(buff);
+        } else if (readIf("CHARACTER")) {
+            read("SET");
+            parseShowCharSet(buff);
+        } else if (readIf("COLLATION")) {
+            parseShowCollation(buff);
         } else if (readIf("PLUGINS")) {
             buff.append("'InnoDB' AS Name, 'ACTIVE' AS Status, "
                     + "'STORAGE ENGINE' AS Type, NULL AS Library, 'GPL' AS License FROM DUAL");
-        } else if (readIf("CLIENT_ENCODING")) {
-            // for PostgreSQL compatibility
-            buff.append("'UNICODE' AS CLIENT_ENCODING FROM DUAL");
-        } else if (readIf("DEFAULT_TRANSACTION_ISOLATION")) {
-            // for PostgreSQL compatibility
-            buff.append("'read committed' AS DEFAULT_TRANSACTION_ISOLATION FROM DUAL");
-        } else if (readIf("TRANSACTION")) {
-            // for PostgreSQL compatibility
-            read("ISOLATION");
-            read("LEVEL");
-            buff.append("'read committed' AS TRANSACTION_ISOLATION FROM DUAL");
-        } else if (readIf("DATESTYLE")) {
-            // for PostgreSQL compatibility
-            buff.append("'ISO' AS DATESTYLE FROM DUAL");
-        } else if (readIf("SERVER_VERSION")) {
-            // for PostgreSQL compatibility
-            buff.append("'8.1.4' AS SERVER_VERSION FROM DUAL");
-        } else if (readIf("SERVER_ENCODING")) {
-            // for PostgreSQL compatibility
-            buff.append("'UTF8' AS SERVER_ENCODING FROM DUAL");
         } else if (readIf("TABLES")) {
-            // for MySQL compatibility
             String schema = Constants.SCHEMA_MAIN;
             if (readIf("FROM")) {
                 schema = readUniqueIdentifier();
             }
-            buff.append(
-                    "TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=? ORDER BY TABLE_NAME");
+            buff.append("TABLE_NAME, TABLE_SCHEMA FROM INFORMATION_SCHEMA.TABLES "
+                    + "WHERE TABLE_SCHEMA=? ORDER BY TABLE_NAME");
             schema = identifier(schema);
             paramValues.add(ValueString.get(schema));
         } else if (readIf("GRANTS")) {
-            // for MySQL compatibility
             buff.append("* FROM INFORMATION_SCHEMA.TABLE_PRIVILEGES");
         } else if (readIf("COLUMNS")) {
-            // for MySQL compatibility
             read("FROM");
             String tableName = readIdentifierWithSchema();
             String schemaName = getSchema().getName();
@@ -976,7 +977,6 @@ public class MySQLParser implements SQLParser {
                     + "WHERE C.TABLE_NAME=? AND C.TABLE_SCHEMA=? " + "ORDER BY C.ORDINAL_POSITION");
             paramValues.add(ValueString.get(schemaName));
         } else if (readIf("VARIABLES") || readIf("STATUS")) {
-            // for MySQL compatibility
             buff.append(
                     "NAME AS VARIABLE_NAME, VALUE AS VARIABLE_VALUE FROM INFORMATION_SCHEMA.SETTINGS");
 
@@ -987,9 +987,6 @@ public class MySQLParser implements SQLParser {
                 buff.append(" WHERE ");
                 buff.append(readExpression().getSQL());
             }
-        } else if (readIf("COLLATION")) {
-            // for MySQL compatibility
-            buff.append("'latin1',8,'Yes','Yes',1 "); // 不返回结果
         }
         boolean b = session.getAllowLiterals();
         try {
@@ -5551,7 +5548,8 @@ public class MySQLParser implements SQLParser {
             command.setTableName(tableName);
             if (!readIf("(")) {
                 // 指定索引名，例如:
-                // CREATE TABLE IF NOT EXISTS t (f1 int,CONSTRAINT IF NOT EXISTS my_constraint INDEX my_index(f1))
+                // CREATE TABLE IF NOT EXISTS t
+                // (f1 int,CONSTRAINT IF NOT EXISTS my_constraint INDEX my_index(f1))
                 command.setIndexName(readUniqueIdentifier());
                 read("(");
             }

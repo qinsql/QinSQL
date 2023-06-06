@@ -6,6 +6,7 @@
 package org.qinsql.mysql.sql.expression;
 
 import java.sql.Connection;
+import java.util.TimeZone;
 
 import org.lealone.db.session.ServerSession;
 import org.lealone.db.value.Value;
@@ -29,7 +30,10 @@ public class MySQLVariable extends Variable {
             return ValueInt.get(1);
         case "tx_isolation":
             return ValueString.get(getTransactionIsolationLevel(session));
-        }
+        case "time_zone":
+        case "system_time_zone":
+            return ValueString.get(TimeZone.getDefault().getID());
+        };
         return super.getValue(session);
     }
 

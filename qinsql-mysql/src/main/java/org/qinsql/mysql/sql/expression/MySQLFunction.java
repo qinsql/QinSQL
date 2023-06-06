@@ -9,4 +9,8 @@ public class MySQLFunction {
     public static int getConnectionId() {
         return 0;
     }
+
+    public static String getVersion() {
+        return "8.0.22";
+    }
 }

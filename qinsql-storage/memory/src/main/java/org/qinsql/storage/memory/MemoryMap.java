@@ -38,7 +38,8 @@ public class MemoryMap<K, V> extends StorageMapBase<K, V> {
     protected final ConcurrentSkipListMap<K, V> skipListMap;
     protected boolean closed;
 
-    public MemoryMap(String name, StorageDataType keyType, StorageDataType valueType, MemoryStorage memoryStorage) {
+    public MemoryMap(String name, StorageDataType keyType, StorageDataType valueType,
+            MemoryStorage memoryStorage) {
         super(name, keyType, valueType, memoryStorage);
         skipListMap = new ConcurrentSkipListMap<>(new KeyComparator<K>(keyType));
     }
@@ -156,8 +157,8 @@ public class MemoryMap<K, V> extends StorageMapBase<K, V> {
 
     @Override
     public StorageMapCursor<K, V> cursor(K from) {
-        return new MemoryMapCursor<>(
-                from == null ? skipListMap.entrySet().iterator() : skipListMap.tailMap(from).entrySet().iterator());
+        return new MemoryMapCursor<>(from == null ? skipListMap.entrySet().iterator()
+                : skipListMap.tailMap(from).entrySet().iterator());
     }
 
     @Override

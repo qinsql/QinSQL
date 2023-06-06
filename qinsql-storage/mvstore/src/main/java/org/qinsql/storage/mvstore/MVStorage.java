@@ -35,8 +35,8 @@ public class MVStorage extends StorageBase {
     }
 
     @Override
-    public <K, V> StorageMap<K, V> openMap(String name, StorageDataType keyType, StorageDataType valueType,
-            Map<String, String> parameters) {
+    public <K, V> StorageMap<K, V> openMap(String name, StorageDataType keyType,
+            StorageDataType valueType, Map<String, String> parameters) {
         MVMap.Builder<K, V> builder = new MVMap.Builder<>();
         builder.keyType(new MVDataType(keyType));
         builder.valueType(new MVDataType(valueType));

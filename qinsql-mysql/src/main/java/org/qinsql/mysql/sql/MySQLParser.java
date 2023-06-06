@@ -4912,10 +4912,19 @@ public class MySQLParser implements SQLParser {
 
     private StatementBase parseSet() {
         if (readIf("@")) { // session变量
+            if (readIf("@")) {
+                if (readIf("GLOBAL") || readIf("PERSIST") || readIf("PERSIST_ONLY")
+                        || readIf("SESSION")) {
+                    read(".");
+                }
+            }
             SetSession command = new SetSession(session, SessionSetting.VARIABLE);
             command.setString(readAliasIdentifier());
             readIfEqualOrTo();
-            command.setExpression(readExpression());
+            Expression e = readExpression();
+            if (e instanceof ExpressionColumn)
+                e = ValueExpression.get(ValueString.get(e.getSQL()));
+            command.setExpression(e);
             return command;
         } else if (readIf("AUTOCOMMIT")) {
             readIfEqualOrTo();
@@ -5028,7 +5037,7 @@ public class MySQLParser implements SQLParser {
             }
             return new NoOperation(session);
         } else {
-            if (readIf("GLOBAL") || readIf("SESSION")) {
+            if (readIf("GLOBAL") || readIf("PERSIST") || readIf("PERSIST_ONLY") || readIf("SESSION")) {
                 if (readIf("TRANSACTION")) {
                     if (readIf("ISOLATION")) {
                         read("LEVEL");

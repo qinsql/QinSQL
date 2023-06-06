@@ -913,6 +913,10 @@ public class MySQLParser implements SQLParser {
             buff.append("DATABASE_NAME FROM INFORMATION_SCHEMA.DATABASES");
         } else if (readIf("SCHEMAS")) {
             buff.append("SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMAS");
+        } else if (readIf("ENGINES")) {
+            buff.append("'InnoDB' AS Engine, 'DEFAULT' AS Support, "
+                    + "'Supports transactions, row-level locking, and foreign keys' AS Comment, "
+                    + "'YES' AS Transactions, 'YES' AS XA, 'YES' AS Savepoints FROM DUAL");
         } else if (readIf("CLIENT_ENCODING")) {
             // for PostgreSQL compatibility
             buff.append("'UNICODE' AS CLIENT_ENCODING FROM DUAL");

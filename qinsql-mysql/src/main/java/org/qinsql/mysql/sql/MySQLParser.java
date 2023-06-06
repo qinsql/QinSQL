@@ -954,6 +954,13 @@ public class MySQLParser implements SQLParser {
         } else if (readIf("PLUGINS")) {
             buff.append("'InnoDB' AS Name, 'ACTIVE' AS Status, "
                     + "'STORAGE ENGINE' AS Type, NULL AS Library, 'GPL' AS License FROM DUAL");
+        } else if (readIf("WARNINGS")) {
+            buff.append("NULL AS Level, NULL AS Code, NULL AS Message FROM DUAL WHERE 1=2");
+            if (readIf("LIMIT")) {
+                readInt();
+                if (readIf(","))
+                    readInt();
+            }
         } else if (readIf("TABLES")) {
             String schema = Constants.SCHEMA_MAIN;
             if (readIf("FROM") || readIf("IN")) {

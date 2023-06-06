@@ -4917,6 +4917,16 @@ public class MySQLParser implements SQLParser {
         return command;
     }
 
+    private StatementBase parseSetCharSet() {
+        String charset;
+        if (readIf("DEFAULT"))
+            charset = "utf8";
+        else
+            charset = readString();
+        session.setVariable("__CHARSET__", ValueString.get(charset));
+        return new NoOperation(session);
+    }
+
     private StatementBase parseSet() {
         if (readIf("@")) { // session变量
             if (readIf("@")) {
@@ -4933,6 +4943,11 @@ public class MySQLParser implements SQLParser {
                 e = ValueExpression.get(ValueString.get(e.getSQL()));
             command.setExpression(e);
             return command;
+        } else if (readIf("CHARSET")) {
+            return parseSetCharSet();
+        } else if (readIf("CHARACTER")) {
+            read("SET");
+            return parseSetCharSet();
         } else if (readIf("AUTOCOMMIT")) {
             readIfEqualOrTo();
             boolean value = readBooleanSetting();

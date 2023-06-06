@@ -43,9 +43,11 @@
         <module>qinsql-olap</module>
         <module>qinsql-mysql</module>
         <module>qinsql-postgresql</module>
+        <module>qinsql-storage</module>
         <module>qinsql-main</module>
         <module>qinsql-test</module>
         <module>qinsql-dist</module>
+        <module>qinsql-bench</module>
     </modules>
 
     <build>

@@ -5013,6 +5013,31 @@ public class MySQLParser implements SQLParser {
             }
             return new NoOperation(session);
         } else {
+            if (readIf("GLOBAL") || readIf("SESSION")) {
+                if (readIf("TRANSACTION")) {
+                    if (readIf("ISOLATION")) {
+                        read("LEVEL");
+                        SetSession command = new SetSession(session,
+                                SessionSetting.TRANSACTION_ISOLATION_LEVEL);
+                        if (readIf("SERIALIZABLE")) {
+                            command.setString("SERIALIZABLE");
+                        } else if (readIf("REPEATABLE")) {
+                            read("READ");
+                            command.setString("REPEATABLE_READ");
+                        } else if (readIf("READ")) {
+                            if (readIf("COMMITTED"))
+                                command.setString("READ_COMMITTED");
+                            else if (readIf("UNCOMMITTED"))
+                                command.setString("READ_UNCOMMITTED");
+                        }
+                        return command;
+                    } else if (readIf("READ")) {
+                        if (!readIf("WRITE"))
+                            read("ONLY");
+                    }
+                    return new NoOperation(session);
+                }
+            }
             // 先看看是否是session级的参数，然后再看是否是database级的
             SetStatement command;
             try {

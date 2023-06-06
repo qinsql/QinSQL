@@ -4973,8 +4973,8 @@ public class PgSQLParser implements SQLParser {
                                 command.setString("READ_COMMITTED");
                             else if (readIf("UNCOMMITTED"))
                                 command.setString("READ_UNCOMMITTED");
-                            return command;
                         }
+                        return command;
                     } else if (readIf("READ")) {
                         if (!readIf("WRITE"))
                             read("ONLY");

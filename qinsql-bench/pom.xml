@@ -13,14 +13,19 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>qinsql-test</artifactId>
+    <artifactId>qinsql-bench</artifactId>
     <packaging>jar</packaging>
     <version>5.2.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
-            <groupId>org.qinsql</groupId>
-            <artifactId>qinsql-main</artifactId>
+            <groupId>org.lealone</groupId>
+            <artifactId>lealone-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.lealone</groupId>
+            <artifactId>lealone-main</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -29,37 +34,47 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.qinsql</groupId>
-            <artifactId>qinsql-mvstore</artifactId>
-            <version>${project.version}</version>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-pg-client</artifactId>
+            <version>4.2.1</version>
         </dependency>
-
         <dependency>
-            <groupId>org.lealone</groupId>
-            <artifactId>lealone-test</artifactId>
-            <version>${project.version}</version>
-            <classifier>tests</classifier>
+            <groupId>com.ongres.scram</groupId>
+            <artifactId>client</artifactId>
+            <version>2.1</version>
         </dependency>
-        
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.1.212</version>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <!-- 5.1.47   6.0.2   8.0.28 --> 
             <version>8.0.28</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <!-- 9.4.1212   42.3.8 --> 
             <version>42.3.8</version>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.datastax.oss</groupId>
+            <artifactId>java-driver-core</artifactId>
+            <version>4.14.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.lealone</groupId>
+            <artifactId>lealone-test</artifactId>
+            <version>${project.version}</version>
+            <classifier>tests</classifier>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
-            <scope>test</scope>
+            <version>4.13.1</version> 
         </dependency>
     </dependencies>
 </project>

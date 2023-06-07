@@ -1,6 +1,6 @@
 # QinSQL
 
-QinSQL 是一个基于 [Lealone](https://github.com/lealone/Lealone) 的 OLAP 引擎
+QinSQL 是一个基于 [Lealone](https://github.com/lealone/Lealone) 的可暂停的渐进式 OLAP 引擎
 
 可以使用 MySQL 或 PostgreSQL 的协议和 SQL 语法访问 Lealone 数据库
 

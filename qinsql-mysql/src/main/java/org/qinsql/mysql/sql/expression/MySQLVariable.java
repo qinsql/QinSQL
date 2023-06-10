@@ -29,6 +29,7 @@ public class MySQLVariable extends Variable {
         case "auto_increment_increment":
             return ValueInt.get(1);
         case "tx_isolation":
+        case "transaction_isolation":
             return ValueString.get(getTransactionIsolationLevel(session));
         case "time_zone":
         case "system_time_zone":

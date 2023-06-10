@@ -34,7 +34,7 @@ public class MySQLVariable extends Variable {
         case "time_zone":
         case "system_time_zone":
             return ValueString.get(TimeZone.getDefault().getID());
-        };
+        }
         return super.getValue(session);
     }
 
@@ -45,7 +45,7 @@ public class MySQLVariable extends Variable {
         case Connection.TRANSACTION_REPEATABLE_READ:
             return "REPEATABLE-READ";
         case Connection.TRANSACTION_SERIALIZABLE:
-            return "ERIALIZABLE";
+            return "SERIALIZABLE";
         case Connection.TRANSACTION_READ_UNCOMMITTED:
             return "READ-UNCOMMITTED";
         default:

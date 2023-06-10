@@ -83,24 +83,6 @@ public abstract class BenchTest {
         return DriverManager.getConnection(url);
     }
 
-    public static Connection getMySqlConnection() throws Exception {
-        String url = "jdbc:mysql://localhost:3306/test";
-
-        Properties info = new Properties();
-        info.put("user", "root");
-        info.put("password", "zhh");
-        // info.put("holdResultsOpenOverStatementClose","true");
-        // info.put("allowMultiQueries","true");
-
-        // info.put("useServerPrepStmts", "true");
-        // info.put("cachePrepStmts", "true");
-        info.put("rewriteBatchedStatements", "true");
-        info.put("useCompression", "true");
-        info.put("serverTimezone", "GMT");
-
-        return DriverManager.getConnection(url, info);
-    }
-
     protected static final int DEFAULT_ROW_COUNT = 1 * 10000;
     protected int loopCount = 30; // 重复测试次数
     protected int rowCount = DEFAULT_ROW_COUNT; // 总记录数

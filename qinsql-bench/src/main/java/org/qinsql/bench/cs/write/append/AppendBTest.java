@@ -14,8 +14,9 @@ public abstract class AppendBTest extends ClientServerWriteBTest {
 
     public AppendBTest() {
         outerLoop = 15;
-        threadCount = 8;
-        sqlCountPerInnerLoop = 50;
+        threadCount = 48;
+        sqlCountPerInnerLoop = 20;
+        innerLoop = 10;
         rowCount = innerLoop * sqlCountPerInnerLoop * threadCount;
         sqls = new String[rowCount];
     }

@@ -8,16 +8,19 @@ package org.qinsql.bench.cs.query.agg;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Random;
 
 import org.qinsql.bench.cs.query.ClientServerQueryBTest;
 
 public abstract class AggBTest extends ClientServerQueryBTest {
 
+    protected Random random = new Random();
+
     public AggBTest() {
-        threadCount = 8;
+        threadCount = 1;
         outerLoop = 15;
         innerLoop = 5;
-        sqlCountPerInnerLoop = 5;
+        sqlCountPerInnerLoop = 50;
         rowCount = 10000;
         // printInnerLoopResult = true;
     }
@@ -36,7 +39,7 @@ public abstract class AggBTest extends ClientServerQueryBTest {
         for (int row = 1; row <= rowCount; row++) {
             ps.setInt(1, row);
             ps.addBatch();
-            if (row % 100 == 0 || row == rowCount) {
+            if (row % 500 == 0 || row == rowCount) {
                 ps.executeBatch();
                 ps.clearBatch();
             }

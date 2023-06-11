@@ -2,7 +2,7 @@
 # Licensed under the Server Side Public License, v 1.
 # Initial Developer: zhh
 
-base_dir: ./target/data
+base_dir: ./target/bench-test-data/lealone
 
 listen_address: 127.0.0.1
 
@@ -28,18 +28,6 @@ sql_engines:
         # key1: v1,
         # key2: v2,
     }
-  - name: MySQL
-    enabled: false
-    parameters: {
-        # key1: v1,
-        # key2: v2,
-    }
-  - name: PostgreSQL
-    enabled: true
-    parameters: {
-        # key1: v1,
-        # key2: v2,
-    }
 
 protocol_server_engines:
   - name: TCP
@@ -47,24 +35,6 @@ protocol_server_engines:
     parameters: {
         port: 9210,
         name: LealoneServer,
-        trace: false,
-        allow_others: true,
-        daemon: false,
-        ssl: false
-    }
-  - name: MySQL
-    enabled: false
-    parameters: {
-        port: 9310,
-        trace: false,
-        allow_others: true,
-        daemon: false,
-        ssl: false
-    }
-  - name: PostgreSQL
-    enabled: true
-    parameters: {
-        port: 9510,
         trace: false,
         allow_others: true,
         daemon: false,

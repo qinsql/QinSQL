@@ -936,9 +936,10 @@ public class MySQLParser implements SQLParser {
 
         ArrayList<Value> paramValues = Utils.newSmallArrayList();
         StringBuilder buff = new StringBuilder("SELECT ");
-        if (readIf("DATABASES")) {
-            buff.append("DATABASE_NAME FROM INFORMATION_SCHEMA.DATABASES");
-        } else if (readIf("SCHEMAS")) {
+        // if (readIf("DATABASES")) {
+        // buff.append("DATABASE_NAME FROM INFORMATION_SCHEMA.DATABASES");
+        // } else
+        if (readIf("SCHEMAS") || readIf("DATABASES")) {
             buff.append("SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMAS");
         } else if (readIf("ENGINES")) {
             buff.append("'InnoDB' AS Engine, 'DEFAULT' AS Support, "
@@ -966,7 +967,7 @@ public class MySQLParser implements SQLParser {
         } else if (readIf("PRIVILEGES")) {
             buff.append("NULL AS Privilege, NULL AS Context, NULL AS Comment FROM DUAL WHERE 1=2");
         } else if (readIf("TABLES")) {
-            String schema = Constants.SCHEMA_MAIN;
+            String schema = session.getCurrentSchemaName();
             if (readIf("FROM") || readIf("IN")) {
                 schema = readUniqueIdentifier();
             }
@@ -1331,7 +1332,7 @@ public class MySQLParser implements SQLParser {
             ifExists = readIfExists(ifExists);
             command.setIfExists(ifExists);
             return command;
-        } else if (readIf("SCHEMA")) {
+        } else if (readIf("SCHEMA") || readIf("DATABASE")) {
             boolean ifExists = readIfExists(false);
             DropSchema command = new DropSchema(session);
             command.setSchemaName(readUniqueIdentifier());
@@ -4037,7 +4038,7 @@ public class MySQLParser implements SQLParser {
             return parseCreateTrigger(force);
         } else if (readIf("ROLE")) {
             return parseCreateRole();
-        } else if (readIf("SCHEMA")) {
+        } else if (readIf("SCHEMA") || readIf("DATABASE")) {
             return parseCreateSchema();
         } else if (readIf("CONSTANT")) {
             return parseCreateConstant();
@@ -4751,7 +4752,7 @@ public class MySQLParser implements SQLParser {
             return parseAlterUser();
         } else if (readIf("INDEX")) {
             return parseAlterIndex();
-        } else if (readIf("SCHEMA")) {
+        } else if (readIf("SCHEMA") || readIf("DATABASE")) {
             return parseAlterSchema();
         } else if (readIf("SEQUENCE")) {
             return parseAlterSequence();

@@ -927,7 +927,7 @@ public class PgSQLParser implements SQLParser {
             buff.append("'UTF8' AS SERVER_ENCODING FROM DUAL");
         } else if (readIf("TABLES")) {
             // for MySQL compatibility
-            String schema = Constants.SCHEMA_MAIN;
+            String schema = session.getCurrentSchemaName();
             if (readIf("FROM")) {
                 schema = readUniqueIdentifier();
             }

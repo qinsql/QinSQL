@@ -3,9 +3,9 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.cs.async.vertx.pg;
+package org.qinsql.bench.cs.vertx.pg;
 
-import org.qinsql.bench.cs.async.vertx.VertxBTest;
+import org.qinsql.bench.cs.vertx.VertxBTest;
 
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;

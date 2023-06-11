@@ -9,16 +9,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-import org.qinsql.bench.cs.ClientServerBTest;
+import org.qinsql.bench.BenchTest;
 
-public abstract class SqlBenchTest extends ClientServerBTest {
+public abstract class SqlBenchTest extends BenchTest {
+
+    protected abstract Connection getConnection() throws Exception;
 
     @Override
     protected void init() throws Exception {
         Connection conn = getConnection();
         Statement stmt = conn.createStatement();
         stmt.executeUpdate("drop table IF EXISTS SqlBenchTest");
-        stmt.executeUpdate("create table IF NOT EXISTS SqlBenchTest(f1 int primary key , f2 varchar(20))");
+        stmt.executeUpdate(
+                "create table IF NOT EXISTS SqlBenchTest(f1 int primary key , f2 varchar(20))");
         // stmt.executeUpdate("create index index0 on SqlBenchTest(f2)");
         long t1 = System.currentTimeMillis();
         for (int i = 0; i < rowCount; i++) {

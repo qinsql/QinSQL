@@ -3,18 +3,18 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.cs.jdbc.connection;
+package org.qinsql.bench.cs.jdbc;
 
 import java.sql.Connection;
 
-public class LealoneConnectionBTest extends ConnectionBTest {
+public class H2ConnectionBTest extends ConnectionBTest {
 
     public static void main(String[] args) throws Exception {
-        new LealoneConnectionBTest().run();
+        new H2ConnectionBTest().run();
     }
 
     @Override
     protected Connection getConnection() throws Exception {
-        return getLealoneSharedConnection(10);
+        return getH2Connection();
     }
 }

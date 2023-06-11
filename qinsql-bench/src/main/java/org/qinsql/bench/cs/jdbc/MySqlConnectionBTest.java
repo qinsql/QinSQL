@@ -3,7 +3,7 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.cs.jdbc.connection;
+package org.qinsql.bench.cs.jdbc;
 
 import java.sql.Connection;
 

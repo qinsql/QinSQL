@@ -3,18 +3,18 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.cs.jdbc.connection;
+package org.qinsql.bench.cs.jdbc;
 
 import java.sql.Connection;
 
-public class H2ConnectionBTest extends ConnectionBTest {
+public class PgSqlConnectionBTest extends ConnectionBTest {
 
     public static void main(String[] args) throws Exception {
-        new H2ConnectionBTest().run();
+        new PgSqlConnectionBTest().run();
     }
 
     @Override
     protected Connection getConnection() throws Exception {
-        return getH2Connection();
+        return org.qinsql.bench.cs.ClientServerBTest.getPgConnection();
     }
 }

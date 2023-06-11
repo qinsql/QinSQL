@@ -18,7 +18,7 @@ import org.lealone.storage.page.PageOperationHandlerFactory;
 import org.lealone.test.aote.TransactionEngineTest;
 import org.lealone.transaction.TransactionEngine;
 
-public class LealoneEmbeddedSqlBTest extends SqlBenchTest {
+public class LealoneEmbeddedSqlBTest extends EmbeddedSqlBenchTest {
 
     public static void main(String[] args) throws Exception {
         new LealoneEmbeddedSqlBTest().run();

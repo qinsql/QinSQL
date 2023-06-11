@@ -9,7 +9,7 @@ import java.sql.Connection;
 
 import org.qinsql.bench.start.H2BenchTestServer;
 
-public class H2EmbeddedSqlBTest extends SqlBenchTest {
+public class H2EmbeddedSqlBTest extends EmbeddedSqlBenchTest {
 
     public static void main(String[] args) throws Exception {
         H2BenchTestServer.setH2Properties();

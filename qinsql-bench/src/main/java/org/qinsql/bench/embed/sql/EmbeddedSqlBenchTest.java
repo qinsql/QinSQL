@@ -9,9 +9,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 
-import org.qinsql.bench.BenchTest;
+import org.qinsql.bench.embed.EmbeddedBTest;
 
-public abstract class SqlBenchTest extends BenchTest {
+public abstract class EmbeddedSqlBenchTest extends EmbeddedBTest {
 
     protected abstract Connection getConnection() throws Exception;
 

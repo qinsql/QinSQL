@@ -91,9 +91,7 @@ public class MySQLServerConnection extends AsyncConnection {
     public void authenticate(AuthPacket authPacket) {
         this.authPacket = authPacket;
         try {
-            String dbName = authPacket.database != null ? authPacket.database
-                    : MySQLServer.DATABASE_NAME;
-            session = createSession(authPacket, dbName);
+            session = createSession(authPacket, authPacket.database);
             String sql = "CREATE ALIAS IF NOT EXISTS CONNECTION_ID DETERMINISTIC FOR "
                     + "\"org.qinsql.mysql.sql.expression.MySQLFunction.getConnectionId\"";
             session.prepareStatement(sql).executeUpdate();
@@ -110,17 +108,26 @@ public class MySQLServerConnection extends AsyncConnection {
     }
 
     private ServerSession createSession(AuthPacket authPacket, String dbName) {
-        Properties info = new Properties();
-        info.put("MODE", "MySQL");
-        info.put("USER", authPacket.user);
-        info.put("PASSWORD", StringUtils.convertBytesToHex(getPassword(authPacket)));
-        info.put("PASSWORD_HASH", "true");
-        String url = Constants.URL_PREFIX + Constants.URL_TCP + server.getHost() + ":" + server.getPort()
-                + "/" + dbName;
-        ConnectionInfo ci = new ConnectionInfo(url, info);
-        ci.setSalt(seed);
-        ci.setRemote(false);
-        return (ServerSession) ci.createSession();
+        if (session == null) {
+            Properties info = new Properties();
+            info.put("MODE", "MySQL");
+            info.put("USER", authPacket.user);
+            info.put("PASSWORD", StringUtils.convertBytesToHex(getPassword(authPacket)));
+            info.put("PASSWORD_HASH", "true");
+            String url = Constants.URL_PREFIX + Constants.URL_TCP + server.getHost() + ":"
+                    + server.getPort() + "/" + MySQLServer.DATABASE_NAME;
+            ConnectionInfo ci = new ConnectionInfo(url, info);
+            ci.setSalt(seed);
+            ci.setRemote(false);
+            session = (ServerSession) ci.createSession();
+            session.prepareStatement("create schema if not exists " + MySQLServer.DATABASE_NAME)
+                    .executeUpdate();
+            session.prepareStatement("create schema if not exists sys").executeUpdate();
+        }
+        if (dbName == null)
+            dbName = Constants.SCHEMA_MAIN;
+        session.prepareStatement("use " + dbName).executeUpdate();
+        return session;
     }
 
     private static byte[] getPassword(AuthPacket authPacket) {

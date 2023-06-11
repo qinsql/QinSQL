@@ -3,7 +3,7 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.cs.vertx;
+package org.qinsql.bench.misc.vertx;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

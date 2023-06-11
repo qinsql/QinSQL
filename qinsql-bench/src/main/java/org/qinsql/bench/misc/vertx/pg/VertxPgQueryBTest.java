@@ -3,7 +3,7 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.cs.vertx.pg;
+package org.qinsql.bench.misc.vertx.pg;
 
 public class VertxPgQueryBTest extends VertxPgBTest {
 

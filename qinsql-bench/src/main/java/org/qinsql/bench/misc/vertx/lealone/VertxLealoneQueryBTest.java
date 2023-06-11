@@ -3,7 +3,7 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.cs.vertx.lealone;
+package org.qinsql.bench.misc.vertx.lealone;
 
 public class VertxLealoneQueryBTest extends VertxLealoneBTest {
 

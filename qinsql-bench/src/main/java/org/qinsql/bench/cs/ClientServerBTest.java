@@ -25,6 +25,7 @@ public abstract class ClientServerBTest extends BenchTest {
     protected int sqlCountPerInnerLoop = 500;
     protected boolean printInnerLoopResult;
     protected boolean async;
+    protected boolean autoCommit = true;
     protected String[] sqls;
 
     public void start() {

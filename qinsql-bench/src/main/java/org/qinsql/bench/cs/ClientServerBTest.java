@@ -36,8 +36,6 @@ public abstract class ClientServerBTest extends BenchTest {
         } else if (name.startsWith("Lealone")) {
             dbType = DbType.LEALONE;
             async = false;
-        } else if (name.startsWith("PgLealone")) {
-            dbType = DbType.LEALONE;
         } else if (name.startsWith("H2")) {
             dbType = DbType.H2;
         } else if (name.startsWith("MySQL")) {
@@ -47,16 +45,19 @@ public abstract class ClientServerBTest extends BenchTest {
         } else {
             throw new RuntimeException("Unsupported BTestName: " + name);
         }
-        run(dbType);
+        this.dbType = dbType;
+        try {
+            run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @Override
     public void run() throws Exception {
         init();
         run(threadCount);
     }
 
-    @Override
     protected void run(int threadCount) throws Exception {
         Connection[] conns = new Connection[threadCount];
         for (int i = 0; i < threadCount; i++) {
@@ -84,15 +85,6 @@ public abstract class ClientServerBTest extends BenchTest {
     }
 
     protected void run(int threadCount, Connection[] conns, boolean warmUp) throws Exception {
-    }
-
-    public void run(DbType dbType) {
-        this.dbType = dbType;
-        try {
-            run();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     protected Connection getConnection() throws Exception {
@@ -183,15 +175,6 @@ public abstract class ClientServerBTest extends BenchTest {
         return getConnection(url, "root", "");
     }
 
-    public static Connection getLealonePgConnection() throws Exception {
-        return getPgConnection(PG_PORT);
-    }
-
-    public static Connection getPgConnection(int port) throws Exception {
-        String url = "jdbc:postgresql://localhost:" + port + "/test";
-        return getConnection(url, "test", "test");
-    }
-
     public static void disableLealoneQueryCache(Connection conn) {
         try {
             Statement statement = conn.createStatement();
@@ -200,5 +183,12 @@ public abstract class ClientServerBTest extends BenchTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static Connection getConnection(String url, String user, String password) throws Exception {
+        Properties info = new Properties();
+        info.put("user", user);
+        info.put("password", password);
+        return DriverManager.getConnection(url, info);
     }
 }

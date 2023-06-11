@@ -9,8 +9,8 @@ import java.sql.Connection;
 
 public class LealoneConnectionBTest extends ConnectionBTest {
 
-    public static void main(String[] args) throws Exception {
-        new LealoneConnectionBTest().run();
+    public static void main(String[] args) {
+        new LealoneConnectionBTest().start();
     }
 
     @Override

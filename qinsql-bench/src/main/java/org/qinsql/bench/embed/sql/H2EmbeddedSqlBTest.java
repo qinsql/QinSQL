@@ -18,6 +18,6 @@ public class H2EmbeddedSqlBTest extends EmbeddedSqlBenchTest {
 
     @Override
     protected Connection getConnection() throws Exception {
-        return getH2Connection(true);
+        return getEmbeddedH2Connection();
     }
 }

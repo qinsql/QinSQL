@@ -5,9 +5,9 @@
  */
 package org.qinsql.bench.cs.jdbc;
 
-public class H2ConnectionBTest extends ConnectionBTest {
+public class PgConnectionBTest extends ConnectionBTest {
 
     public static void main(String[] args) {
-        new H2ConnectionBTest().start();
+        new PgConnectionBTest().start();
     }
 }

@@ -71,7 +71,7 @@ public class LealoneEmbeddedSqlBTest extends EmbeddedSqlBenchTest {
 
     @Override
     protected Connection getConnection() throws Exception {
-        return getLealoneConnection(true);
+        return getEmbeddedLealoneConnection();
     }
 
     @Override

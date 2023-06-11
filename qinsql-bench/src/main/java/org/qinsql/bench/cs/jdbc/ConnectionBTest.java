@@ -15,10 +15,14 @@ public abstract class ConnectionBTest extends ClientServerBTest {
     private final int connectionCount = 100;
 
     @Override
-    protected abstract Connection getConnection() throws Exception;
+    public void run() throws Exception {
+        outerLoop = 5;
+        for (int i = 0; i < outerLoop; i++) {
+            createConnection(i);
+        }
+    }
 
-    @Override
-    public void run(int loop) throws Exception {
+    private void createConnection(int loop) throws Exception {
         Connection[] connections = new Connection[connectionCount];
 
         long t1 = System.currentTimeMillis();

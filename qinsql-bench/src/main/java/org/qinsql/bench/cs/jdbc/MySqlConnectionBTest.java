@@ -5,16 +5,9 @@
  */
 package org.qinsql.bench.cs.jdbc;
 
-import java.sql.Connection;
+public class MySQLConnectionBTest extends ConnectionBTest {
 
-public class MySqlConnectionBTest extends ConnectionBTest {
-
-    public static void main(String[] args) throws Exception {
-        new MySqlConnectionBTest().run();
-    }
-
-    @Override
-    protected Connection getConnection() throws Exception {
-        return org.qinsql.bench.cs.ClientServerBTest.getMySQLConnection();
+    public static void main(String[] args) {
+        new MySQLConnectionBTest().start();
     }
 }

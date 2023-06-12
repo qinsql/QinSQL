@@ -41,6 +41,7 @@ create table pg_catalog.pg_type(
     typname varchar_ignorecase,
     typnamespace int,
     typlen int,
+    typrelid int,
     typtype varchar,
     typbasetype int,
     typtypmod int);
@@ -52,6 +53,7 @@ select
     cast(type_name as varchar_ignorecase) typname,
     (select oid from pg_catalog.pg_namespace where nspname = 'pg_catalog') typnamespace,
     -1 typlen,
+    0 typrelid,
     'c' typtype,
     0 typbasetype,
     -1 typtypmod
@@ -64,6 +66,7 @@ merge into pg_catalog.pg_type values(
     'name',
     (select oid from pg_catalog.pg_namespace where nspname = 'pg_catalog'),
     -1,
+    0,
     'c',
     0,
     -1
@@ -73,6 +76,7 @@ merge into pg_catalog.pg_type values(
     'null',
     (select oid from pg_catalog.pg_namespace where nspname = 'pg_catalog'),
     -1,
+    0,
     'c',
     0,
     -1
@@ -82,6 +86,7 @@ merge into pg_catalog.pg_type values(
     'int2vector',
     (select oid from pg_catalog.pg_namespace where nspname = 'pg_catalog'),
     -1,
+    0,
     'c',
     0,
     -1
@@ -210,6 +215,9 @@ create alias current_schema for "org.qinsql.postgresql.sql.PgAlias.getCurrentSch
 
 drop alias if exists pg_encoding_to_char;
 create alias pg_encoding_to_char for "org.qinsql.postgresql.sql.PgAlias.getEncodingName";
+
+drop alias if exists format_type;
+create alias format_type for "org.qinsql.postgresql.sql.PgAlias.formatType";
 
 drop alias if exists pg_postmaster_start_time;
 create alias pg_postmaster_start_time for "org.qinsql.postgresql.sql.PgAlias.getStartTime";

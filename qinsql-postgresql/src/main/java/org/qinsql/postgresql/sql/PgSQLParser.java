@@ -226,6 +226,7 @@ public class PgSQLParser implements SQLParser {
     public PgSQLParser(ServerSession session) {
         this.database = session.getDatabase();
         this.session = session;
+        this.session.setSchemaSearchPath(new String[] {"pg_catalog"});
         this.identifiersToUpper = database.getSettings().databaseToUpper;
     }
 
@@ -2587,6 +2588,8 @@ public class PgSQLParser implements SQLParser {
                 } else if (readIf("(")) {
                     r = readFunction(null, name);
                 } else if (equalsToken("CURRENT_USER", name)) {
+                    r = readFunctionWithoutParameters("USER");
+                } else if (equalsToken("SESSION_USER", name)) {
                     r = readFunctionWithoutParameters("USER");
                 } else if (equalsToken("CURRENT", name)) {
                     if (readIf("TIMESTAMP")) {

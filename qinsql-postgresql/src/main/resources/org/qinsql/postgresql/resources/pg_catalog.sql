@@ -216,7 +216,7 @@ create alias current_schema for "org.qinsql.postgresql.sql.PgAlias.getCurrentSch
 drop alias if exists pg_encoding_to_char;
 create alias pg_encoding_to_char for "org.qinsql.postgresql.sql.PgAlias.getEncodingName";
 
-drop alias if exists pg_format_type;
+drop alias if exists format_type;
 create alias format_type for "org.qinsql.postgresql.sql.PgAlias.formatType";
 
 drop alias if exists pg_postmaster_start_time;

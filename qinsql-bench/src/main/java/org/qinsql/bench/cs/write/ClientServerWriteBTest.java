@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lealone.client.jdbc.JdbcPreparedStatement;
 import org.lealone.client.jdbc.JdbcStatement;
@@ -73,14 +74,15 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
         public void run() {
             try {
                 startTime = System.nanoTime();
-                if (async)
+                if (async) {
                     executeUpdateAsync(stmt);
-                else
+                } else {
                     executeUpdate(stmt);
+                    endTime = System.nanoTime();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                endTime = System.nanoTime();
                 close(stmt);
                 if (closeConn)
                     close(conn);
@@ -96,17 +98,21 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
             if (!autoCommit)
                 conn.setAutoCommit(false);
             JdbcStatement stmt = (JdbcStatement) statement;
+            AtomicInteger counter = new AtomicInteger(sqlCountPerInnerLoop * innerLoop);
+            CountDownLatch latch = new CountDownLatch(1);
             for (int j = 0; j < innerLoop; j++) {
-                CountDownLatch latch = new CountDownLatch(sqlCountPerInnerLoop);
                 for (int i = 0; i < sqlCountPerInnerLoop; i++) {
                     stmt.executeUpdateAsync(nextSql()).onComplete(ar -> {
-                        latch.countDown();
+                        if (counter.decrementAndGet() == 0) {
+                            endTime = System.nanoTime();
+                            latch.countDown();
+                        }
                     });
                 }
-                latch.await();
-                if (!autoCommit)
-                    conn.commit();
             }
+            if (!autoCommit)
+                conn.commit();
+            latch.await();
             printInnerLoopResult(t1);
         }
 
@@ -118,9 +124,9 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
                 for (int i = 0; i < sqlCountPerInnerLoop; i++) {
                     statement.executeUpdate(nextSql());
                 }
-                if (!autoCommit)
-                    conn.commit();
             }
+            if (!autoCommit)
+                conn.commit();
             printInnerLoopResult(t1);
         }
 
@@ -129,18 +135,22 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
             if (!autoCommit)
                 conn.setAutoCommit(false);
             JdbcPreparedStatement ps2 = (JdbcPreparedStatement) ps;
+            AtomicInteger counter = new AtomicInteger(sqlCountPerInnerLoop * innerLoop);
+            CountDownLatch latch = new CountDownLatch(1);
             for (int j = 0; j < innerLoop; j++) {
-                CountDownLatch latch = new CountDownLatch(sqlCountPerInnerLoop);
                 for (int i = 0; i < sqlCountPerInnerLoop; i++) {
                     prepare();
                     ps2.executeUpdateAsync().onComplete(ar -> {
-                        latch.countDown();
+                        if (counter.decrementAndGet() == 0) {
+                            endTime = System.nanoTime();
+                            latch.countDown();
+                        }
                     });
                 }
-                latch.await();
-                if (!autoCommit)
-                    conn.commit();
             }
+            latch.await();
+            if (!autoCommit)
+                conn.commit();
             printInnerLoopResult(t1);
         }
 
@@ -153,9 +163,9 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
                     prepare();
                     ps.executeUpdate();
                 }
-                if (!autoCommit)
-                    conn.commit();
             }
+            if (!autoCommit)
+                conn.commit();
             printInnerLoopResult(t1);
         }
 

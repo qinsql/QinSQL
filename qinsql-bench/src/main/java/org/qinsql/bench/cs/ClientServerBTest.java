@@ -25,6 +25,8 @@ public abstract class ClientServerBTest extends BenchTest {
     protected int sqlCountPerInnerLoop = 500;
     protected boolean printInnerLoopResult;
     protected boolean async;
+    protected boolean autoCommit = true;
+    protected boolean batch;
     protected String[] sqls;
 
     public void start() {
@@ -136,7 +138,7 @@ public abstract class ClientServerBTest extends BenchTest {
 
         // info.put("useServerPrepStmts", "true");
         // info.put("cachePrepStmts", "true");
-        // info.put("rewriteBatchedStatements", "true");
+        info.put("rewriteBatchedStatements", "true");
         // info.put("useCompression", "true");
         info.put("serverTimezone", "GMT");
 

@@ -6,11 +6,14 @@
 package org.qinsql.bench.cs.write;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.lealone.client.jdbc.JdbcPreparedStatement;
 import org.lealone.client.jdbc.JdbcStatement;
 import org.qinsql.bench.cs.ClientServerBTest;
 
@@ -43,6 +46,7 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
 
         protected Connection conn;
         protected Statement stmt;
+        protected PreparedStatement ps;
         protected boolean closeConn = true;
         protected long startTime;
         protected long endTime;
@@ -63,18 +67,27 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
 
         protected abstract String nextSql();
 
+        protected void prepare() {
+        }
+
         @Override
         public void run() {
             try {
                 startTime = System.nanoTime();
-                if (async)
-                    executeUpdateAsync(stmt);
-                else
-                    executeUpdate(stmt);
+                if (batch) {
+                    executeBatchUpdate();
+                    endTime = System.nanoTime();
+                } else {
+                    if (async) {
+                        executeUpdateAsync(stmt);
+                    } else {
+                        executeUpdate(stmt);
+                        endTime = System.nanoTime();
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                endTime = System.nanoTime();
                 close(stmt);
                 if (closeConn)
                     close(conn);
@@ -87,24 +100,87 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
 
         protected void executeUpdateAsync(Statement statement) throws Exception {
             long t1 = System.nanoTime();
+            if (!autoCommit)
+                conn.setAutoCommit(false);
             JdbcStatement stmt = (JdbcStatement) statement;
+            AtomicInteger counter = new AtomicInteger(sqlCountPerInnerLoop * innerLoop);
+            CountDownLatch latch = new CountDownLatch(1);
             for (int j = 0; j < innerLoop; j++) {
-                CountDownLatch latch = new CountDownLatch(sqlCountPerInnerLoop);
                 for (int i = 0; i < sqlCountPerInnerLoop; i++) {
                     stmt.executeUpdateAsync(nextSql()).onComplete(ar -> {
-                        latch.countDown();
+                        if (counter.decrementAndGet() == 0) {
+                            endTime = System.nanoTime();
+                            latch.countDown();
+                        }
                     });
                 }
-                latch.await();
             }
+            if (!autoCommit)
+                conn.commit();
+            latch.await();
             printInnerLoopResult(t1);
         }
 
         protected void executeUpdate(Statement statement) throws Exception {
             long t1 = System.nanoTime();
+            if (!autoCommit)
+                conn.setAutoCommit(false);
             for (int j = 0; j < innerLoop; j++) {
-                for (int i = 0; i < sqlCountPerInnerLoop; i++)
+                for (int i = 0; i < sqlCountPerInnerLoop; i++) {
                     statement.executeUpdate(nextSql());
+                }
+            }
+            if (!autoCommit)
+                conn.commit();
+            printInnerLoopResult(t1);
+        }
+
+        protected void executePreparedUpdateAsync() throws Exception {
+            long t1 = System.nanoTime();
+            if (!autoCommit)
+                conn.setAutoCommit(false);
+            JdbcPreparedStatement ps2 = (JdbcPreparedStatement) ps;
+            AtomicInteger counter = new AtomicInteger(sqlCountPerInnerLoop * innerLoop);
+            CountDownLatch latch = new CountDownLatch(1);
+            for (int j = 0; j < innerLoop; j++) {
+                for (int i = 0; i < sqlCountPerInnerLoop; i++) {
+                    prepare();
+                    ps2.executeUpdateAsync().onComplete(ar -> {
+                        if (counter.decrementAndGet() == 0) {
+                            endTime = System.nanoTime();
+                            latch.countDown();
+                        }
+                    });
+                }
+            }
+            latch.await();
+            if (!autoCommit)
+                conn.commit();
+            printInnerLoopResult(t1);
+        }
+
+        protected void executePreparedUpdate() throws Exception {
+            long t1 = System.nanoTime();
+            if (!autoCommit)
+                conn.setAutoCommit(false);
+            for (int j = 0; j < innerLoop; j++) {
+                for (int i = 0; i < sqlCountPerInnerLoop; i++) {
+                    prepare();
+                    ps.executeUpdate();
+                }
+            }
+            if (!autoCommit)
+                conn.commit();
+            printInnerLoopResult(t1);
+        }
+
+        protected void executeBatchUpdate() throws Exception {
+            long t1 = System.nanoTime();
+            for (int j = 0; j < innerLoop; j++) {
+                for (int i = 0; i < sqlCountPerInnerLoop; i++) {
+                    stmt.addBatch(nextSql());
+                }
+                stmt.executeBatch();
             }
             printInnerLoopResult(t1);
         }

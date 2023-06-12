@@ -75,13 +75,22 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
             try {
                 startTime = System.nanoTime();
                 if (batch) {
-                    executeBatchUpdate();
+                    if (prepare)
+                        executePreparedBatchUpdate();
+                    else
+                        executeBatchUpdate();
                     endTime = System.nanoTime();
                 } else {
                     if (async) {
-                        executeUpdateAsync(stmt);
+                        if (prepare)
+                            executePreparedUpdateAsync();
+                        else
+                            executeUpdateAsync(stmt);
                     } else {
-                        executeUpdate(stmt);
+                        if (prepare)
+                            executePreparedUpdate();
+                        else
+                            executeUpdate(stmt);
                         endTime = System.nanoTime();
                     }
                 }
@@ -171,6 +180,18 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
             }
             if (!autoCommit)
                 conn.commit();
+            printInnerLoopResult(t1);
+        }
+
+        protected void executePreparedBatchUpdate() throws Exception {
+            long t1 = System.nanoTime();
+            for (int j = 0; j < innerLoop; j++) {
+                for (int i = 0; i < sqlCountPerInnerLoop; i++) {
+                    prepare();
+                    ps.addBatch();
+                }
+                ps.executeBatch();
+            }
             printInnerLoopResult(t1);
         }
 

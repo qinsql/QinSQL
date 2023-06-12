@@ -6,6 +6,7 @@
 package org.qinsql.bench.cs.write.batchInsert;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,8 +20,8 @@ public abstract class BatchInsertBTest extends ClientServerWriteBTest {
         batch = true;
         outerLoop = 30;
         threadCount = 16;
-        sqlCountPerInnerLoop = 100;
-        innerLoop = 10;
+        sqlCountPerInnerLoop = 50;
+        innerLoop = 30;
         // printInnerLoopResult = true;
     }
 
@@ -43,11 +44,25 @@ public abstract class BatchInsertBTest extends ClientServerWriteBTest {
 
         UpdateThread(int id, Connection conn) {
             super(id, conn);
+            try {
+                ps = conn.prepareStatement("insert into BatchInsertBTest values(?,1)");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         protected String nextSql() {
             return "insert into BatchInsertBTest values(" + id.incrementAndGet() + ",1)";
+        }
+
+        @Override
+        protected void prepare() {
+            try {
+                ps.setInt(1, id.incrementAndGet());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

@@ -6,6 +6,7 @@
 package org.qinsql.bench.cs.write.insert;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,11 +45,25 @@ public abstract class InsertBTest extends ClientServerWriteBTest {
 
         UpdateThread(int id, Connection conn) {
             super(id, conn);
+            try {
+                ps = conn.prepareStatement("insert into InsertBTest values(?,1)");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         protected String nextSql() {
             return "insert into InsertBTest values(" + id.incrementAndGet() + ",1)";
+        }
+
+        @Override
+        protected void prepare() {
+            try {
+                ps.setInt(1, id.incrementAndGet());
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

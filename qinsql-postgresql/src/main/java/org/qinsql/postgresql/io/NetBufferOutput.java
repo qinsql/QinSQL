@@ -16,7 +16,8 @@ public class NetBufferOutput implements AutoCloseable {
     protected final DataBufferFactory dataBufferFactory;
     protected NetBuffer buffer;
 
-    public NetBufferOutput(WritableChannel writableChannel, int initialSizeHint, DataBufferFactory dataBufferFactory) {
+    public NetBufferOutput(WritableChannel writableChannel, int initialSizeHint,
+            DataBufferFactory dataBufferFactory) {
         this.writableChannel = writableChannel;
         this.initialSizeHint = initialSizeHint;
         this.dataBufferFactory = dataBufferFactory;

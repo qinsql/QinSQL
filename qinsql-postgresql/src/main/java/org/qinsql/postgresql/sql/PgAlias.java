@@ -126,48 +126,42 @@ public class PgAlias {
         return "PostgreSQL 8.1.4  server protocol using Lealone " + Constants.getFullVersion();
     }
 
-    /**
-     * Get the version. This method must return PostgreSQL to keep some clients
-     * happy. This method is called by the database.
-     *
-     * @return the server name and version
-     */
     public static String formatType(final int type, final int typmod) {
         switch (type) {
-            case Types.BOOLEAN:
-                return "PG_TYPE_BOOL";
-            case Types.VARCHAR:
-                return "PG_TYPE_VARCHAR";
-            case Types.CLOB:
-                return "PG_TYPE_TEXT";
-            case Types.CHAR:
-                return "PG_TYPE_BPCHAR";
-            case Types.SMALLINT:
-                return "PG_TYPE_INT2";
-            case Types.INTEGER:
-                return "PG_TYPE_INT4";
-            case Types.BIGINT:
-                return "PG_TYPE_INT8";
-            case Types.DECIMAL:
-                return "PG_TYPE_NUMERIC";
-            case Types.REAL:
-                return "PG_TYPE_FLOAT4";
-            case Types.DOUBLE:
-                return "PG_TYPE_FLOAT8";
-            case Types.TIME:
-                return "PG_TYPE_TIME";
-            case Types.DATE:
-                return "PG_TYPE_DATE";
-            case Types.TIMESTAMP:
-                return "PG_TYPE_TIMESTAMP_NO_TMZONE";
-            case Types.VARBINARY:
-                return "PG_TYPE_BYTEA";
-            case Types.BLOB:
-                return "PG_TYPE_OID";
-            case Types.ARRAY:
-                return "PG_TYPE_TEXTARRAY";
-            default:
-                return "PG_TYPE_UNKNOWN";
+        case Types.BOOLEAN:
+            return "PG_TYPE_BOOL";
+        case Types.VARCHAR:
+            return "PG_TYPE_VARCHAR";
+        case Types.CLOB:
+            return "PG_TYPE_TEXT";
+        case Types.CHAR:
+            return "PG_TYPE_BPCHAR";
+        case Types.SMALLINT:
+            return "PG_TYPE_INT2";
+        case Types.INTEGER:
+            return "PG_TYPE_INT4";
+        case Types.BIGINT:
+            return "PG_TYPE_INT8";
+        case Types.DECIMAL:
+            return "PG_TYPE_NUMERIC";
+        case Types.REAL:
+            return "PG_TYPE_FLOAT4";
+        case Types.DOUBLE:
+            return "PG_TYPE_FLOAT8";
+        case Types.TIME:
+            return "PG_TYPE_TIME";
+        case Types.DATE:
+            return "PG_TYPE_DATE";
+        case Types.TIMESTAMP:
+            return "PG_TYPE_TIMESTAMP_NO_TMZONE";
+        case Types.VARBINARY:
+            return "PG_TYPE_BYTEA";
+        case Types.BLOB:
+            return "PG_TYPE_OID";
+        case Types.ARRAY:
+            return "PG_TYPE_TEXTARRAY";
+        default:
+            return "PG_TYPE_UNKNOWN";
         }
     }
 

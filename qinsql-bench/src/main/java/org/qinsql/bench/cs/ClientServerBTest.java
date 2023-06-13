@@ -27,6 +27,7 @@ public abstract class ClientServerBTest extends BenchTest {
     protected boolean async;
     protected boolean autoCommit = true;
     protected boolean batch;
+    protected boolean prepare;
     protected String[] sqls;
 
     public void start() {

@@ -5,13 +5,14 @@
  */
 package org.qinsql.test.mysql;
 
+import org.junit.Test;
 import org.lealone.common.util.Utils;
 import org.qinsql.mysql.server.util.RandomUtil;
 import org.qinsql.mysql.server.util.SecurityUtil;
 
-public class PasswordTest {
-
-    public static void main(String[] args) {
+public class PasswordTest extends MySQLTestBase {
+    @Test
+    public void run() throws Exception {
         String password = "PasswordTest";
         byte[] seed = RandomUtil.randomBytes(20);
         byte[] hash1 = SecurityUtil.scramble411(password.getBytes(), seed);
@@ -19,7 +20,6 @@ public class PasswordTest {
         byte[] sha1Pass = SecurityUtil.sha1(password);
         byte[] hash2 = SecurityUtil.scramble411Sha1Pass(sha1Pass, seed);
 
-        System.out.println(Utils.compareSecure(hash1, hash2));
+        assertTrue(Utils.compareSecure(hash1, hash2));
     }
-
 }

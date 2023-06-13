@@ -5,42 +5,17 @@
  */
 package org.qinsql.test.postgresql;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Properties;
 
-import org.qinsql.postgresql.server.PgServer;
+import org.junit.Test;
 
-public class PgJdbcTest {
-
-    public static Connection getConnection() throws Exception {
-        String url = "jdbc:postgresql://localhost:" + PgServer.DEFAULT_PORT + "/postgres";
-        Properties info = new Properties();
-        info.put("user", "postgres");
-        info.put("password", "postgres");
-        return DriverManager.getConnection(url, info);
-    }
-
-    public static void sqlException(SQLException e) {
-        while (e != null) {
-            System.err.println("SQLException:" + e);
-            System.err.println("-----------------------------------");
-            System.err.println("Message  : " + e.getMessage());
-            System.err.println("SQLState : " + e.getSQLState());
-            System.err.println("ErrorCode: " + e.getErrorCode());
-            System.err.println();
-            System.err.println();
-            e = e.getNextException();
-        }
-    }
-
-    public static void main(String[] args) {
+public class PgJdbcTest extends PgTestBase {
+    @Test
+    public void run() throws Exception {
         try {
-            Connection conn = getConnection();
             Statement statement = conn.createStatement();
             statement.executeUpdate("drop table if exists pet");
             statement.executeUpdate("create table if not exists pet(name varchar(20), age int)");
@@ -63,7 +38,6 @@ public class PgJdbcTest {
 
             rs.close();
             ps.close();
-            conn.close();
         } catch (SQLException e) {
             sqlException(e);
             e.printStackTrace();

@@ -1,10 +1,9 @@
-package org.qinsql.bench.misc;
 /// *
 // * Copyright Lealone Database Group.
 // * Licensed under the Server Side Public License, v 1.
 // * Initial Developer: zhh
 // */
-// package org.lealone.plugins.bench;
+// package org.qinsql.bench.misc;
 //
 // import java.sql.Connection;
 // import java.sql.Statement;
@@ -12,10 +11,12 @@ package org.qinsql.bench.misc;
 // import java.util.concurrent.CountDownLatch;
 // import java.util.concurrent.Executors;
 // import java.util.concurrent.ThreadFactory;
+// import java.util.concurrent.atomic.AtomicLong;
 // import java.util.concurrent.locks.ReentrantLock;
 // import java.util.stream.IntStream;
 //
 // import org.lealone.client.jdbc.JdbcStatement;
+// import org.qinsql.bench.cs.ClientServerBTest;
 //
 //// javac --enable-preview -source 19 VirtualThreadBTest.java
 //// java --enable-preview -cp . VirtualThreadBTest
@@ -23,13 +24,21 @@ package org.qinsql.bench.misc;
 // public class VirtualThreadBTest {
 //
 // public static void main(String[] args) throws Exception {
-// Connection conn = org.lealone.plugins.bench.cs.ClientServerBTest.getH2Connection();
-// // Connection conn = org.lealone.plugins.bench.cs.ClientServerBTest.getLealoneConnection();
+// Connection conn = ClientServerBTest.getLealoneConnection();
+// // h2和mysql的jdbc client都是基于synchronized来实现的
+// // 所以调用insertVirtualThread反而比调用insertSync
+// // 虚拟线程遇到synchronized会阻塞系统线程
+// // Connection conn = ClientServerBTest.getH2Connection();
+// // Connection conn = ClientServerBTest.getMySQLConnection();
 // Statement stmt = conn.createStatement();
-// // init(stmt);
+// init(stmt);
 //
+// int rowCount = 5000;
 // for (int i = 0; i < 50; i++) {
-// insertVirtualThread(stmt, 500);
+// // insertSync(stmt, rowCount);
+// // insertAsync(stmt, rowCount);
+// insertVirtualThread(stmt, rowCount);
+// // insertVirtualThreadAsync(stmt, rowCount);
 // }
 //
 // // query(stmt);
@@ -41,10 +50,28 @@ package org.qinsql.bench.misc;
 // static void insertSync(Statement stmt, int rowCount) throws Exception {
 // long t1 = System.currentTimeMillis();
 // for (int i = 0; i < rowCount; i++) {
-// stmt.executeUpdate("INSERT INTO test VALUES('a', 1,10)");
+// stmt.executeUpdate("INSERT INTO test VALUES('a', 1, 10)");
 // }
 // long t2 = System.currentTimeMillis();
-// System.out.println("Sync: row count: " + rowCount + ", time: " + (t2 - t1) + "ms");
+// System.out.println("Sync: row count: " + rowCount + ", time: " + (t2 - t1) + " ms");
+// }
+//
+// static void insertAsync(Statement stmt, int rowCount) throws Exception {
+// JdbcStatement stmtAsync = (JdbcStatement) stmt;
+// CountDownLatch latch = new CountDownLatch(1);
+// long t1 = System.currentTimeMillis();
+// AtomicLong endTime = new AtomicLong();
+// AtomicLong count = new AtomicLong(rowCount);
+// for (int i = 0; i < rowCount; i++) {
+// stmtAsync.executeUpdateAsync("INSERT INTO test VALUES('a', 1, 10)").onComplete(ar -> {
+// if (count.decrementAndGet() == 0) {
+// endTime.set(System.currentTimeMillis());
+// latch.countDown();
+// }
+// });
+// }
+// latch.await();
+// System.out.println("Async row count: " + rowCount + ", time: " + (endTime.get() - t1) + " ms");
 // }
 //
 // static void insertVirtualThread(Statement stmt, int rowCount) throws Exception {
@@ -52,30 +79,12 @@ package org.qinsql.bench.misc;
 // try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 // for (int i = 0; i < rowCount; i++) {
 // executor.submit(() -> {
-// stmt.executeUpdate("INSERT INTO test VALUES('a', 1,10)");
-// return null;
+// return stmt.executeUpdate("INSERT INTO test VALUES('a', 1, 10)");
 // });
 // }
 // }
 // long t2 = System.currentTimeMillis();
-// System.out.println("VirtualThread row count: " + rowCount + ", time: " + (t2 - t1) + "ms");
-// }
-//
-// static void insertAsync(Statement stmt, int rowCount) throws Exception {
-// JdbcStatement stmtAsync = (JdbcStatement) stmt;
-// CountDownLatch latch = new CountDownLatch(rowCount);
-// long t1 = System.currentTimeMillis();
-// for (int i = 0; i < rowCount; i++) {
-// stmtAsync.executeUpdateAsync("INSERT INTO test VALUES('a', 1,10)").onComplete(ar -> {
-// if (ar.isFailed()) {
-// ar.getCause().printStackTrace();
-// }
-// latch.countDown();
-// });
-// }
-// latch.await();
-// long t2 = System.currentTimeMillis();
-// System.out.println("Async row count: " + rowCount + ", time: " + (t2 - t1) + "ms");
+// System.out.println("VirtualThread row count: " + rowCount + ", time: " + (t2 - t1) + " ms");
 // }
 //
 // static void insertVirtualThreadAsync(Statement stmt, int rowCount) throws Exception {
@@ -85,7 +94,8 @@ package org.qinsql.bench.misc;
 // try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
 // for (int i = 0; i < rowCount; i++) {
 // executor.submit(() -> {
-// stmtAsync.executeUpdateAsync("INSERT INTO test VALUES('a', 1,10)").onComplete(ar -> {
+// stmtAsync.executeUpdateAsync("INSERT INTO test VALUES('a', 1, 10)")
+// .onComplete(ar -> {
 // if (ar.isFailed()) {
 // ar.getCause().printStackTrace();
 // }
@@ -97,7 +107,8 @@ package org.qinsql.bench.misc;
 // }
 // latch.await();
 // long t2 = System.currentTimeMillis();
-// System.out.println("Async VirtualThread row count: " + rowCount + ", time: " + (t2 - t1) + "ms");
+// System.out
+// .println("Async VirtualThread row count: " + rowCount + ", time: " + (t2 - t1) + " ms");
 // }
 //
 // static void init(Statement stmt) throws Exception {

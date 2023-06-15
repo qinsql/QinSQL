@@ -5,22 +5,17 @@
  */
 package org.qinsql.test.mysql;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
 import org.junit.Test;
-import org.lealone.test.client.ClientTestBase;
 
-public class JdbcDatabaseMetaDataTest extends ClientTestBase {
+public class JdbcDatabaseMetaDataTest extends MySQLTestBase {
     @Test
     public void run() throws Exception {
-        Connection conn = MySQLJdbcTest.getMySQLConnection();
-        Statement statement = conn.createStatement();
-        statement.executeUpdate("create schema if not exists test");
-        statement.executeUpdate("use test");
-        statement.executeUpdate("create table if not exists VVV(f1 int)");
+        executeUpdate("create schema if not exists test");
+        executeUpdate("use test");
+        executeUpdate("create table if not exists VVV(f1 int)");
         DatabaseMetaData md = conn.getMetaData();
         ResultSet rs = md.getCatalogs();
         printResultSet(rs);
@@ -31,6 +26,5 @@ public class JdbcDatabaseMetaDataTest extends ClientTestBase {
         rs = md.getTables(null, "test", "VVV", null);
         printResultSet(rs);
         rs.close();
-        conn.close();
     }
 }

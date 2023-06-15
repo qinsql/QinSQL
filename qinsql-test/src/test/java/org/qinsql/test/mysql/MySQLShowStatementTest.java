@@ -5,17 +5,14 @@
  */
 package org.qinsql.test.mysql;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Statement;
 
-public class MySQLShowStatementTest {
+import org.junit.Test;
 
-    public static void main(String[] args) throws Exception {
-        Connection conn = MySQLJdbcTest.getMySQLConnection();
-        Statement stmt = conn.createStatement();
+public class MySQLShowStatementTest extends MySQLTestBase {
+    @Test
+    public void run() throws Exception {
         ResultSet rs = stmt.executeQuery("SHOW VARIABLES LIKE 'lower_case_%'");
         rs.next();
-        conn.close();
     }
 }

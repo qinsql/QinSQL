@@ -8,13 +8,22 @@ package org.qinsql.bench.cs.query.singleRowQuery;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.qinsql.bench.cs.query.ClientServerQueryBTest;
 
 public abstract class SingleRowQueryBTest extends ClientServerQueryBTest {
 
+    protected AtomicInteger id = new AtomicInteger();
+    protected Random random = new Random();
+
     public SingleRowQueryBTest() {
-        rowCount = innerLoop * sqlCountPerInnerLoop;
+        threadCount = 16;
+        outerLoop = 15;
+        innerLoop = 5;
+        sqlCountPerInnerLoop = 50;
+        rowCount = 10000;
         sqls = new String[rowCount];
     }
 
@@ -58,6 +67,11 @@ public abstract class SingleRowQueryBTest extends ClientServerQueryBTest {
 
         @Override
         protected String nextSql() {
+            return "select * from SingleRowQueryBTest where pk=" + random.nextInt(rowCount);
+        }
+
+        @SuppressWarnings("unused")
+        protected String nextSql0() {
             return sqls[start++];
         }
     }

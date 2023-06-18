@@ -20,6 +20,7 @@ public abstract class ClientServerBTest extends BenchTest {
     protected DbType dbType;
     protected boolean disableLealoneQueryCache = true;
 
+    protected int benchTestLoop = 10;
     protected int outerLoop = 15;
     protected int innerLoop = 100;
     protected int sqlCountPerInnerLoop = 500;
@@ -57,8 +58,10 @@ public abstract class ClientServerBTest extends BenchTest {
     }
 
     public void run() throws Exception {
-        init();
-        run(threadCount);
+        for (int i = 0; i < benchTestLoop; i++) {
+            init();
+            run(threadCount);
+        }
     }
 
     protected void run(int threadCount) throws Exception {

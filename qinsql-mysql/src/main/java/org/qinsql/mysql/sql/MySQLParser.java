@@ -227,6 +227,7 @@ public class MySQLParser implements SQLParser {
     public MySQLParser(ServerSession session) {
         this.database = session.getDatabase();
         this.session = session;
+        this.session.setSchemaSearchPath(new String[] { "mysql" });
         this.identifiersToUpper = database.getSettings().databaseToUpper;
     }
 
@@ -3993,6 +3994,11 @@ public class MySQLParser implements SQLParser {
             read("DATA");
             if (dataType.type == Value.STRING) {
                 dataType = DataType.getTypeByName("BINARY");
+            }
+        }
+        if (readIf("BINARY")) {
+            if (dataType.type == Value.STRING) {
+                dataType = DataType.getTypeByName("VARCHAR");
             }
         }
         // MySQL compatibility

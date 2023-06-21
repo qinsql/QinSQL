@@ -8,13 +8,10 @@ package org.qinsql.bench.cs.query.agg;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Random;
 
 import org.qinsql.bench.cs.query.ClientServerQueryBTest;
 
 public abstract class AggBTest extends ClientServerQueryBTest {
-
-    protected Random random = new Random();
 
     public AggBTest() {
         threadCount = 1;

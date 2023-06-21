@@ -8,13 +8,10 @@ package org.qinsql.bench.cs.write.batchInsert;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.qinsql.bench.cs.write.ClientServerWriteBTest;
 
 public abstract class BatchInsertBTest extends ClientServerWriteBTest {
-
-    AtomicInteger id = new AtomicInteger();
 
     protected BatchInsertBTest() {
         batch = true;

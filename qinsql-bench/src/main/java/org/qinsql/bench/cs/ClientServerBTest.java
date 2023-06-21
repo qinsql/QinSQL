@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lealone.db.ConnectionSetting;
 import org.lealone.db.Constants;
@@ -30,6 +32,9 @@ public abstract class ClientServerBTest extends BenchTest {
     protected boolean batch;
     protected boolean prepare;
     protected String[] sqls;
+
+    protected AtomicInteger id = new AtomicInteger();
+    protected Random random = new Random();
 
     public void start() {
         String name = getBTestName();

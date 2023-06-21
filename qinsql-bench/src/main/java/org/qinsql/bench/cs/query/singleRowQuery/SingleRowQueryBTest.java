@@ -8,15 +8,10 @@ package org.qinsql.bench.cs.query.singleRowQuery;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.qinsql.bench.cs.query.ClientServerQueryBTest;
 
 public abstract class SingleRowQueryBTest extends ClientServerQueryBTest {
-
-    protected AtomicInteger id = new AtomicInteger();
-    protected Random random = new Random();
 
     public SingleRowQueryBTest() {
         threadCount = 16;

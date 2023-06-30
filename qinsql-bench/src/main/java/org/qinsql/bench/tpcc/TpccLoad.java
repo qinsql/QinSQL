@@ -7,6 +7,7 @@ package org.qinsql.bench.tpcc;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -21,10 +22,11 @@ import org.qinsql.bench.tpcc.load.LoadConfig;
 
 public class TpccLoad extends Tpcc {
 
-    public static void main(String[] args) {
+    public static void main(String[] args, String... sqlScripts) {
         dumpInformation(args);
         TpccLoad tpccLoad = new TpccLoad();
         tpccLoad.parseArgs(args);
+        tpccLoad.runScript(sqlScripts);
         tpccLoad.runLoad();
     }
 
@@ -159,14 +161,7 @@ public class TpccLoad extends Tpcc {
         if (jdbcMode) {
             Connection conn;
             try {
-                Properties jdbcConnectProp = new Properties();
-                jdbcConnectProp.setProperty("user", dbUser);
-                jdbcConnectProp.setProperty("password", dbPassword);
-                if (dbType == DbType.MYSQL) {
-                    jdbcConnectProp.setProperty("useServerPrepStmts", "true");
-                    jdbcConnectProp.setProperty("cachePrepStmts", "true");
-                }
-                conn = DriverManager.getConnection(jdbcUrl, jdbcConnectProp);
+                conn = getConnection();
                 conn.setAutoCommit(false);
             } catch (SQLException e) {
                 throw new RuntimeException("Connection error", e);
@@ -268,6 +263,38 @@ public class TpccLoad extends Tpcc {
         System.out.println(
                 "Total execution time: " + df1.format(minutes) + " minute(s), " + df1.format(seconds)
                         + " second(s) (" + df2.format(durationSeconds / 60.0f) + " minutes)");
+    }
+
+    private Connection getConnection() throws SQLException {
+        Properties jdbcConnectProp = new Properties();
+        jdbcConnectProp.setProperty("user", dbUser);
+        jdbcConnectProp.setProperty("password", dbPassword);
+        if (dbType == DbType.MYSQL) {
+            jdbcConnectProp.setProperty("useServerPrepStmts", "true");
+            jdbcConnectProp.setProperty("cachePrepStmts", "true");
+        }
+        return DriverManager.getConnection(jdbcUrl, jdbcConnectProp);
+    }
+
+    private void runScript(String... sqlScripts) {
+        if (sqlScripts != null && sqlScripts.length > 0) {
+            try {
+                if (dbType == DbType.LEALONE || dbType == DbType.H2) {
+                    Connection conn = getConnection();
+                    Statement stmt = conn.createStatement();
+                    for (String sqlScript : sqlScripts) {
+                        URL url = getConfigURL(sqlScript);
+                        File file = new File(url.toURI());
+                        String fileName = file.getCanonicalPath();
+                        logger.info("RUNSCRIPT: " + fileName);
+                        stmt.executeUpdate("RUNSCRIPT FROM '" + fileName + "'");
+                    }
+                    conn.close();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("run script error", e);
+            }
+        }
     }
 
     private static void showUsage() {

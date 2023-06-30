@@ -8,6 +8,6 @@ package org.qinsql.bench.tpcc;
 public class LealoneTpccLoad {
     public static void main(String[] args) {
         System.setProperty("tpcc.config", "lealone/tpcc.properties");
-        TpccLoad.main(args);
+        TpccLoad.main(args, "lealone/create_tables.sql", "lealone/add_fkey_idx.sql");
     }
 }

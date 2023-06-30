@@ -65,6 +65,10 @@ public abstract class Tpcc implements TpccConstants {
 
     public static URL getConfigURL() {
         String configUrl = System.getProperty("tpcc.config", PROPERTIESFILE);
+        return getConfigURL(configUrl);
+    }
+
+    public static URL getConfigURL(String configUrl) {
         URL url;
         try {
             url = new URL(configUrl);

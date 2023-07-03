@@ -8,6 +8,6 @@ package org.qinsql.bench.tpcc;
 public class MySQLTpccLoad {
     public static void main(String[] args) {
         System.setProperty("tpcc.config", "mysql/tpcc.properties");
-        TpccLoad.main(args);
+        TpccLoad.main(args, "mysql/create_tables.sql", "mysql/add_fkey_idx.sql");
     }
 }

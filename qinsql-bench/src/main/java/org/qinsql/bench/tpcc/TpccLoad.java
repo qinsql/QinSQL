@@ -5,8 +5,11 @@
  */
 package org.qinsql.bench.tpcc;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FilenameFilter;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,6 +18,7 @@ import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Properties;
 
+import org.lealone.common.util.ScriptReader;
 import org.qinsql.bench.DbType;
 import org.qinsql.bench.tpcc.bench.Util;
 import org.qinsql.bench.tpcc.load.Load;
@@ -279,18 +283,32 @@ public class TpccLoad extends Tpcc {
     private void runScript(String... sqlScripts) {
         if (sqlScripts != null && sqlScripts.length > 0) {
             try {
-                if (dbType == DbType.LEALONE || dbType == DbType.H2) {
-                    Connection conn = getConnection();
-                    Statement stmt = conn.createStatement();
-                    for (String sqlScript : sqlScripts) {
-                        URL url = getConfigURL(sqlScript);
-                        File file = new File(url.toURI());
-                        String fileName = file.getCanonicalPath();
-                        logger.info("RUNSCRIPT: " + fileName);
+                Connection conn = getConnection();
+                Statement stmt = conn.createStatement();
+                for (String sqlScript : sqlScripts) {
+                    URL url = getConfigURL(sqlScript);
+                    File file = new File(url.toURI());
+                    String fileName = file.getCanonicalPath();
+                    logger.info("RUNSCRIPT: " + fileName);
+                    if (dbType == DbType.MYSQL || dbType == DbType.POSTGRESQL) {
+                        BufferedReader reader = new BufferedReader(
+                                new InputStreamReader(new FileInputStream(fileName)));
+                        ScriptReader r = new ScriptReader(reader);
+                        while (true) {
+                            String sql = r.readStatement();
+                            if (sql == null)
+                                break;
+                            sql = sql.trim();
+                            if (sql.isEmpty() || sql.charAt(0) == '#' || sql.startsWith("--"))
+                                continue;
+                            // logger.info("sql: " + sql);
+                            stmt.executeUpdate(sql);
+                        }
+                        reader.close();
+                    } else
                         stmt.executeUpdate("RUNSCRIPT FROM '" + fileName + "'");
-                    }
-                    conn.close();
                 }
+                conn.close();
             } catch (Exception e) {
                 throw new RuntimeException("run script error", e);
             }

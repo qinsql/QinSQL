@@ -48,7 +48,6 @@ public class TpccBench extends Tpcc {
 
     private final boolean joins = true;
 
-    private int numConn;
     private int rampupTime;
     private int measureTime;
     private int fetchSize = 100;

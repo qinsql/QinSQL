@@ -30,6 +30,7 @@ public abstract class Tpcc implements TpccConstants {
     protected static final String JDBCURL = "JDBCURL";
     protected static final String DBTYPE = "DBTYPE";
     protected static final String PROPERTIESFILE = "tpcc.properties";
+    protected static final String CONNECTIONS = "CONNECTIONS";
 
     /* Global SQL Variables */
     protected String javaDriver;
@@ -38,6 +39,7 @@ public abstract class Tpcc implements TpccConstants {
     protected String dbPassword;
     protected DbType dbType;
     protected int numWare;
+    protected int numConn;
 
     protected Properties properties;
     protected InputStream inputStream;
@@ -61,6 +63,7 @@ public abstract class Tpcc implements TpccConstants {
         String dbType = properties.getProperty(DBTYPE).toUpperCase();
         this.dbType = DbType.valueOf(dbType);
         numWare = Integer.parseInt(properties.getProperty(WAREHOUSECOUNT));
+        numConn = Integer.parseInt(properties.getProperty(CONNECTIONS));
     }
 
     public static URL getConfigURL() {

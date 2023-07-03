@@ -6,36 +6,30 @@
 package org.qinsql.bench.tpcc.load;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Future;
+
+import org.qinsql.bench.tpcc.TpccLoad;
 
 /**
  * Copyright (C) 2011 CodeFutures Corporation. All rights reserved.
  */
 public class JdbcStatementLoader implements RecordLoader {
 
-    Connection conn;
+    private String tableName;
+    private String[] columnNames;
+    private boolean ignore;
+    private int maxBatchSize;
+    private int currentBatchSize;
+    private StringBuilder b = new StringBuilder();
+    private ArrayList<Future<?>> futures = new ArrayList<>();
 
-    Statement stmt;
-
-    String tableName;
-
-    String columnName[];
-
-    boolean ignore;
-
-    int maxBatchSize;
-
-    int currentBatchSize;
-
-    StringBuilder b = new StringBuilder();
-
-    public JdbcStatementLoader(Connection conn, String tableName, String columnName[], boolean ignore,
+    public JdbcStatementLoader(String tableName, String[] columnNames, boolean ignore,
             int maxBatchSize) {
-        this.conn = conn;
         this.tableName = tableName;
-        this.columnName = columnName;
+        this.columnNames = columnNames;
         this.ignore = ignore;
         this.maxBatchSize = maxBatchSize;
     }
@@ -48,11 +42,11 @@ public class JdbcStatementLoader implements RecordLoader {
                 b.append("IGNORE ");
             }
             b.append("INTO `").append(tableName).append("` (");
-            for (int i = 0; i < columnName.length; i++) {
+            for (int i = 0; i < columnNames.length; i++) {
                 if (i > 0) {
                     b.append(',');
                 }
-                b.append(columnName[i].trim());
+                b.append(columnNames[i].trim());
             }
             b.append(") VALUES ");
         } else {
@@ -67,22 +61,38 @@ public class JdbcStatementLoader implements RecordLoader {
         }
     }
 
-    private void executeBulkInsert() throws SQLException {
-        if (stmt == null) {
-            stmt = conn.createStatement();
+    @Override
+    public void close() throws Exception {
+        if (currentBatchSize > 0) {
+            executeBulkInsert();
         }
+        for (Future<?> f : futures)
+            f.get();
+    }
+
+    private void executeBulkInsert() throws Exception {
         final String sql = b.toString();
         b.setLength(0);
+        currentBatchSize = 0;
+        futures.add(TpccLoad.submit(() -> executeBulkInsert(sql)));
+    }
+
+    private void executeBulkInsert(String sql) {
         try {
-            stmt.execute(sql);
-        } catch (SQLException e) {
+            Connection conn = TpccLoad.getNextConnection();
+            synchronized (conn) {
+                Statement stmt = conn.createStatement();
+                stmt.execute(sql);
+                conn.commit();
+                stmt.close();
+            }
+        } catch (Exception e) {
             throw new RuntimeException("Error loading into table '" + tableName + "' with SQL: " + sql,
                     e);
         }
-        currentBatchSize = 0;
     }
 
-    public void write(StringBuilder b, Record r, String delim) throws Exception {
+    private void write(StringBuilder b, Record r, String delim) throws Exception {
         final Object[] field = r.getField();
         for (int i = 0; i < field.length; i++) {
             if (i > 0) {
@@ -99,24 +109,6 @@ public class JdbcStatementLoader implements RecordLoader {
             } else {
                 b.append(fieldValue);
             }
-        }
-    }
-
-    @Override
-    public void commit() throws Exception {
-        if (!conn.getAutoCommit()) {
-            conn.commit();
-        }
-    }
-
-    @Override
-    public void close() throws Exception {
-        if (currentBatchSize > 0) {
-            executeBulkInsert();
-        }
-        stmt.close();
-        if (!conn.getAutoCommit()) {
-            conn.commit();
         }
     }
 }

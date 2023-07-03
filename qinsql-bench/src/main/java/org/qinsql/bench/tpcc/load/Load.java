@@ -186,7 +186,6 @@ public class Load implements TpccConstants {
                 warehouseRecord.add(w_ytd);
 
                 warehouseLoader.load(warehouseRecord);
-                warehouseLoader.commit();
 
                 /** Make Rows associated with Warehouse **/
                 stock(loadConfig, w_id);
@@ -371,7 +370,7 @@ public class Load implements TpccConstants {
 
         stockLoader.close();
 
-        System.out.printf(" Stock Done.\n");
+        System.out.printf("Stock Done.\n");
         return error;
 
     }

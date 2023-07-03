@@ -24,14 +24,14 @@ public class LoadConfig {
     private Connection conn;
     private File outputDir;
     private boolean jdbcInsertIgnore = false;
-    private int jdbcBatchSize = 100;
+    private int jdbcBatchSize = 200;
 
     public RecordLoader createLoader(String tableName, String columnName[]) throws IOException {
         switch (loadType) {
         case JDBC_STATEMENT:
-            return new JdbcStatementLoader(conn, tableName, columnName, jdbcInsertIgnore, jdbcBatchSize);
+            return new JdbcStatementLoader(tableName, columnName, jdbcInsertIgnore, jdbcBatchSize);
         case JDBC_PREPARED_STATEMENT:
-            return new JdbcPreparedStatementLoader(conn, tableName, columnName, jdbcInsertIgnore,
+            return new JdbcPreparedStatementLoader(tableName, columnName, jdbcInsertIgnore,
                     jdbcBatchSize);
         case CSV:
             return new FileLoader(new File(outputDir, tableName + ".txt"));

@@ -17,6 +17,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lealone.common.util.ScriptReader;
 import org.qinsql.bench.DbType;
@@ -34,9 +38,7 @@ public class TpccLoad extends Tpcc {
         tpccLoad.runLoad();
     }
 
-    // static int is_local = 1; /* "1" mean local */
-    // static int DB_STRING_MAX = 51;
-    private static boolean option_debug = false; /* 1 if generating debug output    */
+    private static boolean option_debug = false; // 1 if generating debug output
 
     private static final String MODE = "MODE";
     private static final String OUTPUTDIR = "OUTPUTDIR";
@@ -49,11 +51,24 @@ public class TpccLoad extends Tpcc {
     private int shardId = -1;
 
     private int seed = 0;
+    private boolean jdbcMode;
 
-    private int particle_flg = 0; /* "1" means particle mode */
-    private int part_no = 0; /* 1:items 2:warehouse 3:customer 4:orders */
+    private int particle_flg = 0; // "1" means particle mode
+    private int part_no = 0; // 1:items 2:warehouse 3:customer 4:orders
     private long min_ware = 1;
     private long max_ware;
+
+    private static Connection[] connections;
+    private static AtomicInteger connectionIndex = new AtomicInteger();
+    private static ExecutorService executor;
+
+    public static Connection getNextConnection() {
+        return connections[connectionIndex.getAndIncrement() % connections.length];
+    }
+
+    public static Future<?> submit(Runnable task) {
+        return executor.submit(task);
+    }
 
     public TpccLoad() {
         // Empty.
@@ -66,6 +81,7 @@ public class TpccLoad extends Tpcc {
             outputDir = properties.getProperty(OUTPUTDIR);
             shardCount = Integer.parseInt(properties.getProperty(SHARDCOUNT));
             shardId = Integer.parseInt(properties.getProperty(SHARDID));
+            seed = Integer.parseInt(properties.getProperty("SEED", "0"));
         } else {
             if ((args.length % 2) != 0) {
                 System.out.println("Invalid number of arguments: " + args.length);
@@ -89,6 +105,8 @@ public class TpccLoad extends Tpcc {
                     shardCount = Integer.parseInt(args[i + 1]);
                 } else if (args[i].equals("-i")) {
                     shardId = Integer.parseInt(args[i + 1]);
+                } else if (args[i].equals("-c")) {
+                    numConn = Integer.parseInt(args[i + 1]);
                 } else {
                     System.out.println("Incorrect Argument: " + args[i]);
                     showUsage();
@@ -108,7 +126,7 @@ public class TpccLoad extends Tpcc {
         if (mode == null) {
             throw new RuntimeException("Mode is null.");
         }
-        boolean jdbcMode = mode.equalsIgnoreCase("JDBC");
+        jdbcMode = mode.equalsIgnoreCase("JDBC");
         if (jdbcMode) {
             if (dbUser == null) {
                 throw new RuntimeException("User is null.");
@@ -156,11 +174,75 @@ public class TpccLoad extends Tpcc {
             System.out.printf("     [MAX WH]: %d\n", max_ware);
         }
 
-        // TODO: Pass the seed in as a variable.
         Util.setSeed(seed);
 
-        LoadConfig loadConfig = new LoadConfig();
+        initConnections();
+        LoadConfig loadConfig = createLoadConfig();
 
+        System.out.printf("TPCC Data Load Started...\n");
+
+        try {
+            max_ware = numWare;
+            if (particle_flg == 0) {
+                System.out.printf("Particle flag: %d\n", particle_flg);
+                Load.loadItems(loadConfig, option_debug);
+                Load.loadWare(loadConfig, shardCount, (int) min_ware, (int) max_ware, option_debug,
+                        shardId);
+                Load.loadCust(loadConfig, shardCount, (int) min_ware, (int) max_ware, shardId);
+                Load.loadOrd(loadConfig, shardCount, (int) max_ware, shardId);
+            } else if (particle_flg == 1) {
+                switch (part_no) {
+                case 1:
+                    Load.loadItems(loadConfig, option_debug);
+                    break;
+                case 2:
+                    Load.loadWare(loadConfig, shardCount, (int) min_ware, (int) max_ware, option_debug,
+                            shardId);
+                    break;
+                case 3:
+                    Load.loadCust(loadConfig, shardCount, (int) min_ware, (int) max_ware, shardId);
+                    break;
+                case 4:
+                    Load.loadOrd(loadConfig, shardCount, (int) max_ware, shardId);
+                    break;
+                default:
+                    System.out.printf("Unknown part_no\n");
+                    System.out.printf("1:ITEMS 2:WAREHOUSE 3:CUSTOMER 4:ORDERS\n");
+                }
+            }
+
+            System.out.printf("\n...DATA LOADING COMPLETED SUCCESSFULLY.\n");
+        } catch (Exception e) {
+            System.out.println("Error loading data");
+            e.printStackTrace();
+        }
+
+        final long end = System.currentTimeMillis();
+        final long durationSeconds = (long) ((end - start) / 1000.0f);
+
+        long seconds = durationSeconds % 60;
+        long minutes = (durationSeconds - seconds) / 60;
+
+        DecimalFormat df1 = new DecimalFormat("#,##0");
+        DecimalFormat df2 = new DecimalFormat("#,##0.000");
+        System.out.println(
+                "Total execution time: " + df1.format(minutes) + " minute(s), " + df1.format(seconds)
+                        + " second(s) (" + df2.format(durationSeconds / 60.0f) + " minutes)");
+
+        TpccLoad.executor.shutdown();
+    }
+
+    private void initConnections() {
+        connections = new Connection[numConn];
+        for (int i = 0; i < numConn; i++) {
+            LoadConfig loadConfig = createLoadConfig();
+            connections[i] = loadConfig.getConn();
+        }
+        executor = Executors.newFixedThreadPool(numConn);
+    }
+
+    private LoadConfig createLoadConfig() {
+        LoadConfig loadConfig = new LoadConfig();
         /* EXEC SQL WHENEVER SQLERROR GOTO Error_SqlCall; */
         if (jdbcMode) {
             Connection conn;
@@ -217,56 +299,7 @@ public class TpccLoad extends Tpcc {
             loadConfig.setLoadType(LoadConfig.LoadType.CSV);
             loadConfig.setOutputDir(outputDir);
         }
-
-        System.out.printf("TPCC Data Load Started...\n");
-
-        try {
-            max_ware = numWare;
-            if (particle_flg == 0) {
-                System.out.printf("Particle flag: %d\n", particle_flg);
-                Load.loadItems(loadConfig, option_debug);
-                Load.loadWare(loadConfig, shardCount, (int) min_ware, (int) max_ware, option_debug,
-                        shardId);
-                Load.loadCust(loadConfig, shardCount, (int) min_ware, (int) max_ware, shardId);
-                Load.loadOrd(loadConfig, shardCount, (int) max_ware, shardId);
-            } else if (particle_flg == 1) {
-                switch (part_no) {
-                case 1:
-                    Load.loadItems(loadConfig, option_debug);
-                    break;
-                case 2:
-                    Load.loadWare(loadConfig, shardCount, (int) min_ware, (int) max_ware, option_debug,
-                            shardId);
-                    break;
-                case 3:
-                    Load.loadCust(loadConfig, shardCount, (int) min_ware, (int) max_ware, shardId);
-                    break;
-                case 4:
-                    Load.loadOrd(loadConfig, shardCount, (int) max_ware, shardId);
-                    break;
-                default:
-                    System.out.printf("Unknown part_no\n");
-                    System.out.printf("1:ITEMS 2:WAREHOUSE 3:CUSTOMER 4:ORDERS\n");
-                }
-            }
-
-            System.out.printf("\n...DATA LOADING COMPLETED SUCCESSFULLY.\n");
-        } catch (Exception e) {
-            System.out.println("Error loading data");
-            e.printStackTrace();
-        }
-
-        final long end = System.currentTimeMillis();
-        final long durationSeconds = (long) ((end - start) / 1000.0f);
-
-        long seconds = durationSeconds % 60;
-        long minutes = (durationSeconds - seconds) / 60;
-
-        DecimalFormat df1 = new DecimalFormat("#,##0");
-        DecimalFormat df2 = new DecimalFormat("#,##0.000");
-        System.out.println(
-                "Total execution time: " + df1.format(minutes) + " minute(s), " + df1.format(seconds)
-                        + " second(s) (" + df2.format(durationSeconds / 60.0f) + " minutes)");
+        return loadConfig;
     }
 
     private Connection getConnection() throws SQLException {

@@ -32,7 +32,6 @@ public class TpccBench extends Tpcc {
     private static final boolean DEBUG = logger.isDebugEnabled();
 
     private static final String DATABASE = "DATABASE";
-    private static final String CONNECTIONS = "CONNECTIONS";
     private static final String RAMPUPTIME = "RAMPUPTIME";
     private static final String DURATION = "DURATION";
     private static final String JOINS = "JOINS";
@@ -83,7 +82,6 @@ public class TpccBench extends Tpcc {
     private void parseArgs(String[] args) {
         if (args.length == 0) {
             loadConfig();
-            numConn = Integer.parseInt(properties.getProperty(CONNECTIONS));
             rampupTime = Integer.parseInt(properties.getProperty(RAMPUPTIME));
             measureTime = Integer.parseInt(properties.getProperty(DURATION));
             String jdbcFetchSize = properties.getProperty("JDBCFETCHSIZE");

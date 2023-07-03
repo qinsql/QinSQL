@@ -31,6 +31,10 @@ public class Record {
         this.field = new Object[columnCount];
     }
 
+    public Record(Object[] field) {
+        this.field = field;
+    }
+
     public void reset() {
         index = 0;
     }
@@ -51,8 +55,15 @@ public class Record {
         return field.length;
     }
 
+    public Record copy() {
+        Object field[] = new Object[index];
+        System.arraycopy(this.field, 0, field, 0, index);
+        return new Record(field);
+    }
+
     @Override
     public String toString() {
         return Arrays.toString(field);
     }
+
 }

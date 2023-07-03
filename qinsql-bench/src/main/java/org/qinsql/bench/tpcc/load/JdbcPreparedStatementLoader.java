@@ -7,34 +7,28 @@ package org.qinsql.bench.tpcc.load;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.concurrent.Future;
+
+import org.qinsql.bench.tpcc.TpccLoad;
 
 /**
- * Data loader using prepared statements and batches. This is slower than the JdbcStatementLoader which uses
- * bulk inserts.
+ * Data loader using prepared statements and batches. 
+ * This is slower than the JdbcStatementLoader which uses bulk inserts.
  */
 public class JdbcPreparedStatementLoader implements RecordLoader {
 
-    Connection conn;
+    private String tableName;
+    private String[] columnNames;
+    private int maxBatchSize;
+    private ArrayList<Future<?>> futures = new ArrayList<>();
+    private ArrayList<Record> records = new ArrayList<>();
+    private String sql;
 
-    PreparedStatement pstmt;
-
-    String tableName;
-
-    String columnName[];
-
-    boolean ignore;
-
-    int maxBatchSize;
-
-    int currentBatchSize;
-
-    public JdbcPreparedStatementLoader(Connection conn, String tableName, String columnName[],
-            boolean ignore, int maxBatchSize) {
-        this.conn = conn;
+    public JdbcPreparedStatementLoader(String tableName, String[] columnNames, boolean ignore,
+            int maxBatchSize) {
         this.tableName = tableName;
-        this.columnName = columnName;
-        this.ignore = ignore;
+        this.columnNames = columnNames;
         this.maxBatchSize = maxBatchSize;
 
         StringBuilder b = new StringBuilder();
@@ -44,55 +38,64 @@ public class JdbcPreparedStatementLoader implements RecordLoader {
         }
         // b.append("INTO `").append(tableName).append("` (");
         b.append("INTO ").append(tableName).append(" (");
-        for (int i = 0; i < columnName.length; i++) {
+        for (int i = 0; i < columnNames.length; i++) {
             if (i > 0) {
                 b.append(',');
             }
-            b.append(columnName[i].trim());
+            b.append(columnNames[i].trim());
         }
         b.append(") VALUES (");
-        for (int i = 0; i < columnName.length; i++) {
+        for (int i = 0; i < columnNames.length; i++) {
             if (i > 0) {
                 b.append(',');
             }
             b.append('?');
         }
         b.append(')');
-        final String sql = b.toString();
-
-        try {
-            this.conn.setAutoCommit(false);
-            this.pstmt = conn.prepareStatement(sql);
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to prepare: " + sql, e);
-        }
+        sql = b.toString();
     }
 
     @Override
     public void load(Record r) throws Exception {
-        for (int i = 0; i < columnName.length; i++) {
-            pstmt.setObject(i + 1, r.getField(i));
+        records.add(r.copy());
+        if (records.size() == maxBatchSize) {
+            executeBatch();
         }
-        pstmt.addBatch();
-        if (++currentBatchSize == maxBatchSize) {
-            executeCurrentBatch();
-        }
-    }
-
-    private void executeCurrentBatch() throws Exception {
-        pstmt.executeBatch();
-        currentBatchSize = 0;
-    }
-
-    @Override
-    public void commit() throws Exception {
-        conn.commit();
     }
 
     @Override
     public void close() throws Exception {
-        executeCurrentBatch();
-        pstmt.close();
-        conn.commit();
+        if (!records.isEmpty()) {
+            executeBatch();
+        }
+        for (Future<?> f : futures)
+            f.get();
+    }
+
+    private void executeBatch() throws Exception {
+        ArrayList<Record> records = new ArrayList<>(this.records);
+        this.records.clear();
+        futures.add(TpccLoad.submit(() -> executeBatch(records)));
+    }
+
+    private void executeBatch(ArrayList<Record> records) {
+        try {
+            Connection conn = TpccLoad.getNextConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            for (Record r : records) {
+                for (int i = 0; i < columnNames.length; i++) {
+                    pstmt.setObject(i + 1, r.getField(i));
+                }
+                pstmt.addBatch();
+            }
+            synchronized (conn) {
+                pstmt.executeBatch();
+                conn.commit();
+                pstmt.close();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading into table '" + tableName + "' with SQL: " + sql,
+                    e);
+        }
     }
 }

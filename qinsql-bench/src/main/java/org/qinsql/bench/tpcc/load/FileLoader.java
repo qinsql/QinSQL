@@ -51,11 +51,6 @@ public class FileLoader implements RecordLoader {
     }
 
     @Override
-    public void commit() throws Exception {
-        // ignore
-    }
-
-    @Override
     public void close() throws Exception {
         os.close();
     }

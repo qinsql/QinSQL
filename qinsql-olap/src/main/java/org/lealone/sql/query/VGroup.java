@@ -41,7 +41,7 @@ class VGroup extends VOperator {
         while (topTableFilter.next()) {
             boolean yield = yieldIfNeeded(++loopCount);
             if (conditionEvaluator.getBooleanValue()) {
-                if (select.isForUpdate && !topTableFilter.lockRow())
+                if (select.isForUpdate && !tryLockRow())
                     return; // 锁记录失败
                 rowCount++;
                 Value key = QGroup.getKey(select);

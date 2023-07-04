@@ -36,7 +36,7 @@ class VGroupSorted extends VOperator {
         while (topTableFilter.next()) {
             boolean yield = yieldIfNeeded(++loopCount);
             if (conditionEvaluator.getBooleanValue()) {
-                if (select.isForUpdate && !topTableFilter.lockRow())
+                if (select.isForUpdate && !tryLockRow())
                     return; // 锁记录失败
                 rowCount++;
                 Value[] keyValues = QGroup.getKeyValues(select);

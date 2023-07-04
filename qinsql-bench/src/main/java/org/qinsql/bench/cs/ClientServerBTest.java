@@ -111,7 +111,7 @@ public abstract class ClientServerBTest extends BenchTest {
         case POSTGRESQL:
             return getPgConnection();
         case LEALONE: {
-            Connection conn = getLealoneConnection();
+            Connection conn = getLealoneConnection(async);
             if (disableLealoneQueryCache) {
                 disableLealoneQueryCache(conn);
             }
@@ -196,10 +196,11 @@ public abstract class ClientServerBTest extends BenchTest {
         return url;
     }
 
-    public static Connection getLealoneConnection() throws Exception {
+    public static Connection getLealoneConnection(boolean async) throws Exception {
         String url = getLealoneUrl();
         url += "&" + ConnectionSetting.IS_SHARED + "=false";
         url += "&" + ConnectionSetting.NET_CLIENT_COUNT + "=16";
+        url += "&" + ConnectionSetting.NET_FACTORY_NAME + "=" + (async ? "nio" : "bio");
         return getConnection(url, "root", "");
     }
 

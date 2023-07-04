@@ -9,5 +9,7 @@ public enum DbType {
     H2,
     MYSQL,
     POSTGRESQL,
-    LEALONE
+    LEALONE,
+    LM, // lealone mysql客户端
+    LP // lealone postgresql客户端
 }

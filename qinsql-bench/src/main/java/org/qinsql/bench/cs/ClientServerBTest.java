@@ -51,6 +51,10 @@ public abstract class ClientServerBTest extends BenchTest {
             dbType = DbType.MYSQL;
         } else if (name.startsWith("Pg")) {
             dbType = DbType.POSTGRESQL;
+        } else if (name.startsWith("LM")) {
+            dbType = DbType.LM;
+        } else if (name.startsWith("LP")) {
+            dbType = DbType.LP;
         } else {
             throw new RuntimeException("Unsupported BTestName: " + name);
         }
@@ -113,6 +117,13 @@ public abstract class ClientServerBTest extends BenchTest {
             }
             return conn;
         }
+        case LM: {
+            Connection conn = getLMConnection();
+            if (disableLealoneQueryCache) {
+                disableLealoneQueryCache(conn);
+            }
+            return conn;
+        }
         default:
             throw new RuntimeException();
         }
@@ -132,11 +143,24 @@ public abstract class ClientServerBTest extends BenchTest {
         }
     }
 
+    public static Connection getLMConnection() throws Exception {
+        String db = "mysql";
+        String user = "root";
+        String password = "";
+        int port = 9310;
+        return getMySQLConnection(db, user, password, port);
+    }
+
     public static Connection getMySQLConnection() throws Exception {
         String db = "test";
         String user = "test";
         String password = "test";
         int port = 3306;
+        return getMySQLConnection(db, user, password, port);
+    }
+
+    public static Connection getMySQLConnection(String db, String user, String password, int port)
+            throws Exception {
         String url = "jdbc:mysql://localhost:" + port + "/" + db;
 
         Properties info = new Properties();

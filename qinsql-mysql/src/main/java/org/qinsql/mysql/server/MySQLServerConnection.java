@@ -26,6 +26,7 @@ import org.lealone.net.NetBufferOutputStream;
 import org.lealone.net.WritableChannel;
 import org.lealone.server.Scheduler;
 import org.lealone.sql.PreparedSQLStatement;
+import org.lealone.sql.StatementBase;
 import org.qinsql.mysql.server.handler.AuthPacketHandler;
 import org.qinsql.mysql.server.handler.CommandPacketHandler;
 import org.qinsql.mysql.server.handler.PacketHandler;
@@ -173,10 +174,13 @@ public class MySQLServerConnection extends AsyncConnection {
     }
 
     private void executeStatement(PreparedSQLStatement ps, String sql) {
-        logger.info("execute sql: " + sql);
+        if (logger.isDebugEnabled())
+            logger.debug("execute sql: " + sql);
         try {
             if (ps == null)
                 ps = (PreparedSQLStatement) session.prepareSQLCommand(sql, -1);
+            if (ps instanceof StatementBase)
+                ((StatementBase) ps).setExecutor(scheduler);
             if (ps.isQuery()) {
                 Result result = ps.executeQuery(-1).get();
                 writeQueryResult(result);

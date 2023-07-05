@@ -65,5 +65,4 @@ public class Record {
     public String toString() {
         return Arrays.toString(field);
     }
-
 }

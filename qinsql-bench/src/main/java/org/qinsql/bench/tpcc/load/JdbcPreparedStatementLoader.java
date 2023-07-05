@@ -81,14 +81,14 @@ public class JdbcPreparedStatementLoader implements RecordLoader {
     private void executeBatch(ArrayList<Record> records) {
         try {
             Connection conn = TpccLoad.getNextConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            for (Record r : records) {
-                for (int i = 0; i < columnNames.length; i++) {
-                    pstmt.setObject(i + 1, r.getField(i));
-                }
-                pstmt.addBatch();
-            }
             synchronized (conn) {
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                for (Record r : records) {
+                    for (int i = 0; i < columnNames.length; i++) {
+                        pstmt.setObject(i + 1, r.getField(i));
+                    }
+                    pstmt.addBatch();
+                }
                 pstmt.executeBatch();
                 conn.commit();
                 pstmt.close();

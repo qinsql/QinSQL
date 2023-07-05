@@ -8,7 +8,6 @@ package org.qinsql.bench.tpcc;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.Connection;
@@ -40,18 +39,13 @@ public class TpccLoad extends Tpcc {
 
     private static boolean option_debug = false; // 1 if generating debug output
 
-    private static final String MODE = "MODE";
-    private static final String OUTPUTDIR = "OUTPUTDIR";
     private static final String SHARDCOUNT = "SHARDCOUNT";
     private static final String SHARDID = "SHARDID";
 
-    private String mode;
-    private String outputDir;
     private int shardCount = 0;
     private int shardId = -1;
 
     private int seed = 0;
-    private boolean jdbcMode;
 
     private int particle_flg = 0; // "1" means particle mode
     private int part_no = 0; // 1:items 2:warehouse 3:customer 4:orders
@@ -77,8 +71,6 @@ public class TpccLoad extends Tpcc {
     private void parseArgs(String[] args) {
         if (args.length == 0) {
             loadConfig();
-            mode = properties.getProperty(MODE);
-            outputDir = properties.getProperty(OUTPUTDIR);
             shardCount = Integer.parseInt(properties.getProperty(SHARDCOUNT));
             shardId = Integer.parseInt(properties.getProperty(SHARDID));
             seed = Integer.parseInt(properties.getProperty("SEED", "0"));
@@ -89,11 +81,7 @@ public class TpccLoad extends Tpcc {
             }
             System.out.println("Using the command line arguments for the load configuration.");
             for (int i = 0; i < args.length; i = i + 2) {
-                if (args[i].equals("-m")) {
-                    mode = args[i + 1];
-                } else if (args[i].equals("-o")) {
-                    outputDir = args[i + 1];
-                } else if (args[i].equals("-u")) {
+                if (args[i].equals("-u")) {
                     dbUser = args[i + 1];
                 } else if (args[i].equals("-p")) {
                     dbPassword = args[i + 1];
@@ -123,23 +111,11 @@ public class TpccLoad extends Tpcc {
         final long start = System.currentTimeMillis();
         System.out.println("Execution time start: " + start);
 
-        if (mode == null) {
-            throw new RuntimeException("Mode is null.");
+        if (dbUser == null) {
+            throw new RuntimeException("User is null.");
         }
-        jdbcMode = mode.equalsIgnoreCase("JDBC");
-        if (jdbcMode) {
-            if (dbUser == null) {
-                throw new RuntimeException("User is null.");
-            }
-            if (dbPassword == null) {
-                throw new RuntimeException("Password is null.");
-            }
-        } else if (mode.equalsIgnoreCase("FILE")) {
-            if (outputDir == null) {
-                throw new RuntimeException("Output dir is null.");
-            }
-        } else {
-            throw new RuntimeException("Invalid mode '" + mode + "': must be CSV or JDBC");
+        if (dbPassword == null) {
+            throw new RuntimeException("Password is null.");
         }
 
         if (numWare < 1) {
@@ -156,15 +132,10 @@ public class TpccLoad extends Tpcc {
         }
 
         System.out.printf("<Parameters>\n");
-
-        if (jdbcMode) {
-            System.out.printf("     [Driver]: %s\n", javaDriver);
-            System.out.printf("        [URL]: %s\n", jdbcUrl);
-            System.out.printf("       [user]: %s\n", dbUser);
-            System.out.printf("       [pass]: %s\n", dbPassword);
-        } else {
-            System.out.printf(" [Output Dir]: %s\n", outputDir);
-        }
+        System.out.printf("     [Driver]: %s\n", javaDriver);
+        System.out.printf("        [URL]: %s\n", jdbcUrl);
+        System.out.printf("       [user]: %s\n", dbUser);
+        System.out.printf("       [pass]: %s\n", dbPassword);
 
         System.out.printf("  [warehouse]: %d\n", numWare);
         System.out.printf("    [shardId]: %d\n", shardId);
@@ -244,61 +215,39 @@ public class TpccLoad extends Tpcc {
     private LoadConfig createLoadConfig() {
         LoadConfig loadConfig = new LoadConfig();
         /* EXEC SQL WHENEVER SQLERROR GOTO Error_SqlCall; */
-        if (jdbcMode) {
-            Connection conn;
-            try {
-                conn = getConnection();
-                conn.setAutoCommit(false);
-            } catch (SQLException e) {
-                throw new RuntimeException("Connection error", e);
-            }
-            if (dbType == DbType.MYSQL) {
-                Statement stmt;
-                try {
-                    stmt = conn.createStatement();
-                } catch (SQLException e) {
-                    throw new RuntimeException("Could not create statement", e);
-                }
-                try {
-                    stmt.execute("SET UNIQUE_CHECKS=0");
-                } catch (SQLException e) {
-                    throw new RuntimeException("Could not set unique checks error", e);
-                }
-                try {
-                    stmt.execute("SET FOREIGN_KEY_CHECKS=0");
-                    stmt.close();
-                } catch (SQLException e) {
-                    throw new RuntimeException("Could not set foreign key checks error", e);
-                }
-                loadConfig.setJdbcInsertIgnore(true);
-
-                // mysql用JDBC_STATEMENT比JDBC_PREPARED_STATEMENT快
-                loadConfig.setLoadType(LoadConfig.LoadType.JDBC_STATEMENT);
-            } else {
-                loadConfig.setLoadType(LoadConfig.LoadType.JDBC_PREPARED_STATEMENT);
-            }
-            loadConfig.setConn(conn);
-        } else {
-            File outputDir = new File(this.outputDir);
-            if (outputDir.exists()) {
-                String[] list = outputDir.list(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return name.endsWith(".txt");
-                    }
-                });
-                if (list.length > 0) {
-                    throw new RuntimeException("All text files must be deleted from " + outputDir
-                            + " before generating data");
-                }
-            } else {
-                if (!outputDir.mkdirs()) {
-                    throw new RuntimeException("Could not create dir: " + outputDir.getAbsolutePath());
-                }
-            }
-            loadConfig.setLoadType(LoadConfig.LoadType.CSV);
-            loadConfig.setOutputDir(outputDir);
+        Connection conn;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new RuntimeException("Connection error", e);
         }
+        if (dbType == DbType.MYSQL) {
+            Statement stmt;
+            try {
+                stmt = conn.createStatement();
+            } catch (SQLException e) {
+                throw new RuntimeException("Could not create statement", e);
+            }
+            try {
+                stmt.execute("SET UNIQUE_CHECKS=0");
+            } catch (SQLException e) {
+                throw new RuntimeException("Could not set unique checks error", e);
+            }
+            try {
+                stmt.execute("SET FOREIGN_KEY_CHECKS=0");
+                stmt.close();
+            } catch (SQLException e) {
+                throw new RuntimeException("Could not set foreign key checks error", e);
+            }
+            loadConfig.setJdbcInsertIgnore(true);
+
+            // mysql用JDBC_STATEMENT比JDBC_PREPARED_STATEMENT快
+            loadConfig.setLoadType(LoadConfig.LoadType.JDBC_STATEMENT);
+        } else {
+            loadConfig.setLoadType(LoadConfig.LoadType.JDBC_PREPARED_STATEMENT);
+        }
+        loadConfig.setConn(conn);
         return loadConfig;
     }
 
@@ -350,8 +299,6 @@ public class TpccLoad extends Tpcc {
 
     private static void showUsage() {
         System.out.println("The possible arguments are as follows: ");
-        System.out.println("-m [mode (FILE or JDBC)]");
-        System.out.println("-o [file output dir]");
         System.out.println("-u [database username]");
         System.out.println("-p [database password]");
         System.out.println("-w [number of warehouses]");

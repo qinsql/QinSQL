@@ -5,7 +5,6 @@
  */
 package org.qinsql.bench.tpcc.load;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 
@@ -16,13 +15,11 @@ public class LoadConfig {
 
     public enum LoadType {
         JDBC_STATEMENT,
-        JDBC_PREPARED_STATEMENT,
-        CSV
+        JDBC_PREPARED_STATEMENT
     }
 
     private LoadType loadType = LoadType.JDBC_PREPARED_STATEMENT;
     private Connection conn;
-    private File outputDir;
     private boolean jdbcInsertIgnore = false;
     private int jdbcBatchSize = 200;
 
@@ -33,15 +30,9 @@ public class LoadConfig {
         case JDBC_PREPARED_STATEMENT:
             return new JdbcPreparedStatementLoader(tableName, columnName, jdbcInsertIgnore,
                     jdbcBatchSize);
-        case CSV:
-            return new FileLoader(new File(outputDir, tableName + ".txt"));
         default:
             throw new IllegalStateException();
         }
-    }
-
-    public void setOutputDir(File outputDir) {
-        this.outputDir = outputDir;
     }
 
     public Connection getConn() {

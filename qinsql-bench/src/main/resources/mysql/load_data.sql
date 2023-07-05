@@ -1,9 +1,0 @@
-LOAD DATA INFILE 'warehouse.txt' INTO TABLE warehouse;
-LOAD DATA INFILE 'district.txt' INTO TABLE district;
-LOAD DATA INFILE 'customer.txt' INTO TABLE customer;
-LOAD DATA INFILE 'history.txt' INTO TABLE history;
-LOAD DATA INFILE 'orders.txt' INTO TABLE orders;
-LOAD DATA INFILE 'new_orders.txt' INTO TABLE new_orders;
-LOAD DATA INFILE 'order_line.txt' INTO TABLE order_line;
-LOAD DATA INFILE 'item.txt' INTO TABLE item;
-LOAD DATA INFILE 'stock.txt' INTO TABLE stock;

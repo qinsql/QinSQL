@@ -316,9 +316,9 @@ public class MySQLServerConnection extends AsyncConnection {
 
     @Override
     public int getPacketLength() {
-        int length = (packetLengthByteBuffer.get(0) & 0xff);
-        length |= (packetLengthByteBuffer.get(1) & 0xff) << 8;
-        length |= (packetLengthByteBuffer.get(2) & 0xff) << 16;
+        int length = (packetLengthByteBuffer.get() & 0xff);
+        length |= (packetLengthByteBuffer.get() & 0xff) << 8;
+        length |= (packetLengthByteBuffer.get() & 0xff) << 16;
         return length;
     }
 

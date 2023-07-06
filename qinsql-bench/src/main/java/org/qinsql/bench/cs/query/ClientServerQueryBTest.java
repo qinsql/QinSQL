@@ -17,6 +17,10 @@ import org.qinsql.bench.cs.ClientServerBTest;
 
 public abstract class ClientServerQueryBTest extends ClientServerBTest {
 
+    public ClientServerQueryBTest() {
+        reinit = false;
+    }
+
     @Override
     protected void run(int threadCount, Connection[] conns, boolean warmUp) throws Exception {
         QueryThreadBase[] threads = new QueryThreadBase[threadCount];

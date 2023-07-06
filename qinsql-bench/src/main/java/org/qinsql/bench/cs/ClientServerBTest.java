@@ -31,6 +31,7 @@ public abstract class ClientServerBTest extends BenchTest {
     protected boolean autoCommit = true;
     protected boolean batch;
     protected boolean prepare;
+    protected boolean reinit = true;
     protected String[] sqls;
 
     protected AtomicInteger id = new AtomicInteger();
@@ -68,7 +69,8 @@ public abstract class ClientServerBTest extends BenchTest {
 
     public void run() throws Exception {
         for (int i = 0; i < benchTestLoop; i++) {
-            init();
+            if (reinit || i == 0)
+                init();
             run(threadCount);
         }
     }

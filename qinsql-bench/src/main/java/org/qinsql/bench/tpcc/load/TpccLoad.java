@@ -3,7 +3,7 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh, CodeFutures Corporation
  */
-package org.qinsql.bench.tpcc;
+package org.qinsql.bench.tpcc.load;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,11 +11,9 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,11 +21,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lealone.common.util.ScriptReader;
 import org.qinsql.bench.DbType;
-import org.qinsql.bench.tpcc.bench.Util;
-import org.qinsql.bench.tpcc.load.Load;
-import org.qinsql.bench.tpcc.load.LoadConfig;
+import org.qinsql.bench.tpcc.config.TpccConfig;
+import org.qinsql.bench.tpcc.util.Util;
 
-public class TpccLoad extends Tpcc {
+public class TpccLoad extends TpccConfig {
 
     public static void main(String[] args, String... sqlScripts) {
         dumpInformation(args);
@@ -39,8 +36,8 @@ public class TpccLoad extends Tpcc {
 
     private static boolean option_debug = false; // 1 if generating debug output
 
-    private static final String SHARDCOUNT = "SHARDCOUNT";
-    private static final String SHARDID = "SHARDID";
+    private static final String SHARD_COUNT = "shard_count";
+    private static final String SHARD_ID = "shard_id";
 
     private int shardCount = 0;
     private int shardId = -1;
@@ -71,8 +68,8 @@ public class TpccLoad extends Tpcc {
     private void parseArgs(String[] args) {
         if (args.length == 0) {
             loadConfig();
-            shardCount = Integer.parseInt(properties.getProperty(SHARDCOUNT));
-            shardId = Integer.parseInt(properties.getProperty(SHARDID));
+            shardCount = Integer.parseInt(properties.getProperty(SHARD_COUNT));
+            shardId = Integer.parseInt(properties.getProperty(SHARD_ID));
             seed = Integer.parseInt(properties.getProperty("SEED", "0"));
         } else {
             if ((args.length % 2) != 0) {
@@ -249,17 +246,6 @@ public class TpccLoad extends Tpcc {
         }
         loadConfig.setConn(conn);
         return loadConfig;
-    }
-
-    private Connection getConnection() throws SQLException {
-        Properties jdbcConnectProp = new Properties();
-        jdbcConnectProp.setProperty("user", dbUser);
-        jdbcConnectProp.setProperty("password", dbPassword);
-        if (dbType == DbType.MYSQL) {
-            jdbcConnectProp.setProperty("useServerPrepStmts", "true");
-            jdbcConnectProp.setProperty("cachePrepStmts", "true");
-        }
-        return DriverManager.getConnection(jdbcUrl, jdbcConnectProp);
     }
 
     private void runScript(String... sqlScripts) {

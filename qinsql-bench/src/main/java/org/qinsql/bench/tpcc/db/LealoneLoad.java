@@ -3,11 +3,13 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.tpcc;
+package org.qinsql.bench.tpcc.db;
 
-public class LealoneTpccLoad {
+import org.qinsql.bench.tpcc.load.TpccLoad;
+
+public class LealoneLoad {
     public static void main(String[] args) {
-        System.setProperty("tpcc.config", "lealone/tpcc.properties");
+        System.setProperty("db.config", "lealone/db.properties");
         TpccLoad.main(args, "lealone/create_tables.sql", "lealone/add_fkey_idx.sql");
     }
 }

@@ -8,8 +8,8 @@ package org.qinsql.bench.tpcc.load;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.qinsql.bench.tpcc.bench.TpccConstants;
-import org.qinsql.bench.tpcc.bench.Util;
+import org.qinsql.bench.tpcc.config.TpccConstants;
+import org.qinsql.bench.tpcc.util.Util;
 
 public class Load implements TpccConstants {
 

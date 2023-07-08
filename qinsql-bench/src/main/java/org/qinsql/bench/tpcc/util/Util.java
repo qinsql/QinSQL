@@ -3,9 +3,11 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh, CodeFutures Corporation
  */
-package org.qinsql.bench.tpcc.bench;
+package org.qinsql.bench.tpcc.util;
 
 import java.util.Random;
+
+import org.qinsql.bench.tpcc.config.TpccConstants;
 
 public class Util implements TpccConstants {
 
@@ -95,6 +97,8 @@ public class Util implements TpccConstants {
       * return number uniformly distributed b/w min and max, inclusive
       */
     public static int randomNumber(int min, int max) {
+        if (min == max)
+            return min;
         int next = generate.nextInt();
         int div = next % ((max - min) + 1);
         if (div < 0) {

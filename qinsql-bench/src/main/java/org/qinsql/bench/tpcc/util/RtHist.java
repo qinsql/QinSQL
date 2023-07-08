@@ -3,9 +3,9 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh, CodeFutures Corporation
  */
-package org.qinsql.bench.tpcc.bench;
+package org.qinsql.bench.tpcc.util;
 
-public class RtHist implements TpccConstants {
+public class RtHist {
 
     private static final int MAXREC = 20;
     private static final int REC_PER_SEC = 1000;
@@ -13,8 +13,8 @@ public class RtHist implements TpccConstants {
     private static int[][] cur_hist = new int[5][MAXREC * REC_PER_SEC];
 
     // CHECK: These are externs so should they be public????
-    public static double[] max_rt = new double[10];
-    public static double[] cur_max_rt = new double[10];
+    private static double[] max_rt = new double[10];
+    private static double[] cur_max_rt = new double[10];
 
     /* initialize */
     public static void histInit() {

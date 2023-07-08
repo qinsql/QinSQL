@@ -3,11 +3,13 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.tpcc;
+package org.qinsql.bench.tpcc.db;
 
-public class LealoneTpccBench {
+import org.qinsql.bench.tpcc.bench.TpccBench;
+
+public class H2Bench {
     public static void main(String[] args) {
-        System.setProperty("tpcc.config", "lealone/tpcc.properties");
+        System.setProperty("db.config", "h2/db.properties");
         TpccBench.main(args);
     }
 }

@@ -3,11 +3,13 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh
  */
-package org.qinsql.bench.tpcc;
+package org.qinsql.bench.tpcc.db;
 
-public class MySQLTpccLoad {
+import org.qinsql.bench.tpcc.load.TpccLoad;
+
+public class MySQLLoad {
     public static void main(String[] args) {
-        System.setProperty("tpcc.config", "mysql/tpcc.properties");
+        System.setProperty("db.config", "mysql/db.properties");
         TpccLoad.main(args, "mysql/create_tables.sql", "mysql/add_fkey_idx.sql");
     }
 }

@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Future;
 
-import org.qinsql.bench.tpcc.TpccLoad;
-
 /**
  * Copyright (C) 2011 CodeFutures Corporation. All rights reserved.
  */

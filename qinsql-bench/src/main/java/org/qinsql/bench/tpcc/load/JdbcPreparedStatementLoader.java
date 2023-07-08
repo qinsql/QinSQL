@@ -10,8 +10,6 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.concurrent.Future;
 
-import org.qinsql.bench.tpcc.TpccLoad;
-
 /**
  * Data loader using prepared statements and batches. 
  * This is slower than the JdbcStatementLoader which uses bulk inserts.

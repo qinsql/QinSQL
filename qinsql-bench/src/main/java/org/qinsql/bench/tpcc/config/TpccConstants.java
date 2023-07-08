@@ -3,7 +3,11 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh, CodeFutures Corporation
  */
-package org.qinsql.bench.tpcc.bench;
+package org.qinsql.bench.tpcc.config;
+
+import org.lealone.common.logging.Logger;
+import org.lealone.common.logging.LoggerFactory;
+import org.qinsql.bench.tpcc.bench.TpccBench;
 
 public interface TpccConstants {
     /*
@@ -21,4 +25,7 @@ public interface TpccConstants {
     public static int MAX_NUM_ITEMS = 15;
     public static int MAX_ITEM_LEN = 24;
 
+    public static final Logger logger = LoggerFactory.getLogger(TpccBench.class);
+    public static final boolean DEBUG = logger.isDebugEnabled();
+    public static final boolean TRACE = logger.isTraceEnabled();
 }

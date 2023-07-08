@@ -3,19 +3,16 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh, CodeFutures Corporation
  */
-package org.qinsql.bench.tpcc.bench;
+package org.qinsql.bench.tpcc.bench.transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.lealone.common.logging.Logger;
-import org.lealone.common.logging.LoggerFactory;
+import org.qinsql.bench.tpcc.config.TpccConstants;
 
-public class TpccStatements {
-
-    private static final Logger logger = LoggerFactory.getLogger(TpccStatements.class);
+public class TpccStatements implements TpccConstants {
 
     public static final int STMT_COUNT = 37;
 
@@ -142,7 +139,8 @@ public class TpccStatements {
      * Commit a transaction.
      */
     public void commit() throws SQLException {
-        logger.trace("COMMIT");
+        if (TRACE)
+            logger.trace("COMMIT");
         conn.commit();
     }
 
@@ -150,7 +148,19 @@ public class TpccStatements {
      * Rollback a transaction.
      */
     public void rollback() throws SQLException {
-        logger.trace("ROLLBACK");
+        if (TRACE)
+            logger.trace("ROLLBACK");
         conn.rollback();
+    }
+
+    public void rollback(Exception e, String prefix) {
+        try {
+            // Rollback if an aborted transaction, they are intentional in some percentage of cases.
+            rollback();
+        } catch (Throwable t) {
+            throw new RuntimeException(prefix + " error", t);
+        } finally {
+            logger.error(prefix + " error", e);
+        }
     }
 }

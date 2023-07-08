@@ -3,22 +3,15 @@
  * Licensed under the Server Side Public License, v 1.
  * Initial Developer: zhh, CodeFutures Corporation
  */
-package org.qinsql.bench.tpcc;
+package org.qinsql.bench.tpcc.bench;
 
 import java.text.DecimalFormat;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import org.lealone.common.logging.Logger;
-import org.lealone.common.logging.LoggerFactory;
-import org.qinsql.bench.tpcc.bench.NamedThreadFactory;
-import org.qinsql.bench.tpcc.bench.RtHist;
-import org.qinsql.bench.tpcc.bench.TpccThread;
-import org.qinsql.bench.tpcc.bench.Util;
+import org.qinsql.bench.tpcc.config.TpccConfig;
+import org.qinsql.bench.tpcc.util.RtHist;
+import org.qinsql.bench.tpcc.util.Util;
 
-@SuppressWarnings("unused")
-public class TpccBench extends Tpcc {
+public class TpccBench extends TpccConfig {
 
     public static void main(String[] args) {
         dumpInformation(args);
@@ -28,13 +21,9 @@ public class TpccBench extends Tpcc {
         System.out.println("Terminating process now");
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(TpccBench.class);
-    private static final boolean DEBUG = logger.isDebugEnabled();
-
-    private static final String DATABASE = "DATABASE";
-    private static final String RAMPUPTIME = "RAMPUPTIME";
-    private static final String DURATION = "DURATION";
-    private static final String JOINS = "JOINS";
+    private static final String RAMPUP_TIME = "rampup_time";
+    private static final String MEASURE_TIME = "measure_time";
+    private static final String JOINS = "joins";
 
     private static final String TRANSACTION_NAME[] = {
             "NewOrder",
@@ -43,36 +32,14 @@ public class TpccBench extends Tpcc {
             "Delivery",
             "Slev" };
 
-    public static volatile int activate_transaction = 0;
+    public static volatile boolean stopped = false;
     public static volatile boolean counting_on = false;
-
-    private final boolean joins = true;
 
     private int rampupTime;
     private int measureTime;
-    private int fetchSize = 100;
+    private boolean joins;
 
-    private int num_node; /* number of servers that consists of cluster i.e. RAC (0:normal mode)*/
-    private final int[] success = new int[TRANSACTION_COUNT];
-    private final int[] late = new int[TRANSACTION_COUNT];
-    private final int[] retry = new int[TRANSACTION_COUNT];
-    private final int[] failure = new int[TRANSACTION_COUNT];
-
-    private int[][] success2;
-    private int[][] late2;
-    private int[][] retry2;
-    private int[][] failure2;
-
-    private int[] success2_sum = new int[TRANSACTION_COUNT];
-    private int[] late2_sum = new int[TRANSACTION_COUNT];
-    private int[] retry2_sum = new int[TRANSACTION_COUNT];
-    private int[] failure2_sum = new int[TRANSACTION_COUNT];
-
-    private int[] prev_s = new int[5];
-    private int[] prev_l = new int[5];
-
-    private double[] max_rt = new double[5];
-    private int port = 3306;
+    private TpccThread[] threads;
 
     public TpccBench() {
         // Empty.
@@ -81,13 +48,9 @@ public class TpccBench extends Tpcc {
     private void parseArgs(String[] args) {
         if (args.length == 0) {
             loadConfig();
-            rampupTime = Integer.parseInt(properties.getProperty(RAMPUPTIME));
-            measureTime = Integer.parseInt(properties.getProperty(DURATION));
-            String jdbcFetchSize = properties.getProperty("JDBCFETCHSIZE");
-            // joins = Boolean.parseBoolean(properties.getProperty(JOINS));
-            if (jdbcFetchSize != null) {
-                fetchSize = Integer.parseInt(jdbcFetchSize);
-            }
+            rampupTime = getIntProperty(RAMPUP_TIME);
+            measureTime = getIntProperty(MEASURE_TIME);
+            joins = Boolean.parseBoolean(properties.getProperty(JOINS));
         } else {
             if ((args.length % 2) != 0) {
                 System.out.println("Invalid number of arguments: " + args.length);
@@ -113,48 +76,11 @@ public class TpccBench extends Tpcc {
                     jdbcUrl = args[i + 1];
                 } else if (args[i].equals("-f")) {
                     fetchSize = Integer.parseInt(args[i + 1]);
-                    // } else if (args[i].equals("-J")) {
-                    // joins = Boolean.parseBoolean(args[i + 1]);
+                } else if (args[i].equals("-J")) {
+                    joins = Boolean.parseBoolean(args[i + 1]);
                 } else {
                     showUsage();
                 }
-            }
-        }
-    }
-
-    private void runBenchmark() {
-
-        System.out.println("***************************************");
-        System.out.println("****** Java TPC-C Load Generator ******");
-        System.out.println("***************************************");
-
-        /* initialize */
-        RtHist.histInit();
-        activate_transaction = 1;
-
-        for (int i = 0; i < TRANSACTION_COUNT; i++) {
-            success[i] = 0;
-            late[i] = 0;
-            retry[i] = 0;
-            failure[i] = 0;
-
-            prev_s[i] = 0;
-            prev_l[i] = 0;
-
-            max_rt[i] = 0.0;
-        }
-
-        /* number of node (default 0) */
-        num_node = 0;
-
-        if (num_node > 0) {
-            if (numWare % num_node != 0) {
-                logger.error(" [warehouse] value must be devided by [num_node].");
-                return;
-            }
-            if (numConn % num_node != 0) {
-                logger.error("[connection] value must be devided by [num_node].");
-                return;
             }
         }
 
@@ -182,14 +108,11 @@ public class TpccBench extends Tpcc {
         if (measureTime < 1) {
             throw new RuntimeException("Duration has to be greater than or equal to 1.");
         }
+    }
 
-        // Init 2-dimensional arrays.
-        success2 = new int[TRANSACTION_COUNT][numConn];
-        late2 = new int[TRANSACTION_COUNT][numConn];
-        retry2 = new int[TRANSACTION_COUNT][numConn];
-        failure2 = new int[TRANSACTION_COUNT][numConn];
-
-        // long delay1 = measure_time*1000;
+    private void init() {
+        RtHist.histInit();
+        stopped = false;
 
         System.out.printf("<Parameters>\n");
 
@@ -205,93 +128,125 @@ public class TpccBench extends Tpcc {
         System.out.printf("    [measure]: %d (sec.)\n", measureTime);
 
         Util.seqInit(10, 10, 1, 1, 1);
+    }
 
-        /* set up threads */
+    private void runBenchmark() {
 
-        if (DEBUG)
-            logger.debug("Creating TpccThread");
-        ExecutorService executor = Executors.newFixedThreadPool(numConn,
-                new NamedThreadFactory("tpcc-thread"));
+        System.out.println("***************************************");
+        System.out.println("********* Java TPC-C Benchmark ********");
+        System.out.println("***************************************");
 
-        // Start each server.
+        init();
 
-        for (int i = 0; i < numConn; i++) {
-            Runnable worker = new TpccThread(dbType, i, port, 1, dbUser, dbPassword, numWare, numConn,
-                    javaDriver, jdbcUrl, fetchSize, success, late, retry, failure, success2, late2,
-                    retry2, failure2, joins);
-            executor.execute(worker);
-        }
+        // start threads
+        startThreads();
 
         if (rampupTime > 0) {
             // rampup time
-            System.out.printf("\nRAMPUP START.\n\n");
-            try {
-                Thread.sleep(rampupTime * 1000);
-            } catch (InterruptedException e) {
-                logger.error("Rampup wait interrupted", e);
-            }
-            System.out.printf("\nRAMPUP END.\n\n");
+            System.out.println();
+            System.out.println("RAMPUP START.");
+            timeLapse(System.currentTimeMillis(), rampupTime);
+            System.out.println("RAMPUP END.");
         }
-
-        // measure time
-        System.out.printf("\nMEASURING START.\n\n");
 
         // start counting
         counting_on = true;
 
+        // measure time
+        System.out.println();
+        System.out.println("MEASURING START.");
         // loop for the measure_time
-        final long startTime = System.currentTimeMillis();
-        DecimalFormat df = new DecimalFormat("#,##0.0");
-        long runTime = 0;
-        while ((runTime = System.currentTimeMillis() - startTime) < measureTime * 1000) {
-            System.out.println(
-                    "Current execution time lapse: " + df.format(runTime / 1000.0f) + " seconds");
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                logger.error("Sleep interrupted", e);
-            }
-        }
-        final long actualTestTime = System.currentTimeMillis() - startTime;
+        long startTime = System.currentTimeMillis();
+        timeLapse(startTime, measureTime);
+        System.out.println("MEASURING END.");
 
+        // stop threads
+        stopThreads();
+
+        showResults(startTime);
+
+        // TODO: To be implemented better later.
+        // RtHist.histReport();
+    }
+
+    private TpccThread[] startThreads() {
+        System.out.println("STARTING TPCC THREADS");
+        threads = new TpccThread[numConn];
+        for (int i = 0; i < numConn; i++) {
+            threads[i] = new TpccThread(this, i, numWare, fetchSize, joins);
+        }
+        for (int i = 0; i < numConn; i++) {
+            threads[i].start();
+        }
+        return threads;
+    }
+
+    private void stopThreads() {
+        stopped = true;
+        try {
+            for (int i = 0; i < numConn; i++) {
+                threads[i].join(30 * 1000);
+            }
+            System.out.println("TPCC THREADS STOPPED");
+        } catch (InterruptedException e) {
+            System.out.println("Timed out waiting for threads to terminate");
+        }
+    }
+
+    private void showResults(long startTime) {
+        final long actualTestTime = System.currentTimeMillis() - startTime;
         // show results
         System.out.println("---------------------------------------------------");
-        /*
-         *  Raw Results 
-         */
 
+        int[] success = new int[TRANSACTION_COUNT];
+        int[] late = new int[TRANSACTION_COUNT];
+        int[] retry = new int[TRANSACTION_COUNT];
+        int[] failure = new int[TRANSACTION_COUNT];
+        long[] sum_rt = new long[TRANSACTION_COUNT];
+        long[] min_rt = new long[TRANSACTION_COUNT];
+        long[] max_rt = new long[TRANSACTION_COUNT];
+        long[] avg_rt = new long[TRANSACTION_COUNT];
+        for (int i = 0; i < TRANSACTION_COUNT; i++) {
+            min_rt[i] = Long.MAX_VALUE;
+        }
+        for (int i = 0; i < TRANSACTION_COUNT; i++) {
+            max_rt[i] = 0;
+        }
+
+        for (int i = 0; i < TRANSACTION_COUNT; i++) {
+            for (int j = 0; j < numConn; j++) {
+                TpccThread t = threads[j];
+                success[i] += t.success[i];
+                late[i] += t.late[i];
+                retry[i] += t.retry[i];
+                failure[i] += t.failure[i];
+
+                sum_rt[i] += t.sum_rt[i];
+                long rt = t.min_rt[i];
+                if (rt < min_rt[i])
+                    min_rt[i] = rt;
+                rt = t.max_rt[i];
+                if (rt > max_rt[i])
+                    max_rt[i] = rt;
+            }
+        }
+        for (int i = 0; i < TRANSACTION_COUNT; i++) {
+            avg_rt[i] = sum_rt[i] / (success[i] + late[i]);
+        }
+
+        /*
+         * Raw Results 
+         */
         System.out.println("<Raw Results>");
         for (int i = 0; i < TRANSACTION_COUNT; i++) {
-            System.out.printf("  |%s| sc:%d  lt:%d  rt:%d  fl:%d \n", TRANSACTION_NAME[i], success[i],
-                    late[i], retry[i], failure[i]);
+            System.out.printf("  |%s| success:%d  late:%d  retry:%d  failure:%d \n", TRANSACTION_NAME[i],
+                    success[i], late[i], retry[i], failure[i]);
         }
         System.out.printf(" in %f sec.\n", actualTestTime / 1000.0f);
 
-        /*
-        * Raw Results 2
-        */
-        System.out.println("<Raw Results2(sum ver.)>");
-        for (int i = 0; i < TRANSACTION_COUNT; i++) {
-            success2_sum[i] = 0;
-            late2_sum[i] = 0;
-            retry2_sum[i] = 0;
-            failure2_sum[i] = 0;
-            for (int k = 0; k < numConn; k++) {
-                success2_sum[i] += success2[i][k];
-                late2_sum[i] += late2[i][k];
-                retry2_sum[i] += retry2[i][k];
-                failure2_sum[i] += failure2[i][k];
-            }
-        }
-        for (int i = 0; i < TRANSACTION_COUNT; i++) {
-            System.out.printf("  |%s| sc:%d  lt:%d  rt:%d  fl:%d \n", TRANSACTION_NAME[i],
-                    success2_sum[i], late2_sum[i], retry2_sum[i], failure2_sum[i]);
-        }
-
         System.out.println("<Constraint Check> (all must be [OK])\n [transaction percentage]");
         int j = 0;
-        int i;
-        for (i = 0; i < TRANSACTION_COUNT; i++) {
+        for (int i = 0; i < TRANSACTION_COUNT; i++) {
             j += (success[i] + late[i]);
         }
 
@@ -336,10 +291,11 @@ public class TpccBench extends Tpcc {
                         + late[n]);
             System.out.printf("      %s: %f%% ", TRANSACTION_NAME[n], f);
             if (f >= 90.0) {
-                System.out.printf(" [OK]\n");
+                System.out.printf(" [OK]");
             } else {
-                System.out.printf(" [NG] *\n");
+                System.out.printf(" [NG] *");
             }
+            System.out.printf("  min:%d  max:%d  avg:%d [ms]\n", min_rt[n], max_rt[n], avg_rt[n]);
         }
 
         double total = 0.0;
@@ -353,20 +309,20 @@ public class TpccBench extends Tpcc {
         System.out.println();
         System.out.println("<TpmC>");
         System.out.println(tpcm + " TpmC");
+    }
 
-        // stop threads
-        System.out.printf("\nSTOPPING THREADS\n");
-        activate_transaction = 0;
-
-        executor.shutdown();
-        try {
-            executor.awaitTermination(30, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            System.out.println("Timed out waiting for executor to terminate");
+    private static void timeLapse(long startTime, int endTime) {
+        DecimalFormat df = new DecimalFormat("#,##0.0");
+        long runTime = 0;
+        while ((runTime = System.currentTimeMillis() - startTime) < endTime * 1000) {
+            System.out.println(
+                    "Current execution time lapse: " + df.format(runTime / 1000.0f) + " seconds");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                logger.error("Sleep interrupted", e);
+            }
         }
-
-        // TODO: To be implemented better later.
-        // RtHist.histReport();
     }
 
     private static void showUsage() {

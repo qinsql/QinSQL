@@ -7,9 +7,12 @@ package org.qinsql.bench.cs;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lealone.db.ConnectionSetting;
@@ -18,6 +21,11 @@ import org.qinsql.bench.BenchTest;
 import org.qinsql.bench.DbType;
 
 public abstract class ClientServerBTest extends BenchTest {
+
+    static {
+        System.setProperty("lealone.server.cached.objects", "10000000");
+        System.setProperty("h2.serverCachedObjects", "10000000");
+    }
 
     protected DbType dbType;
     protected boolean disableLealoneQueryCache = true;
@@ -102,6 +110,84 @@ public abstract class ClientServerBTest extends BenchTest {
     }
 
     protected void run(int threadCount, Connection[] conns, boolean warmUp) throws Exception {
+        ClientServerBTestThread[] threads = new ClientServerBTestThread[threadCount];
+        for (int i = 0; i < threadCount; i++) {
+            threads[i] = createBTestThread(i, conns[i]);
+        }
+        long totalTime = 0;
+        for (int i = 0; i < threadCount; i++) {
+            threads[i].setCloseConn(false);
+            threads[i].start();
+        }
+        for (int i = 0; i < threadCount; i++) {
+            threads[i].join();
+            totalTime += threads[i].getTotalTime();
+        }
+        System.out.println(
+                getBTestName() + " sql count: " + (threadCount * innerLoop * sqlCountPerInnerLoop)
+                        + ", total time: " + TimeUnit.NANOSECONDS.toMillis(totalTime / threadCount)
+                        + " ms" + (warmUp ? " (***WarmUp***)" : ""));
+    }
+
+    protected ClientServerBTestThread createBTestThread(int id, Connection conn) {
+        throw new RuntimeException("not supports");
+    }
+
+    protected abstract class ClientServerBTestThread extends Thread {
+
+        protected Connection conn;
+        protected Statement stmt;
+        protected PreparedStatement ps;
+        protected boolean closeConn = true;
+        protected long startTime;
+        protected long endTime;
+
+        public ClientServerBTestThread(int id, Connection conn) {
+            super(getBTestName() + "Thread-" + id);
+            this.conn = conn;
+            try {
+                this.stmt = conn.createStatement();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public long getTotalTime() {
+            return endTime - startTime;
+        }
+
+        public void setCloseConn(boolean closeConn) {
+            this.closeConn = closeConn;
+        }
+
+        public void prepareStatement(String sql) {
+            try {
+                ps = conn.prepareStatement(sql);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        protected abstract String nextSql();
+
+        protected void prepare() throws Exception {
+        }
+
+        protected void execute() throws Exception {
+        }
+
+        @Override
+        public void run() {
+            try {
+                execute();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                close(stmt, ps);
+                if (closeConn)
+                    close(conn);
+            }
+        }
     }
 
     protected Connection getConnection() throws Exception {

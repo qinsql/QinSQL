@@ -6,7 +6,6 @@
 package org.qinsql.bench.cs.write.insert;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.qinsql.bench.cs.write.ClientServerWriteBTest;
@@ -34,7 +33,7 @@ public abstract class InsertBTest extends ClientServerWriteBTest {
     }
 
     @Override
-    protected UpdateThreadBase createUpdateThread(int id, Connection conn) {
+    protected UpdateThreadBase createBTestThread(int id, Connection conn) {
         return new UpdateThread(id, conn);
     }
 
@@ -42,11 +41,7 @@ public abstract class InsertBTest extends ClientServerWriteBTest {
 
         UpdateThread(int id, Connection conn) {
             super(id, conn);
-            try {
-                ps = conn.prepareStatement("insert into InsertBTest values(?,1)");
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            prepareStatement("insert into InsertBTest values(?,1)");
         }
 
         @Override
@@ -55,12 +50,8 @@ public abstract class InsertBTest extends ClientServerWriteBTest {
         }
 
         @Override
-        protected void prepare() {
-            try {
-                ps.setInt(1, id.incrementAndGet());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        protected void prepare() throws Exception {
+            ps.setInt(1, id.incrementAndGet());
         }
     }
 }

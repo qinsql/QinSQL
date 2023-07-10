@@ -6,12 +6,12 @@
 package org.qinsql.bench.cs.query;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.lealone.client.jdbc.JdbcPreparedStatement;
 import org.lealone.client.jdbc.JdbcStatement;
 import org.qinsql.bench.cs.ClientServerBTest;
 
@@ -21,74 +21,27 @@ public abstract class ClientServerQueryBTest extends ClientServerBTest {
         reinit = false;
     }
 
-    @Override
-    protected void run(int threadCount, Connection[] conns, boolean warmUp) throws Exception {
-        QueryThreadBase[] threads = new QueryThreadBase[threadCount];
-        for (int i = 0; i < threadCount; i++) {
-            threads[i] = createQueryThread(i, conns[i]);
-        }
-        long totalTime = 0;
-        for (int i = 0; i < threadCount; i++) {
-            threads[i].setCloseConn(false);
-            threads[i].start();
-        }
-        for (int i = 0; i < threadCount; i++) {
-            threads[i].join();
-            totalTime += threads[i].getTotalTime();
-        }
-        System.out.println(
-                getBTestName() + " sql count: " + (threadCount * innerLoop * sqlCountPerInnerLoop)
-                        + ", total time: " + TimeUnit.NANOSECONDS.toMillis(totalTime / threadCount)
-                        + " ms" + (warmUp ? " (***WarmUp***)" : ""));
-    }
-
-    protected abstract QueryThreadBase createQueryThread(int id, Connection conn);
-
-    protected abstract class QueryThreadBase extends Thread {
-
-        protected Connection conn;
-        protected Statement stmt;
-        protected boolean closeConn = true;
-        protected long startTime;
-        protected long endTime;
+    protected abstract class QueryThreadBase extends ClientServerBTestThread {
 
         public QueryThreadBase(int id, Connection conn) {
-            super(getBTestName() + "Thread-" + id);
-            this.conn = conn;
-            try {
-                this.stmt = conn.createStatement();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            super(id, conn);
         }
-
-        public void setCloseConn(boolean closeConn) {
-            this.closeConn = closeConn;
-        }
-
-        protected abstract String nextSql();
 
         @Override
-        public void run() {
-            try {
-                startTime = System.nanoTime();
-                if (async) {
+        protected void execute() throws Exception {
+            startTime = System.nanoTime();
+            if (async) {
+                if (prepare)
+                    executePreparedQueryAsync();
+                else
                     executeQueryAsync(stmt);
-                } else {
+            } else {
+                if (prepare)
+                    executePreparedQuery();
+                else
                     executeQuery(stmt);
-                    endTime = System.nanoTime();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                close(stmt);
-                if (closeConn)
-                    close(conn);
+                endTime = System.nanoTime();
             }
-        }
-
-        public long getTotalTime() {
-            return endTime - startTime;
         }
 
         protected void executeQueryAsync(Statement statement) throws Exception {
@@ -110,11 +63,42 @@ public abstract class ClientServerQueryBTest extends ClientServerBTest {
             printInnerLoopResult(t1);
         }
 
+        protected void executePreparedQueryAsync() throws Exception {
+            JdbcPreparedStatement ps2 = (JdbcPreparedStatement) ps;
+            AtomicInteger counter = new AtomicInteger(sqlCountPerInnerLoop * innerLoop);
+            CountDownLatch latch = new CountDownLatch(1);
+            long t1 = System.nanoTime();
+            for (int j = 0; j < innerLoop; j++) {
+                for (int i = 0; i < sqlCountPerInnerLoop; i++) {
+                    prepare();
+                    ps2.executeQueryAsync().onComplete(ar -> {
+                        if (counter.decrementAndGet() == 0) {
+                            endTime = System.nanoTime();
+                            latch.countDown();
+                        }
+                    });
+                }
+            }
+            latch.await();
+            printInnerLoopResult(t1);
+        }
+
         protected void executeQuery(Statement statement) throws Exception {
             long t1 = System.nanoTime();
             for (int j = 0; j < innerLoop; j++) {
                 for (int i = 0; i < sqlCountPerInnerLoop; i++)
                     statement.executeQuery(nextSql());
+            }
+            printInnerLoopResult(t1);
+        }
+
+        protected void executePreparedQuery() throws Exception {
+            long t1 = System.nanoTime();
+            for (int j = 0; j < innerLoop; j++) {
+                for (int i = 0; i < sqlCountPerInnerLoop; i++) {
+                    prepare();
+                    ps.executeQuery();
+                }
             }
             printInnerLoopResult(t1);
         }

@@ -19,7 +19,7 @@ public abstract class SingleRowQueryBTest extends ClientServerQueryBTest {
         innerLoop = 5;
         sqlCountPerInnerLoop = 50;
         rowCount = 10000;
-        sqls = new String[rowCount];
+        // prepare = true;
     }
 
     @Override
@@ -41,23 +41,19 @@ public abstract class SingleRowQueryBTest extends ClientServerQueryBTest {
                 ps.clearBatch();
             }
         }
-        for (int i = 1; i <= rowCount; i++) {
-            sqls[i - 1] = "select * from SingleRowQueryBTest where pk=" + i;
-        }
         close(statement, ps, conn);
     }
 
     @Override
-    protected QueryThreadBase createQueryThread(int id, Connection conn) {
+    protected QueryThreadBase createBTestThread(int id, Connection conn) {
         return new QueryThread(id, conn);
     }
 
     private class QueryThread extends QueryThreadBase {
-        int start;
 
         QueryThread(int id, Connection conn) {
             super(id, conn);
-            start = 0;
+            prepareStatement("select * from SingleRowQueryBTest where pk=?");
         }
 
         @Override
@@ -65,9 +61,9 @@ public abstract class SingleRowQueryBTest extends ClientServerQueryBTest {
             return "select * from SingleRowQueryBTest where pk=" + random.nextInt(rowCount);
         }
 
-        @SuppressWarnings("unused")
-        protected String nextSql0() {
-            return sqls[start++];
+        @Override
+        protected void prepare() throws Exception {
+            ps.setInt(1, random.nextInt(rowCount));
         }
     }
 }

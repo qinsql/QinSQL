@@ -6,8 +6,6 @@
 package org.qinsql.bench.cs.write;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -19,92 +17,35 @@ import org.qinsql.bench.cs.ClientServerBTest;
 
 public abstract class ClientServerWriteBTest extends ClientServerBTest {
 
-    @Override
-    protected void run(int threadCount, Connection[] conns, boolean warmUp) throws Exception {
-        UpdateThreadBase[] threads = new UpdateThreadBase[threadCount];
-        for (int i = 0; i < threadCount; i++) {
-            threads[i] = createUpdateThread(i, conns[i]);
-        }
-        long totalTime = 0;
-        for (int i = 0; i < threadCount; i++) {
-            threads[i].setCloseConn(false);
-            threads[i].start();
-        }
-        for (int i = 0; i < threadCount; i++) {
-            threads[i].join();
-            totalTime += threads[i].getTotalTime();
-        }
-        System.out.println(
-                getBTestName() + " sql count: " + (threadCount * innerLoop * sqlCountPerInnerLoop)
-                        + ", total time: " + TimeUnit.NANOSECONDS.toMillis(totalTime / threadCount)
-                        + " ms" + (warmUp ? " (***WarmUp***)" : ""));
-    }
-
-    protected abstract UpdateThreadBase createUpdateThread(int id, Connection conn);
-
-    protected abstract class UpdateThreadBase extends Thread {
-
-        protected Connection conn;
-        protected Statement stmt;
-        protected PreparedStatement ps;
-        protected boolean closeConn = true;
-        protected long startTime;
-        protected long endTime;
+    protected abstract class UpdateThreadBase extends ClientServerBTestThread {
 
         public UpdateThreadBase(int id, Connection conn) {
-            super(getBTestName() + "Thread-" + id);
-            this.conn = conn;
-            try {
-                this.stmt = conn.createStatement();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public void setCloseConn(boolean closeConn) {
-            this.closeConn = closeConn;
-        }
-
-        protected abstract String nextSql();
-
-        protected void prepare() {
+            super(id, conn);
         }
 
         @Override
-        public void run() {
-            try {
-                startTime = System.nanoTime();
-                if (batch) {
+        protected void execute() throws Exception {
+            startTime = System.nanoTime();
+            if (batch) {
+                if (prepare)
+                    executePreparedBatchUpdate();
+                else
+                    executeBatchUpdate();
+                endTime = System.nanoTime();
+            } else {
+                if (async) {
                     if (prepare)
-                        executePreparedBatchUpdate();
+                        executePreparedUpdateAsync();
                     else
-                        executeBatchUpdate();
-                    endTime = System.nanoTime();
+                        executeUpdateAsync(stmt);
                 } else {
-                    if (async) {
-                        if (prepare)
-                            executePreparedUpdateAsync();
-                        else
-                            executeUpdateAsync(stmt);
-                    } else {
-                        if (prepare)
-                            executePreparedUpdate();
-                        else
-                            executeUpdate(stmt);
-                        endTime = System.nanoTime();
-                    }
+                    if (prepare)
+                        executePreparedUpdate();
+                    else
+                        executeUpdate(stmt);
+                    endTime = System.nanoTime();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                close(stmt);
-                if (closeConn)
-                    close(conn);
             }
-        }
-
-        public long getTotalTime() {
-            return endTime - startTime;
         }
 
         protected void executeUpdateAsync(Statement statement) throws Exception {

@@ -44,7 +44,7 @@ public abstract class MultiRowsUpdateBTest extends ClientServerWriteBTest {
     }
 
     @Override
-    protected UpdateThreadBase createUpdateThread(int id, Connection conn) {
+    protected UpdateThreadBase createBTestThread(int id, Connection conn) {
         return new UpdateThread(id, conn);
     }
 

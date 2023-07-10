@@ -21,6 +21,7 @@ public abstract class IndexQueryBTest extends ClientServerQueryBTest {
         innerLoop = 5;
         sqlCountPerInnerLoop = 50;
         rowCount = 30000;
+        // prepare = true;
     }
 
     @Override
@@ -63,18 +64,24 @@ public abstract class IndexQueryBTest extends ClientServerQueryBTest {
     }
 
     @Override
-    protected QueryThreadBase createQueryThread(int id, Connection conn) {
+    protected QueryThreadBase createBTestThread(int id, Connection conn) {
         return new QueryThread(id, conn);
     }
 
     private class QueryThread extends QueryThreadBase {
         QueryThread(int id, Connection conn) {
             super(id, conn);
+            prepareStatement("select * from IndexQueryBTest where name=?");
         }
 
         @Override
         protected String nextSql() {
             return "select * from IndexQueryBTest where name='n" + random.nextInt(rowCount) + "'";
+        }
+
+        @Override
+        protected void prepare() throws Exception {
+            ps.setString(1, "n" + random.nextInt(rowCount));
         }
     }
 }

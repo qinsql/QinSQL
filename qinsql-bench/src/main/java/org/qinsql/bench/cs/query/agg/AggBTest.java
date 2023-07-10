@@ -47,7 +47,7 @@ public abstract class AggBTest extends ClientServerQueryBTest {
     protected abstract String nextAggSql();
 
     @Override
-    protected QueryThreadBase createQueryThread(int id, Connection conn) {
+    protected QueryThreadBase createBTestThread(int id, Connection conn) {
         return new QueryThread(id, conn);
     }
 

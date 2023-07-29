@@ -272,6 +272,7 @@ public class PgServerConnection extends AsyncConnection {
                     sendErrorResponse("Prepared not found: " + name);
                 } else {
                     sendParameterDescription(p);
+                    sendNoData();
                 }
             } else if (type == 'P') {
                 Portal p = portals.get(name);
@@ -504,8 +505,8 @@ public class PgServerConnection extends AsyncConnection {
             writeShort(count);
             for (int i = 0; i < count; i++) {
                 int type;
-                if (p.paramType != null && p.paramType[i] != 0) {
-                    type = p.paramType[i];
+                if (meta.getParameterType(i+1) > 0) {
+                    type = PgType.convertType( meta.getParameterType(i+1) );
                 } else {
                     type = PgType.PG_TYPE_VARCHAR;
                 }

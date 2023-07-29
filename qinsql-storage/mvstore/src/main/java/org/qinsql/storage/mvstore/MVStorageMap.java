@@ -19,6 +19,7 @@ package org.qinsql.storage.mvstore;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.lealone.storage.CursorParameters;
 import org.lealone.storage.Storage;
 import org.lealone.storage.StorageMapBase;
 import org.lealone.storage.StorageMapCursor;
@@ -134,8 +135,8 @@ public class MVStorageMap<K, V> extends StorageMapBase<K, V> {
     }
 
     @Override
-    public StorageMapCursor<K, V> cursor(K from) {
-        return new MVStorageMapCursor<>(mvMap.cursor(from));
+    public StorageMapCursor<K, V> cursor(CursorParameters<K> parameters) {
+        return new MVStorageMapCursor<>(mvMap.cursor(parameters.from));
     }
 
     @Override

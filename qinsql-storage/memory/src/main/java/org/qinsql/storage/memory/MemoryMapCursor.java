@@ -30,18 +30,11 @@ public class MemoryMapCursor<K, V> implements StorageMapCursor<K, V> {
     }
 
     @Override
-    public boolean hasNext() {
-        return iterator.hasNext();
-    }
-
-    @Override
-    public K next() {
-        e = iterator.next();
-        return e.getKey();
-    }
-
-    @Override
-    public void remove() {
-        iterator.remove();
+    public boolean next() {
+        if (iterator.hasNext()) {
+            e = iterator.next();
+            return true;
+        }
+        return false;
     }
 }

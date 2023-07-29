@@ -39,12 +39,11 @@ public class MVStorageMapCursor<K, V> implements StorageMapCursor<K, V> {
     }
 
     @Override
-    public boolean hasNext() {
-        return cursor.hasNext();
-    }
-
-    @Override
-    public K next() {
-        return cursor.next();
+    public boolean next() {
+        if (cursor.hasNext()) {
+            cursor.next();
+            return true;
+        }
+        return false;
     }
 }

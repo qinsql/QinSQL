@@ -13,6 +13,7 @@ import org.lealone.sql.expression.evaluator.ExpressionEvaluator;
 import org.lealone.sql.expression.evaluator.HotSpotEvaluator;
 import org.lealone.sql.expression.visitor.GetValueVectorVisitor;
 import org.lealone.sql.operator.Operator;
+import org.lealone.sql.optimizer.TableFilter;
 import org.lealone.sql.vector.ValueVector;
 
 public class VOperator extends QOperator {
@@ -21,12 +22,14 @@ public class VOperator extends QOperator {
 
     protected ArrayList<Row> batch;
     protected final int batchSize;
+    protected final TableFilter topTableFilter;
 
     VOperator(Select select) {
         super(select);
         // 批量大小为128时经过实测更优，见VectorPerfTest
         batchSize = session.getOlapBatchSize() <= 0 ? 128 : session.getOlapBatchSize();
         batch = new ArrayList<>(batchSize);
+        topTableFilter = select.getTopTableFilter();
     }
 
     @Override

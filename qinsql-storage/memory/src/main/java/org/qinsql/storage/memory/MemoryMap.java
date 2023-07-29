@@ -8,6 +8,7 @@ package org.qinsql.storage.memory;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.lealone.storage.CursorParameters;
 import org.lealone.storage.StorageMapBase;
 import org.lealone.storage.StorageMapCursor;
 import org.lealone.storage.type.StorageDataType;
@@ -156,9 +157,9 @@ public class MemoryMap<K, V> extends StorageMapBase<K, V> {
     }
 
     @Override
-    public StorageMapCursor<K, V> cursor(K from) {
-        return new MemoryMapCursor<>(from == null ? skipListMap.entrySet().iterator()
-                : skipListMap.tailMap(from).entrySet().iterator());
+    public StorageMapCursor<K, V> cursor(CursorParameters<K> parameters) {
+        return new MemoryMapCursor<>(parameters.from == null ? skipListMap.entrySet().iterator()
+                : skipListMap.tailMap(parameters.from).entrySet().iterator());
     }
 
     @Override

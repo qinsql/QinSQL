@@ -120,9 +120,6 @@ public class NewOrder implements TpccConstants {
             int min_num = 0;
             int i = 0, j = 0, tmp = 0, swp = 0;
 
-            // struct timespec tbuf1,tbuf_start;
-            // clock_t clk1,clk_start;
-
             // Timestamp
             java.sql.Timestamp time = new Timestamp(System.currentTimeMillis());
             // String currentTimeStamp = "'" + time.toString() + "'";

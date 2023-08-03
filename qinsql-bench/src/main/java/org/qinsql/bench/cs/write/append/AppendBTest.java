@@ -17,6 +17,7 @@ public abstract class AppendBTest extends ClientServerWriteBTest {
         threadCount = 48;
         sqlCountPerInnerLoop = 20;
         innerLoop = 10;
+        // prepare = true;
     }
 
     @Override
@@ -38,12 +39,21 @@ public abstract class AppendBTest extends ClientServerWriteBTest {
 
         UpdateThread(int id, Connection conn) {
             super(id, conn);
+            prepareStatement("insert into AppendBTest values(?,?,?)");
         }
 
         @Override
         protected String nextSql() {
             int i = id.incrementAndGet();
             return "insert into AppendBTest values('n" + i + "'," + i + "," + (i * 10) + ")";
+        }
+
+        @Override
+        protected void prepare() throws Exception {
+            int i = id.incrementAndGet();
+            ps.setString(1, "n" + i);
+            ps.setInt(2, i);
+            ps.setInt(3, i * 10);
         }
     }
 }

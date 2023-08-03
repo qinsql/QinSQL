@@ -5,6 +5,7 @@
  */
 package org.qinsql.test.postgresql;
 
+import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,6 +37,9 @@ public class PgJdbcTest extends PgTestBase {
             int age = rs.getInt(2);
             System.out.println("PreparedStatement.executeQuery name: " + name + ", age: " + age);
 
+            ParameterMetaData pmd = ps.getParameterMetaData();
+            pmd.getParameterCount();
+            pmd.getParameterTypeName(1);
             rs.close();
             ps.close();
         } catch (SQLException e) {

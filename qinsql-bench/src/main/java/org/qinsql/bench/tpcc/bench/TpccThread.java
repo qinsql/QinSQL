@@ -74,7 +74,9 @@ public class TpccThread extends Thread implements TpccConstants {
     private final Delivery delivery;
     private final Slev slev;
 
-    public TpccThread(TpccBench tpcc, int t_num, int num_ware, int fetchSize, boolean joins) {
+    public long start, stop, sum;
+
+    public TpccThread(Connection conn, int t_num, int num_ware, int fetchSize, boolean joins) {
         super("tcpp-thread-" + (t_num + 1));
         for (int i = 0; i < TRANSACTION_COUNT; i++) {
             min_rt[i] = Long.MAX_VALUE;
@@ -85,7 +87,7 @@ public class TpccThread extends Thread implements TpccConstants {
 
         this.num_ware = num_ware;
         try {
-            conn = tpcc.getConnection();
+            this.conn = conn;
             pStmts = new TpccStatements(conn, fetchSize);
 
             // Initialize the transactions.
@@ -102,14 +104,30 @@ public class TpccThread extends Thread implements TpccConstants {
     @Override
     public void run() {
         try {
-            runTransaction();
+            for (int i = 0; i < 200; i++) {
+                // start = System.currentTimeMillis();
+                runTransaction();
+                // stop = System.currentTimeMillis();
+                // System.out.println("time: " + (stop - start));
+            }
+            for (int j = 0; j < 100; j++) {
+                start = System.currentTimeMillis();
+                for (int i = 0; i < 10; i++) {
+                    runTransaction();
+                }
+                stop = System.currentTimeMillis();
+                sum += (stop - start);
+                System.out.println("time: " + (stop - start));
+            }
+
         } catch (Throwable e) {
             logger.error("Unhandled exception", e);
         }
     }
 
     private int runTransaction() {
-        while (!TpccBench.stopped) {
+        // while (!TpccBench.stopped) {
+        for (int i = 0; i < 1; i++) {
             int sequence = Util.seqGet();
             try {
                 if (DETECT_LOCK_WAIT_TIMEOUTS) {
@@ -324,7 +342,8 @@ public class TpccThread extends Thread implements TpccConstants {
         int level = Util.randomNumber(10, 20);
         long beginTime = System.currentTimeMillis();
         for (int i = 0; i < MAX_RETRY; i++) {
-            int result = slev.slev(w_id, d_id, level);
+            // int result = slev.slev(w_id, d_id, level);
+            int result = slev.slev_ps(w_id, d_id, level);
             if (handleResult(beginTime, result, 4)) {
                 return;
             }

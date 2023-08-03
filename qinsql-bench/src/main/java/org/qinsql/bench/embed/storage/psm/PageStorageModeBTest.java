@@ -105,8 +105,7 @@ public class PageStorageModeBTest extends TestBase {
         ValueLong from = ValueLong.get(2000);
         t1 = System.currentTimeMillis();
         StorageMapCursor<ValueLong, TransactionalValue> cursor = map.cursor(from);
-        while (cursor.hasNext()) {
-            cursor.next();
+        while (cursor.next()) {
             rows++;
         }
         t2 = System.currentTimeMillis();
@@ -156,8 +155,7 @@ public class PageStorageModeBTest extends TestBase {
         t1 = System.currentTimeMillis();
         StorageMapCursor<ValueLong, TransactionalValue> cursor = map
                 .cursor(CursorParameters.create(from, columnIndex));
-        while (cursor.hasNext()) {
-            cursor.next();
+        while (cursor.next()) {
             rows++;
         }
         t2 = System.currentTimeMillis();

@@ -88,7 +88,8 @@ public abstract class TpccConfig implements TpccConstants {
             if (dbType == DbType.LEALONE) {
                 Statement stmt = conn.createStatement();
                 stmt.executeUpdate("set LOCK_TIMEOUT 1000000");
-                // stmt.executeUpdate("set query_cache_size 0");
+                stmt.executeUpdate("set query_cache_size 0");
+                // stmt.executeUpdate("set OPTIMIZE_REUSE_RESULTS 0");
                 stmt.close();
             } else if (dbType == DbType.H2) {
                 Statement stmt = conn.createStatement();

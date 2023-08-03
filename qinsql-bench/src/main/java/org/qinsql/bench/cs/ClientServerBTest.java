@@ -223,10 +223,12 @@ public abstract class ClientServerBTest extends BenchTest {
 
     protected static void close(AutoCloseable... acArray) {
         for (AutoCloseable ac : acArray) {
-            try {
-                ac.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (ac != null) {
+                try {
+                    ac.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -257,7 +259,7 @@ public abstract class ClientServerBTest extends BenchTest {
         // info.put("holdResultsOpenOverStatementClose","true");
         // info.put("allowMultiQueries","true");
 
-        // info.put("useServerPrepStmts", "true");
+        info.put("useServerPrepStmts", "true");
         // info.put("cachePrepStmts", "true");
         info.put("rewriteBatchedStatements", "true");
         // info.put("useCompression", "true");
@@ -303,6 +305,7 @@ public abstract class ClientServerBTest extends BenchTest {
         try {
             Statement statement = conn.createStatement();
             statement.executeUpdate("set QUERY_CACHE_SIZE 0");
+            // statement.executeUpdate("set OPTIMIZE_REUSE_RESULTS 0");
             statement.close();
         } catch (Exception e) {
             e.printStackTrace();

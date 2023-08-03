@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import org.qinsql.bench.tpcc.config.TpccConstants;
 
@@ -20,8 +21,12 @@ public class TpccStatements implements TpccConstants {
 
     private final PreparedStatement[] pStmts = new PreparedStatement[STMT_COUNT];
 
+    public Statement stmt;
+
     public TpccStatements(Connection conn, int fetchSize) throws Exception {
         this.conn = conn;
+        stmt = conn.createStatement();
+        stmt.setFetchSize(fetchSize);
 
         // NewOrder statements.
         pStmts[0] = prepareStatement("SELECT c.c_discount, c.c_last, c.c_credit, w.w_tax "
@@ -154,13 +159,12 @@ public class TpccStatements implements TpccConstants {
     }
 
     public void rollback(Exception e, String prefix) {
+        logger.error(prefix + " error", new RuntimeException(e));
         try {
             // Rollback if an aborted transaction, they are intentional in some percentage of cases.
             rollback();
         } catch (Throwable t) {
             throw new RuntimeException(prefix + " error", t);
-        } finally {
-            logger.error(prefix + " error", e);
         }
     }
 }

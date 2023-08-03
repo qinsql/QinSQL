@@ -5,6 +5,7 @@
  */
 package org.qinsql.bench.tpcc.bench;
 
+import java.sql.Connection;
 import java.text.DecimalFormat;
 
 import org.qinsql.bench.tpcc.config.TpccConfig;
@@ -14,6 +15,7 @@ import org.qinsql.bench.tpcc.util.Util;
 public class TpccBench extends TpccConfig {
 
     public static void main(String[] args) {
+        System.setProperty("lealone.server.cached.objects", "10000000");
         dumpInformation(args);
         TpccBench tpccBench = new TpccBench();
         tpccBench.parseArgs(args);
@@ -130,6 +132,8 @@ public class TpccBench extends TpccConfig {
         Util.seqInit(10, 10, 1, 1, 1);
     }
 
+    Connection[] connections;
+
     private void runBenchmark() {
 
         System.out.println("***************************************");
@@ -137,7 +141,10 @@ public class TpccBench extends TpccConfig {
         System.out.println("***************************************");
 
         init();
-
+        connections = new Connection[numConn];
+        for (int i = 0; i < numConn; i++) {
+            connections[i] = getConnection();
+        }
         // start threads
         startThreads();
 
@@ -145,9 +152,10 @@ public class TpccBench extends TpccConfig {
             // rampup time
             System.out.println();
             System.out.println("RAMPUP START.");
-            timeLapse(System.currentTimeMillis(), rampupTime);
+            // timeLapse(System.currentTimeMillis(), rampupTime);
             System.out.println("RAMPUP END.");
         }
+        // startThreads();
 
         // start counting
         counting_on = true;
@@ -157,7 +165,7 @@ public class TpccBench extends TpccConfig {
         System.out.println("MEASURING START.");
         // loop for the measure_time
         long startTime = System.currentTimeMillis();
-        timeLapse(startTime, measureTime);
+        // timeLapse(startTime, measureTime);
         System.out.println("MEASURING END.");
 
         // stop threads
@@ -173,7 +181,7 @@ public class TpccBench extends TpccConfig {
         System.out.println("STARTING TPCC THREADS");
         threads = new TpccThread[numConn];
         for (int i = 0; i < numConn; i++) {
-            threads[i] = new TpccThread(this, i, numWare, fetchSize, joins);
+            threads[i] = new TpccThread(connections[i], i, numWare, fetchSize, joins);
         }
         for (int i = 0; i < numConn; i++) {
             threads[i].start();
@@ -182,7 +190,7 @@ public class TpccBench extends TpccConfig {
     }
 
     private void stopThreads() {
-        stopped = true;
+        // stopped = true;
         try {
             for (int i = 0; i < numConn; i++) {
                 threads[i].join(30 * 1000);
@@ -231,7 +239,9 @@ public class TpccBench extends TpccConfig {
             }
         }
         for (int i = 0; i < TRANSACTION_COUNT; i++) {
-            avg_rt[i] = sum_rt[i] / (success[i] + late[i]);
+            int count = success[i] + late[i];
+            if (count > 0)
+                avg_rt[i] = sum_rt[i] / count;
         }
 
         /*
@@ -309,8 +319,16 @@ public class TpccBench extends TpccConfig {
         System.out.println();
         System.out.println("<TpmC>");
         System.out.println(tpcm + " TpmC");
+
+        long time = 0;
+        for (int t = 0; t < numConn; t++) {
+            TpccThread tt = threads[t];
+            time += tt.sum;
+        }
+        System.out.println("time: " + time / numConn / 100);
     }
 
+    @SuppressWarnings("unused")
     private static void timeLapse(long startTime, int endTime) {
         DecimalFormat df = new DecimalFormat("#,##0.0");
         long runTime = 0;

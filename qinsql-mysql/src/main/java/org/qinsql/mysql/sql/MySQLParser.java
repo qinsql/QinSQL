@@ -1101,9 +1101,7 @@ public class MySQLParser implements SQLParser {
             columns = parseColumnList(table);
             command.setColumns(columns);
         }
-        if (readIf("DIRECT")) {
-            command.setInsertFromSelect(true);
-        }
+        readIf("DIRECT"); // 兼容H2
         if (readIf("DEFAULT")) {
             read("VALUES");
             Expression[] expr = {};

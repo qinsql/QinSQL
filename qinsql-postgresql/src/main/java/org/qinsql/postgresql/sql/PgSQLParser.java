@@ -4670,13 +4670,8 @@ public class PgSQLParser implements SQLParser {
     }
 
     private TransactionStatement parseCheckpoint() {
-        TransactionStatement command;
-        if (readIf("SYNC")) {
-            command = new TransactionStatement(session, SQLStatement.CHECKPOINT_SYNC);
-        } else {
-            command = new TransactionStatement(session, SQLStatement.CHECKPOINT);
-        }
-        return command;
+        readIf("SYNC"); // 兼容原来的CHECKPOINT_SYNC命令
+        return new TransactionStatement(session, SQLStatement.CHECKPOINT);
     }
 
     private StatementBase parseAlter() {

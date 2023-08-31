@@ -353,8 +353,6 @@ public class MySQLParser implements SQLParser {
                     s = parseAlter();
                 } else if (readIf("ANALYZE")) {
                     s = parseAnalyze();
-                } else if (readIf("ADMIN")) {
-                    s = parseAdmin();
                 }
                 break;
             case 'b':
@@ -564,21 +562,6 @@ public class MySQLParser implements SQLParser {
         return command;
     }
 
-    private StatementBase parseAdmin() {
-        if (readIf("SHUTDOWN")) {
-            return parseShutdownServer();
-        } else {
-            throw getSyntaxError();
-        }
-
-    }
-
-    private StatementBase parseShutdownServer() {
-        read("SERVER");
-        int port = readInt();
-        return new ShutdownServer(session, port);
-    }
-
     private TransactionStatement parseBegin() {
         TransactionStatement command;
         if (!readIf("WORK")) {
@@ -600,18 +583,30 @@ public class MySQLParser implements SQLParser {
         return command;
     }
 
-    private ShutdownDatabase parseShutdown() {
-        int type = SQLStatement.SHUTDOWN;
-        if (readIf("IMMEDIATELY")) {
-            type = SQLStatement.SHUTDOWN_IMMEDIATELY;
-        } else if (readIf("COMPACT")) {
-            type = SQLStatement.SHUTDOWN_COMPACT;
-        } else if (readIf("DEFRAG")) {
-            type = SQLStatement.SHUTDOWN_DEFRAG;
+    private StatementBase parseShutdown() {
+        if (readIf("SERVER")) {
+            return parseShutdownServer();
         } else {
-            readIf("SCRIPT");
+            return parseShutdownDatabase();
         }
-        return new ShutdownDatabase(session, type);
+    }
+
+    private StatementBase parseShutdownServer() {
+        int port;
+        if (currentTokenType == END || isToken(";")) {
+            port = -1;
+        } else {
+            port = readInt();
+        }
+        return new ShutdownServer(session, port);
+    }
+
+    private StatementBase parseShutdownDatabase() {
+        read("DATABASE");
+        String dbName = readUniqueIdentifier();
+        Database db = LealoneDatabase.getInstance().getDatabase(dbName);
+        boolean immediately = readIf("IMMEDIATELY");
+        return new ShutdownDatabase(session, db, immediately);
     }
 
     private TransactionStatement parseRollback() {

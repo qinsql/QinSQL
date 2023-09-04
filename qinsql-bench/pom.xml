@@ -65,7 +65,7 @@
             <groupId>com.datastax.oss</groupId>
             <artifactId>java-driver-core</artifactId>
             <version>4.14.1</version>
-        </dependency>
+        </dependency>--> 
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-reactivestreams</artifactId>
-            <version>4.9.0</version>
-        </dependency>-->
+            <version>4.3.0</version>
+        </dependency>
     </dependencies>
 </project>

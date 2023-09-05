@@ -42,7 +42,7 @@ public abstract class MongodbAsyncBTest {
 
     void createMongoClients() {
         String connectionString = "mongodb://127.0.0.1:27017";
-        // connectionString = "mongodb://127.0.0.1:27017/?maxPoolSize=48&&minpoolsize=12";
+        connectionString += "/?maxPoolSize=" + threadCount + "&&minPoolSize=" + (threadCount / 2);
         mongoClients = new MongoClient[clientCount];
         for (int i = 0; i < clientCount; i++) {
             mongoClients[i] = MongoClients.create(connectionString);
@@ -126,7 +126,7 @@ public abstract class MongodbAsyncBTest {
                 e.printStackTrace();
             }
         }
-        System.out.println(getClass().getSimpleName() + "thread count: " + (threadCount)
+        System.out.println(getClass().getSimpleName() + " thread count: " + (threadCount)
                 + ", document count: " + (threadCount * innerLoop) + ", total time: "
                 + totalTime.get() / 1000 / 1000 / threadCount + " ms");
     }

@@ -23,7 +23,7 @@ public class PageStorageModeSqlBTest extends SqlTestBase {
 
     int rowCount = 6000;
     int columnCount = 20;
-    int pageSplitSize = 1024 * 1024;
+    int pageSize = 1024 * 1024;
 
     // @Test
     public void run() throws Exception {

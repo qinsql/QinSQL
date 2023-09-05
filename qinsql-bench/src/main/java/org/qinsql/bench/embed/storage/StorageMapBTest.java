@@ -152,16 +152,16 @@ public abstract class StorageMapBTest extends EmbeddedBTest {
     protected void openStorage() {
         AOStorageBuilder builder = new AOStorageBuilder(config, pohFactory);
         storagePath = joinDirs("lealone", "aose");
-        int pageSplitSize = 16 * 1024;
-        pageSplitSize = 2 * 1024;
-        pageSplitSize = 4 * 1024; // 最优
-        // pageSplitSize = 6 * 1024;
-        // pageSplitSize = 8 * 1024;
-        // pageSplitSize = 1 * 1024;
-        // pageSplitSize = 1024 / 2 / 2;
-        // pageSplitSize = 32 * 1024;
-        // pageSplitSize = 512 * 1024;
-        builder.storagePath(storagePath).compress().pageSplitSize(pageSplitSize).minFillRate(30);
+        int pageSize = 16 * 1024;
+        pageSize = 2 * 1024;
+        pageSize = 4 * 1024; // 最优
+        // pageSize = 6 * 1024;
+        // pageSize = 8 * 1024;
+        // pageSize = 1 * 1024;
+        // pageSize = 1024 / 2 / 2;
+        // pageSize = 32 * 1024;
+        // pageSize = 512 * 1024;
+        builder.storagePath(storagePath).compress().pageSize(pageSize).minFillRate(30);
         storage = builder.openStorage();
     }
 

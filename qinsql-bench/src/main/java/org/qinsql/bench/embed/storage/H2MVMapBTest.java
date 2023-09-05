@@ -22,7 +22,7 @@ public class H2MVMapBTest extends StorageMapBTest {
         if (!inited.compareAndSet(false, true))
             return;
         Builder builder = new Builder();
-        // builder.pageSplitSize(4 * 1024);
+        // builder.pageSize(4 * 1024);
         // builder.keysPerPage(128);
         // builder.keysPerPage(24);
         // builder.keysPerPage(60); // 默认48，也是效果最优的

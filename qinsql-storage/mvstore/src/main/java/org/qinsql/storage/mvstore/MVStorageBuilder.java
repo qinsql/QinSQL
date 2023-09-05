@@ -73,8 +73,8 @@ public class MVStorageBuilder extends StorageBuilder {
     }
 
     @Override
-    public StorageBuilder pageSplitSize(int pageSplitSize) {
-        builder.pageSplitSize(pageSplitSize);
-        return super.pageSplitSize(pageSplitSize);
+    public StorageBuilder pageSize(int pageSize) {
+        builder.pageSplitSize(pageSize);
+        return super.pageSize(pageSize);
     }
 }

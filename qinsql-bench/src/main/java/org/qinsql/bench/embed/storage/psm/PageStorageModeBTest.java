@@ -31,7 +31,7 @@ public class PageStorageModeBTest extends TestBase {
 
     int rowCount = 6000;
     int columnCount = 10;
-    int pageSplitSize = 1024 * 1024;
+    int pageSize = 1024 * 1024;
     int cacheSize = 100 * 1024 * 1024; // 100M
 
     public void run() {
@@ -79,7 +79,7 @@ public class PageStorageModeBTest extends TestBase {
     void testRowStorage(ValueDataType keyType, TransactionalValueType tvType) {
         long t0 = System.currentTimeMillis();
         long t1 = System.currentTimeMillis();
-        AOStorage storage = AOStorageTest.openStorage(pageSplitSize, cacheSize);
+        AOStorage storage = AOStorageTest.openStorage(pageSize, cacheSize);
         BTreeMap<ValueLong, TransactionalValue> map = storage.openBTreeMap("testRowStorage", keyType,
                 tvType, null);
         map.setPageStorageMode(PageStorageMode.ROW_STORAGE);
@@ -118,7 +118,7 @@ public class PageStorageModeBTest extends TestBase {
     void testColumnStorage(ValueDataType keyType, TransactionalValueType tvType) {
         long t0 = System.currentTimeMillis();
         long t1 = System.currentTimeMillis();
-        AOStorage storage = AOStorageTest.openStorage(pageSplitSize);
+        AOStorage storage = AOStorageTest.openStorage(pageSize);
         BTreeMap<ValueLong, TransactionalValue> map = storage.openBTreeMap("testColumnStorage", keyType,
                 tvType, null);
         map.setPageStorageMode(PageStorageMode.COLUMN_STORAGE);

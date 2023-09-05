@@ -26,7 +26,7 @@ public abstract class InsertBTest extends ClientServerWriteBTest {
         Statement statement = conn.createStatement();
         statement.executeUpdate("drop table if exists InsertBTest");
         String sql = "create table if not exists InsertBTest(pk int primary key, f1 int)"
-                + " parameters(page_split_size='8k')";
+                + " parameters(page_size='8k')";
         sql = "create table if not exists InsertBTest(pk int primary key, f1 int)";
         statement.executeUpdate(sql);
         close(statement, conn);

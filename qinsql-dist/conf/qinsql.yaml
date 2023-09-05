@@ -10,7 +10,7 @@ storage_engines:
   - name: AOSE
     enabled: true
     parameters: {
-        page_split_size: 16k,
+        page_size: 16k,
         compress: no, # no、lzf、deflate 或 0、1、2
     }
 

@@ -147,7 +147,7 @@ public abstract class ClientServerWriteBTest extends ClientServerBTest {
             printInnerLoopResult(t1);
         }
 
-        private void printInnerLoopResult(long t1) {
+        protected void printInnerLoopResult(long t1) {
             if (printInnerLoopResult) {
                 long t2 = System.nanoTime();
                 System.out.println(getBTestName() + " sql count: " + (innerLoop * sqlCountPerInnerLoop) //

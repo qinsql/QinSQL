@@ -75,8 +75,10 @@ public class TpccThread extends Thread implements TpccConstants {
     private final Slev slev;
 
     public long start, stop, sum;
+    private TpccBench tb;
 
-    public TpccThread(Connection conn, int t_num, int num_ware, int fetchSize, boolean joins) {
+    public TpccThread(Connection conn, int t_num, int num_ware, int fetchSize, boolean joins,
+            TpccBench tb) {
         super("tcpp-thread-" + (t_num + 1));
         for (int i = 0; i < TRANSACTION_COUNT; i++) {
             min_rt[i] = Long.MAX_VALUE;
@@ -99,54 +101,55 @@ public class TpccThread extends Thread implements TpccConstants {
         } catch (Throwable t) {
             throw new RuntimeException("Error initializing TpccThread", t);
         }
+        this.tb = tb;
     }
 
     @Override
     public void run() {
         try {
-            for (int i = 0; i < 200; i++) {
-                // start = System.currentTimeMillis();
-                runTransaction();
-                // stop = System.currentTimeMillis();
-                // System.out.println("time: " + (stop - start));
-            }
-            for (int j = 0; j < 100; j++) {
-                start = System.currentTimeMillis();
-                for (int i = 0; i < 10; i++) {
+            if (tb.isTimeMeasure()) {
+                while (!TpccBench.stopped) {
                     runTransaction();
                 }
-                stop = System.currentTimeMillis();
-                sum += (stop - start);
-                System.out.println("time: " + (stop - start));
+            } else {
+                int rampupTransactions = tb.getRampupTransactions();
+                for (int i = 0; i < rampupTransactions; i++) {
+                    runTransaction();
+                }
+                int measureTransactions = tb.getMeasureTransactions();
+                int count = measureTransactions / 10;
+                for (int j = 0; j < count; j++) {
+                    start = System.currentTimeMillis();
+                    for (int i = 0; i < 10; i++) {
+                        runTransaction();
+                    }
+                    stop = System.currentTimeMillis();
+                    sum += (stop - start);
+                    System.out.println("time: " + (stop - start));
+                }
             }
-
         } catch (Throwable e) {
             logger.error("Unhandled exception", e);
         }
     }
 
-    private int runTransaction() {
-        // while (!TpccBench.stopped) {
-        for (int i = 0; i < 1; i++) {
-            int sequence = Util.seqGet();
+    private void runTransaction() {
+        int sequence = Util.seqGet();
+        try {
+            if (DETECT_LOCK_WAIT_TIMEOUTS) {
+                detectLockWaitTimeouts(sequence);
+            } else {
+                doNextTransaction(sequence);
+            }
+        } catch (Throwable th) {
+            logger.error("FAILED", th);
+            TpccBench.stopped = true;
             try {
-                if (DETECT_LOCK_WAIT_TIMEOUTS) {
-                    detectLockWaitTimeouts(sequence);
-                } else {
-                    doNextTransaction(sequence);
-                }
-            } catch (Throwable th) {
-                logger.error("FAILED", th);
-                TpccBench.stopped = true;
-                try {
-                    conn.rollback();
-                } catch (SQLException e) {
-                    logger.error("", e);
-                }
-                return -1;
+                conn.rollback();
+            } catch (SQLException e) {
+                logger.error("", e);
             }
         }
-        return 0;
     }
 
     private final Executor exec = Executors.newSingleThreadExecutor();
@@ -342,6 +345,7 @@ public class TpccThread extends Thread implements TpccConstants {
         int level = Util.randomNumber(10, 20);
         long beginTime = System.currentTimeMillis();
         for (int i = 0; i < MAX_RETRY; i++) {
+            // slev.slev_ps_async(w_id, d_id, level, beginTime, this);
             // int result = slev.slev(w_id, d_id, level);
             int result = slev.slev_ps(w_id, d_id, level);
             if (handleResult(beginTime, result, 4)) {
@@ -351,7 +355,7 @@ public class TpccThread extends Thread implements TpccConstants {
         handleResult2(4);
     }
 
-    private boolean handleResult(long beginTime, int result, int tIndex) {
+    public boolean handleResult(long beginTime, int result, int tIndex) {
         if (result >= 1) {
             if (TpccBench.counting_on) {
                 long rt = System.currentTimeMillis() - beginTime;

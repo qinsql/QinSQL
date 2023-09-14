@@ -37,8 +37,11 @@ public class TpccBench extends TpccConfig {
     public static volatile boolean stopped = false;
     public static volatile boolean counting_on = false;
 
+    private int measureType;
     private int rampupTime;
     private int measureTime;
+    private int rampupTransactions;
+    private int measureTransactions;
     private boolean joins;
 
     private TpccThread[] threads;
@@ -47,11 +50,29 @@ public class TpccBench extends TpccConfig {
         // Empty.
     }
 
+    public boolean isTimeMeasure() {
+        return measureType == 0;
+    }
+
+    public int getRampupTransactions() {
+        return rampupTransactions;
+    }
+
+    public int getMeasureTransactions() {
+        return measureTransactions;
+    }
+
     private void parseArgs(String[] args) {
         if (args.length == 0) {
             loadConfig();
-            rampupTime = getIntProperty(RAMPUP_TIME);
-            measureTime = getIntProperty(MEASURE_TIME);
+            measureType = getIntProperty("measure_type");
+            if (isTimeMeasure()) {
+                rampupTime = getIntProperty(RAMPUP_TIME);
+                measureTime = getIntProperty(MEASURE_TIME);
+            } else {
+                rampupTransactions = getIntProperty("measure__transactions");
+                measureTransactions = getIntProperty("measure__transactions");
+            }
             joins = Boolean.parseBoolean(properties.getProperty(JOINS));
         } else {
             if ((args.length % 2) != 0) {
@@ -152,10 +173,10 @@ public class TpccBench extends TpccConfig {
             // rampup time
             System.out.println();
             System.out.println("RAMPUP START.");
-            // timeLapse(System.currentTimeMillis(), rampupTime);
+            if (isTimeMeasure())
+                timeLapse(System.currentTimeMillis(), rampupTime);
             System.out.println("RAMPUP END.");
         }
-        // startThreads();
 
         // start counting
         counting_on = true;
@@ -165,7 +186,8 @@ public class TpccBench extends TpccConfig {
         System.out.println("MEASURING START.");
         // loop for the measure_time
         long startTime = System.currentTimeMillis();
-        // timeLapse(startTime, measureTime);
+        if (isTimeMeasure())
+            timeLapse(startTime, measureTime);
         System.out.println("MEASURING END.");
 
         // stop threads
@@ -181,7 +203,7 @@ public class TpccBench extends TpccConfig {
         System.out.println("STARTING TPCC THREADS");
         threads = new TpccThread[numConn];
         for (int i = 0; i < numConn; i++) {
-            threads[i] = new TpccThread(connections[i], i, numWare, fetchSize, joins);
+            threads[i] = new TpccThread(connections[i], i, numWare, fetchSize, joins, this);
         }
         for (int i = 0; i < numConn; i++) {
             threads[i].start();
@@ -190,7 +212,7 @@ public class TpccBench extends TpccConfig {
     }
 
     private void stopThreads() {
-        // stopped = true;
+        stopped = true;
         try {
             for (int i = 0; i < numConn; i++) {
                 threads[i].join(30 * 1000);
@@ -320,15 +342,16 @@ public class TpccBench extends TpccConfig {
         System.out.println("<TpmC>");
         System.out.println(tpcm + " TpmC");
 
-        long time = 0;
-        for (int t = 0; t < numConn; t++) {
-            TpccThread tt = threads[t];
-            time += tt.sum;
+        if (!isTimeMeasure()) {
+            long time = 0;
+            for (int t = 0; t < numConn; t++) {
+                TpccThread tt = threads[t];
+                time += tt.sum;
+            }
+            System.out.println("time: " + time / numConn / (measureTransactions / 10));
         }
-        System.out.println("time: " + time / numConn / 100);
     }
 
-    @SuppressWarnings("unused")
     private static void timeLapse(long startTime, int endTime) {
         DecimalFormat df = new DecimalFormat("#,##0.0");
         long runTime = 0;

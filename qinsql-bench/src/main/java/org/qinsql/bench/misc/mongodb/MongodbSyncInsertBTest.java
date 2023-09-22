@@ -17,7 +17,7 @@ public class MongodbSyncInsertBTest extends MongodbSyncBTest {
     private final static AtomicInteger id = new AtomicInteger();
 
     public static void main(String[] args) {
-        new MongodbSyncInsertBTest().run();
+        new MongodbSyncInsertBTest().run(27017);
     }
 
     @Override

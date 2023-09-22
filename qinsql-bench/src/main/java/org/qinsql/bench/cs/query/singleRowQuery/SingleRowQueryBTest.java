@@ -58,7 +58,7 @@ public abstract class SingleRowQueryBTest extends ClientServerQueryBTest {
 
         @Override
         protected String nextSql() {
-            return "select * from SingleRowQueryBTest where pk=" + random.nextInt(rowCount);
+            return "select * from SingleRowQueryBTest where f1=" + random.nextInt(rowCount);
         }
 
         @Override

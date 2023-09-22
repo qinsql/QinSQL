@@ -29,8 +29,8 @@ public abstract class MongodbSyncBTest {
     void afterBenchTest() {
     }
 
-    void run() {
-        createMongoClients();
+    void run(int port) {
+        createMongoClients(port);
         beforeBenchTest();
         for (int i = 0; i < outerLoop; i++) {
             benchTest();
@@ -39,8 +39,8 @@ public abstract class MongodbSyncBTest {
         closeMongoClients();
     }
 
-    void createMongoClients() {
-        String connectionString = "mongodb://127.0.0.1:27017";
+    void createMongoClients(int port) {
+        String connectionString = "mongodb://127.0.0.1:" + port;
         connectionString += "/?maxPoolSize=" + threadCount + "&&minPoolSize=" + (threadCount / 2);
         mongoClients = new MongoClient[clientCount];
         for (int i = 0; i < clientCount; i++) {

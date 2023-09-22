@@ -17,7 +17,7 @@ import com.mongodb.client.model.Filters;
 public class MongodbSyncSingleRowQueryBTest extends MongodbSyncBTest {
 
     public static void main(String[] args) {
-        new MongodbSyncSingleRowQueryBTest().run();
+        new MongodbSyncSingleRowQueryBTest().run(27017);
     }
 
     private final static AtomicInteger id = new AtomicInteger();
@@ -29,6 +29,7 @@ public class MongodbSyncSingleRowQueryBTest extends MongodbSyncBTest {
         threadCount = 16;
         innerLoop = 250;
         MongoCollection<Document> collection = getCollection(0);
+        // collection.drop();
         if (collection.countDocuments() <= 0)
             insert(collection);
         // query(collection);
@@ -36,7 +37,7 @@ public class MongodbSyncSingleRowQueryBTest extends MongodbSyncBTest {
 
     void insert(MongoCollection<Document> collection) {
         for (int i = 0; i < rowCount; i++) {
-            Document doc1 = new Document("_id", id.incrementAndGet()).append("f1", 1);
+            Document doc1 = new Document("_id", id.incrementAndGet()).append("f1", i);
             collection.insertOne(doc1);
         }
         System.out.println("total document count: " + collection.countDocuments());
@@ -55,7 +56,7 @@ public class MongodbSyncSingleRowQueryBTest extends MongodbSyncBTest {
 
     @Override
     void execute(MongoCollection<Document> collection) {
-        MongoCursor<Document> cursor = collection.find(Filters.eq("_id", random.nextInt(rowCount)))
+        MongoCursor<Document> cursor = collection.find(Filters.eq("f1", random.nextInt(rowCount)))
                 .iterator();
         try {
             while (cursor.hasNext()) {

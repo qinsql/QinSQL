@@ -23,15 +23,5 @@
             <artifactId>qinsql-olap</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.qinsql</groupId>
-            <artifactId>qinsql-mysql</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.qinsql</groupId>
-            <artifactId>qinsql-postgresql</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
 </project>

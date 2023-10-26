@@ -2,12 +2,6 @@
 
 QinSQL 是一个基于 [Lealone](https://github.com/lealone/Lealone) 的可暂停的渐进式 OLAP 引擎
 
-可以使用 MySQL 或 PostgreSQL 的协议和 SQL 语法访问 Lealone 数据库
-
-MySQL 协议版本支持 5.x 到 8.x 系列
-
-PostgreSQL JDBC Driver 支持 9.x 和 42.x 两个系列版本
-
 
 ## 编译需要
 
@@ -38,92 +32,26 @@ PostgreSQL JDBC Driver 支持 9.x 和 42.x 两个系列版本
 
 ## 运行 QinSQL
 
-进入 `qinsql\target\qinsql-5.2.0\bin` 目录，运行: `qinsql`
+进入 `qinsql\target\qinsql-6.0.0-SNAPSHOT\bin` 目录，运行: `qinsql`
 
-或者进入 `qinsql\target` 目录，运行: `java -jar qinsql-5.2.0.jar`
+或者进入 `qinsql\target` 目录，运行: `java -jar qinsql-6.0.0-SNAPSHOT.jar`
 
 ```java
-INFO 09:12:13.384 Lealone version: 5.2.0
-INFO 09:12:13.392 Loading config from file:/E:/qinsql/target/qinsql-5.2.0/conf/qinsql.yaml
-INFO 09:12:13.444 Base dir: E:/qinsql/target/qinsql-5.2.0/data
-INFO 09:12:13.450 Init storage engines: 3 ms
-INFO 09:12:13.474 Init transaction engines: 23 ms
-INFO 09:12:13.477 Init sql engines: 2 ms
-INFO 09:12:13.650 Init protocol server engines: 171 ms
-INFO 09:12:13.651 Init lealone database: 0 ms
-INFO 09:12:13.655 Starting TcpServer accepter
-INFO 09:12:13.657 TcpServer started, host: 127.0.0.1, port: 9210
-INFO 09:12:13.657 Starting MySQLServer accepter
-INFO 09:12:13.658 MySQLServer started, host: 127.0.0.1, port: 9310
-INFO 09:12:13.659 Starting PgServer accepter
-INFO 09:12:13.659 PgServer started, host: 127.0.0.1, port: 9510
-INFO 09:12:13.659 Total time: 272 ms (Load config: 57 ms, Init: 208 ms, Start: 7 ms)
-INFO 09:12:13.660 Exit with Ctrl+C
+INFO 08:50:14.554 Lealone version: 6.0.0-SNAPSHOT
+INFO 08:50:14.561 Loading config from file:/E:/qinsql/qinsql-test/target/test-classes/qinsql-test.yaml
+INFO 08:50:14.611 Base dir: E:/qinsql/qinsql-test/target/test-data
+INFO 08:50:14.619 Init storage engines: 5 ms
+INFO 08:50:14.654 Init transaction engines: 35 ms
+INFO 08:50:14.660 Init sql engines: 6 ms
+INFO 08:50:14.835 Init protocol server engines: 174 ms
+INFO 08:50:14.836 Init lealone database: 0 ms
+INFO 08:50:14.837 TcpServer started, host: 127.0.0.1, port: 9210
+INFO 08:50:14.838 MongoServer started, host: 127.0.0.1, port: 27017
+INFO 08:50:14.841 MySQLServer started, host: 127.0.0.1, port: 3306
+INFO 08:50:14.841 PgServer started, host: 127.0.0.1, port: 5432
+INFO 08:50:14.842 Total time: 286 ms (Load config: 54 ms, Init: 226 ms, Start: 6 ms)
+INFO 08:50:14.842 Exit with Ctrl+C
 ```
-
-## 用 MySQL 客户端访问 QinSQL
-
-执行以下命令启动 MySQL 客户端:
-
-`mysql --no-beep -h 127.0.0.1 -P 9310 -u root`
-
-```sql
-Welcome to the MySQL monitor.  Commands end with ; or \g.
-Your MySQL connection id is 0
-Server version: 5.1.48-lealone-5.2.0
-
-Copyright (c) 2000, 2013, Oracle and/or its affiliates. All rights reserved.
-
-Oracle is a registered trademark of Oracle Corporation and/or its
-affiliates. Other names may be trademarks of their respective
-owners.
-
-Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
-
-mysql> create table if not exists pet(name varchar(20), age int);
-Query OK, 0 rows affected (0.00 sec)
-
-mysql> insert into pet values('pet1', 2);
-Query OK, 1 row affected (0.01 sec)
-
-mysql> select count(*) from pet;
-+----------+
-| COUNT(*) |
-+----------+
-|        1 |
-+----------+
-1 row in set (0.01 sec)
-
-mysql>
-```
-
-
-## 用 PostgreSQL 客户端访问 QinSQL
-
-执行以下命令启动 PostgreSQL 客户端:
-
-`psql -h 127.0.0.1 -p 9510 -U postgres -W`
-
-提示口令时输入: postgres
-
-```sql
-口令:
-psql (14.0, 服务器 8.2.23)
-输入 "help" 来获取帮助信息.
-
-postgres=> create table if not exists pet(name varchar(20), age int);
-UPDATE 0
-postgres=> insert into pet values('pet1', 2);
-CommandInterfaceINSERT 0 1
-postgres=> select count(*) from pet;
- count(*)
-----------
-        1
-(1 行记录)
-
-postgres=>
-```
-
 
 ## 在 IDE 中运行
 

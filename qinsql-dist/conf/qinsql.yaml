@@ -29,47 +29,14 @@ sql_engines:
         # key1: v1,
         # key2: v2,
     }
-  - name: MySQL
-    enabled: true
-    parameters: {
-        # key1: v1,
-        # key2: v2,
-    }
-  - name: PostgreSQL
-    enabled: true
-    parameters: {
-        # key1: v1,
-        # key2: v2,
-    }
 
 protocol_server_engines:
   - name: TCP
     enabled: true
     parameters: {
         port: 9210,
-        trace: false,
         allow_others: true,
         # white_list: "127.0.0.4,127.0.0.2",
-        daemon: false,
-        net_factory_name: nio, # 网络层默认用nio来实现
         ssl: false,
         session_timeout: -1
-    }
-  - name: MySQL
-    enabled: true
-    parameters: {
-        port: 9310,
-        trace: false,
-        allow_others: true,
-        daemon: false,
-        ssl: false
-    }
-  - name: PostgreSQL
-    enabled: true
-    parameters: {
-        port: 9510,
-        trace: false,
-        allow_others: true,
-        daemon: false,
-        ssl: false
     }

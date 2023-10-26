@@ -32,4 +32,9 @@ public class LocalFileStorage extends StorageBase {
     public boolean isInMemory() {
         return true;
     }
+
+    @Override
+    public String getStorageName() {
+        return LocalFileStorageEngine.NAME;
+    }
 }

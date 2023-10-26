@@ -42,4 +42,9 @@ public class MemoryStorage extends StorageBase {
     public boolean isInMemory() {
         return true;
     }
+
+    @Override
+    public String getStorageName() {
+        return MemoryStorageEngine.NAME;
+    }
 }

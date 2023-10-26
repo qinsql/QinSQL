@@ -32,4 +32,9 @@ public class HdfsStorage extends StorageBase {
     public boolean isInMemory() {
         return true;
     }
+
+    @Override
+    public String getStorageName() {
+        return HdfsStorageEngine.NAME;
+    }
 }

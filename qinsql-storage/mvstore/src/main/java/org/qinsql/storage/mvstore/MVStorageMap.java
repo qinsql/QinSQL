@@ -19,6 +19,7 @@ package org.qinsql.storage.mvstore;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+import org.lealone.db.value.ValueLong;
 import org.lealone.storage.CursorParameters;
 import org.lealone.storage.Storage;
 import org.lealone.storage.StorageMapBase;
@@ -165,5 +166,13 @@ public class MVStorageMap<K, V> extends StorageMapBase<K, V> {
         MVStore store = mvMap.getStore();
         if (!store.isClosed())
             store.commit();
+    }
+
+    @Override
+    public K append(V value) {
+        @SuppressWarnings("unchecked")
+        K k = (K) ValueLong.get(mvMap.size() + 1);
+        mvMap.append(k, value);
+        return k;
     }
 }

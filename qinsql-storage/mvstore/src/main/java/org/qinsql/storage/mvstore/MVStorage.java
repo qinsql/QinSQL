@@ -62,4 +62,9 @@ public class MVStorage extends StorageBase {
         super.closeImmediately();
         mvStore.closeImmediately();
     }
+
+    @Override
+    public String getStorageName() {
+        return MVStorageEngine.NAME;
+    }
 }

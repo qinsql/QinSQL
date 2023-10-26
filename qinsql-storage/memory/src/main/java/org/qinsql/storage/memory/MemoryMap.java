@@ -8,6 +8,7 @@ package org.qinsql.storage.memory;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ConcurrentSkipListMap;
 
+import org.lealone.db.value.ValueLong;
 import org.lealone.storage.CursorParameters;
 import org.lealone.storage.StorageMapBase;
 import org.lealone.storage.StorageMapCursor;
@@ -185,5 +186,13 @@ public class MemoryMap<K, V> extends StorageMapBase<K, V> {
 
     @Override
     public void save() {
+    }
+
+    @Override
+    public K append(V value) {
+        @SuppressWarnings("unchecked")
+        K k = (K) ValueLong.get(skipListMap.size() + 1);
+        skipListMap.put(k, value);
+        return k;
     }
 }

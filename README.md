@@ -1,3 +1,5 @@
+# 此项目已经迁移到 [lealone-olap](https://github.com/lealone-plugins/lealone-olap)
+
 # QinSQL
 
 QinSQL 是一个基于 [Lealone](https://github.com/lealone/Lealone) 的可暂停的渐进式 OLAP 引擎
